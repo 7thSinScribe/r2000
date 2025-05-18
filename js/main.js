@@ -213,7 +213,7 @@ Type "exit" or "back" to return to main terminal
     setTerminalInput('');
   };
   
-  // FIXED LOG LOADING FUNCTION - Using the path data/logs/log_076_digital_entities.md
+  // FIXED LOG LOADING FUNCTION - Removed .md extension
   const showSpecificLog = async (day) => {
     const dayNumber = parseInt(day);
     
@@ -241,8 +241,8 @@ Type "exit" or "back" to return to main terminal
         // Format the title for use in the filename
         const formattedTitle = logInfo.title.toLowerCase().replace(/\s+/g, '_');
         
-        // Construct the filename using the exact format in the error message
-        const filename = `data/logs/log_${paddedDay}_${formattedTitle}.md`;
+        // Construct the filename without .md extension
+        const filename = `data/logs/log_${paddedDay}_${formattedTitle}`;
         
         // Add loading indicator
         addToTerminalHistory({ 
@@ -285,7 +285,7 @@ Type "exit" or "back" to return to main terminal
             
 Attempted to load: ${filename}
 
-Please make sure the file exists at data/logs/log_${paddedDay}_${formattedTitle}.md`
+Please make sure the file exists at data/logs/log_${paddedDay}_${formattedTitle} (without .md extension)`
           });
         }
       } else {
