@@ -168,7 +168,6 @@ const SurvivorOSTerminal = () => {
     });
   };
 
-  // Modified displayLog function to handle GitHub Pages path correctly
   const displayLog = async (logNumber) => {
     try {
       // Find the log with matching day number
@@ -178,71 +177,51 @@ const SurvivorOSTerminal = () => {
         throw new Error(`Log ${logNumber} not found`);
       }
       
-      // Define log content variable
+      // Use the same exact path pattern that works for quickstart
+      const logPath = getFilePath(`/data/log${logNumber}.md`);
+      console.log(`Trying to fetch log from: ${logPath}`);
+      
       let logContent = null;
-      let foundPath = null;
       
-      // Try both potential locations with correct base path
-      const potentialPaths = [
-        `/data/log_${logNumber}.md`,
-        `/data/logs/log_${logNumber}_${log.title.toLowerCase()}.md`,
-      ];
-      
-      // Try each path with the basePath added
-      for (const path of potentialPaths) {
-        try {
-          const fullPath = getFilePath(path);
-          console.log(`Trying to fetch from: ${fullPath}`);
-          
-          const response = await fetch(fullPath);
-          if (response.ok) {
-            logContent = await response.text();
-            foundPath = fullPath;
-            console.log(`Successfully loaded log from ${fullPath}`);
-            break;
-          }
-        } catch (error) {
-          console.log(`Failed to fetch from ${path}`);
-        }
-      }
-      
-      // If we couldn't load the log, use the hardcoded content
-      if (!logContent) {
-        console.log("All log fetch attempts failed. Using hardcoded content.");
-        
-        // Only include hardcoded content for log 76 since that's the one we know exists
-        if (logNumber === 76) {
-          logContent = `---
-day: 76
-title: "Digital Entities"
-author: "[REDACTED]"
----
->>> PERSONAL LOG: Digital Entities
->>> DAY 76
-
-Nearly lost it today. Was rummaging through an abandoned N-Co shop when my torch died. Just like that - full charge to nothing in seconds. Could have sworn I heard something moving, but couldn't see a bloody thing.
-
-Then I remembered the RogueVision AR goggles I'd pocketed earlier. Put them on and there it was. A glowing blue... thing. Sort of like a jellyfish crossed with a lightning bolt. Some kind of pure digital entity, existing right there in physical space but completely invisible without the goggles.
-
-It was draining the electricity from anything I had powered up. My watch stopped. Phone died. Even the little LED keychain went dark. Could actually see little streams of energy (the goggles visualize it as blue particles) flowing from my devices into the creature.
-
-Key findings about pure digital entities:
-- Invisible without AR glasses/goggles
-- Can't physically touch or harm you
-- Drain "Watts" from any powered device (measured the drain at about 10W/second)
-- Can deliver stun attacks that temporarily paralyze
-- Vulnerable to electrical surges, EM pulses, etc.
-- No blood or physical components - just disrupt their pattern enough and they dissipate
-
-Think I'll call these ones "Parasparks" - they seem to feed on electricity and resemble sparks of energy. Need to be careful about battery management in areas they inhabit.`;
-          
-          // Add a notice that this is fallback content
-          addToTerminalHistory({ 
-            type: 'output', 
-            text: `NOTE: Displaying cached version of Log ${log.day}. Network issues prevented loading the full log.`
-          });
+      try {
+        const response = await fetch(logPath);
+        if (response.ok) {
+          logContent = await response.text();
+          console.log(`Successfully loaded log from ${logPath}`);
         } else {
-          throw new Error(`Could not load log ${logNumber}. File may be missing.`);
+          throw new Error(`Failed to fetch from ${logPath}`);
+        }
+      } catch (error) {
+        console.log(`Failed to fetch from ${logPath}`);
+        
+        // Fallback for log 76 only
+        if (logNumber === 76) {
+          console.log("Using hardcoded content as fallback");
+          logContent = `--- 
+  day: 76
+  title: "Digital Entities"
+  author: "[REDACTED]"
+  ---
+  >>> PERSONAL LOG: Digital Entities
+  >>> DAY 76
+  
+  Nearly lost it today. Was rummaging through an abandoned N-Co shop when my torch died. Just like that - full charge to nothing in seconds. Could have sworn I heard something moving, but couldn't see a bloody thing.
+  
+  Then I remembered the RogueVision AR goggles I'd pocketed earlier. Put them on and there it was. A glowing blue... thing. Sort of like a jellyfish crossed with a lightning bolt. Some kind of pure digital entity, existing right there in physical space but completely invisible without the goggles.
+  
+  It was draining the electricity from anything I had powered up. My watch stopped. Phone died. Even the little LED keychain went dark. Could actually see little streams of energy (the goggles visualize it as blue particles) flowing from my devices into the creature.
+  
+  Key findings about pure digital entities:
+  - Invisible without AR glasses/goggles
+  - Can't physically touch or harm you
+  - Drain "Watts" from any powered device (measured the drain at about 10W/second)
+  - Can deliver stun attacks that temporarily paralyze
+  - Vulnerable to electrical surges, EM pulses, etc.
+  - No blood or physical components - just disrupt their pattern enough and they dissipate
+  
+  Think I'll call these ones "Parasparks" - they seem to feed on electricity and resemble sparks of energy. Need to be careful about battery management in areas they inhabit.`;
+        } else {
+          throw error;
         }
       }
       
@@ -257,7 +236,7 @@ Think I'll call these ones "Parasparks" - they seem to feed on electricity and r
       console.error("Error loading log:", error);
       addToTerminalHistory({ 
         type: 'output', 
-        text: `ERROR: Could not load log ${logNumber}. File may be corrupted or missing.\n\nYou can try again or type EXIT to return to the main terminal.`
+        text: `ERROR: Could not load log ${logNumber}. File may be corrupted or missing.`
       });
       
       // Show logs list again
