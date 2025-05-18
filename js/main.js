@@ -22,9 +22,7 @@ const SurvivorOSTerminal = () => {
   // Survivor logs - simplified
   const [survivorLogs, setSurvivorLogs] = useState({
     active: false,
-    viewingLog: null,
-    availableLogs: [],
-    logContent: {}
+    viewingLog: null
   });
 
   // Quickstart content
@@ -33,74 +31,23 @@ const SurvivorOSTerminal = () => {
   // Audio for logo animation
   const startupSound = useRef(new Audio('data:audio/wav;base64,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rq+wsbKztLW2t7i5uru8vb6/wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t/g4eLj5OXm5+jp6uvs7e7v8PHy8/T19vf4+fr7/P3+/4CAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA=='));
 
-  // Load data from external files - COMPLETELY REWRITTEN
+  // Load quickstart content
   useEffect(() => {
-    async function loadData() {
+    async function loadQuickstart() {
       try {
-        // Load quickstart content
         const quickstartResponse = await fetch('data/quickstart.md');
         const quickstartContent = await quickstartResponse.text();
         setQuickStartContent(quickstartContent);
-        
-        // Load log 76 content directly (hardcoded for simplicity)
-        try {
-          const log76Response = await fetch('data/logs/log_076_digital_entities');
-          if (!log76Response.ok) {
-            // Try alternative path if the first one fails
-            const altResponse = await fetch('data/log_76.md');
-            if (!altResponse.ok) {
-              throw new Error("Could not load log from any path");
-            }
-            const log76Content = await altResponse.text();
-            // Parse the markdown (remove frontmatter)
-            const contentWithoutFrontmatter = log76Content.replace(/^---\n.*?\n---\n/s, '');
-            
-            // Set up logs system with the log content
-            setSurvivorLogs(prev => ({
-              ...prev,
-              availableLogs: [
-                { day: 76, title: "Digital Entities" }
-              ],
-              logContent: {
-                76: contentWithoutFrontmatter
-              }
-            }));
-          } else {
-            const log76Content = await log76Response.text();
-            // Parse the markdown (remove frontmatter)
-            const contentWithoutFrontmatter = log76Content.replace(/^---\n.*?\n---\n/s, '');
-            
-            // Set up logs system with the log content
-            setSurvivorLogs(prev => ({
-              ...prev,
-              availableLogs: [
-                { day: 76, title: "Digital Entities" }
-              ],
-              logContent: {
-                76: contentWithoutFrontmatter
-              }
-            }));
-          }
-        } catch (logError) {
-          console.error("Failed to load log 76:", logError);
-          // If log loading fails, still set up the log listing
-          setSurvivorLogs(prev => ({
-            ...prev,
-            availableLogs: [
-              { day: 76, title: "Digital Entities" }
-            ]
-          }));
-        }
       } catch (error) {
-        console.error("Error loading data:", error);
+        console.error("Error loading quickstart:", error);
         addToTerminalHistory({ 
           type: 'output', 
-          text: 'ERROR: Could not load required data files.' 
+          text: 'ERROR: Could not load quickstart data.' 
         });
       }
     }
     
-    loadData();
+    loadQuickstart();
   }, []);
 
   useEffect(() => {
@@ -215,25 +162,19 @@ const SurvivorOSTerminal = () => {
     setTerminalInput('');
   };
   
-  // SIMPLIFIED LOGS SYSTEM
   const showSurvivorLogs = () => {
     addToTerminalHistory({ type: 'input', text: `> logs` });
     
-    const sortedLogs = [...survivorLogs.availableLogs].sort((a, b) => a.day - b.day);
+    // Hardcoded log listing - simple and reliable
     let logsText = `
 SURVIVOR LOGS DATABASE
 ---------------------
 Recovered personal logs from SurvivorOS creator
-${sortedLogs.length} entries found
+1 entries found
 
 AVAILABLE LOGS:
-`;
-    
-    sortedLogs.forEach(log => {
-      logsText += `[${log.day}] ${log.title}\n`;
-    });
-    
-    logsText += `
+[76] Digital Entities
+
 To view a log, type the day number (e.g. "76")
 Type "exit" or "back" to return to main terminal
 `;
@@ -243,54 +184,64 @@ Type "exit" or "back" to return to main terminal
       text: logsText
     });
     
-    setSurvivorLogs(prev => ({
-      ...prev,
+    setSurvivorLogs({
       active: true,
       viewingLog: null
-    }));
+    });
     
     setTerminalInput('');
   };
   
-  // COMPLETELY REWRITTEN LOG DISPLAY FUNCTION
+  // Uses exactly the same approach as showQuickstartContent
   const showSpecificLog = (day) => {
     const dayNumber = parseInt(day);
     
-    if (isNaN(dayNumber) || !survivorLogs.availableLogs.find(log => log.day === dayNumber)) {
+    if (isNaN(dayNumber) || dayNumber !== 76) { // Hardcoded to only log 76 for now
       addToTerminalHistory({ 
         type: 'output', 
         text: `Log for day ${day} not found. Type "logs" to see available logs.`
       });
-      setSurvivorLogs(prev => ({
-        ...prev,
+      setSurvivorLogs({
         active: false,
         viewingLog: null
-      }));
+      });
       return;
     }
     
-    // Simply display the log from state if it exists
-    if (survivorLogs.logContent[dayNumber]) {
-      addToTerminalHistory({ 
-        type: 'output', 
-        text: survivorLogs.logContent[dayNumber]
-      });
-    } else {
-      // Log is listed in index but content couldn't be loaded
-      addToTerminalHistory({ 
-        type: 'output', 
-        text: `Log ${dayNumber} could not be loaded. The file may be missing or corrupted.
+    addToTerminalHistory({ 
+      type: 'output', 
+      text: 'LOG FILE RETRIEVAL INITIATED',
+    });
+    
+    // Using the exact same approach as quickstart
+    fetch('data/logs/log_076_digital_entities')
+      .then(response => response.text())
+      .then(content => {
+        // Remove frontmatter
+        const contentWithoutFrontmatter = content.replace(/^---\n.*?\n---\n/s, '');
         
-Please contact your terminal administrator or check the developer console for details.`
+        setTimeout(() => {
+          addToTerminalHistory({ 
+            type: 'output', 
+            text: contentWithoutFrontmatter
+          });
+        }, 500);
+      })
+      .catch(error => {
+        console.error("Error loading log:", error);
+        addToTerminalHistory({ 
+          type: 'output', 
+          text: `Error loading log ${day}. The file may be missing or corrupted.`
+        });
       });
-    }
     
     // Exit logs mode
-    setSurvivorLogs(prev => ({
-      ...prev,
+    setSurvivorLogs({
       active: false,
       viewingLog: null
-    }));
+    });
+    
+    setTerminalInput('');
   };
   
   const processSurvivorLogsInput = (input) => {
@@ -301,16 +252,14 @@ Please contact your terminal administrator or check the developer console for de
         type: 'output', 
         text: 'Exiting logs database.'
       });
-      setSurvivorLogs(prev => ({
-        ...prev,
+      setSurvivorLogs({
         active: false,
         viewingLog: null
-      }));
+      });
       return;
     }
     
     showSpecificLog(command);
-    setTerminalInput('');
   };
 
   const startCharacterCreation = () => {
