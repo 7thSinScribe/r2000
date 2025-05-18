@@ -24,119 +24,24 @@ const SurvivorOSTerminal = () => {
   });
   
   const [quickStartContent, setQuickStartContent] = useState("");
-  const [logContents, setLogContents] = useState({}); // Store pre-loaded log contents
-  const startupSound = useRef(new Audio('data:audio/wav;base64,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rq+wsbKztLW2t7i5uru8vb6/wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t/g4eLj5OXm5+jp6uvs7e7v8PHy8/T19vf4+fr7/P3+/4CAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA==')); 
+  const startupSound = useRef(new Audio('data:audio/wav;base64,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rq+wsbKztLW2t7i5uru8vb6/wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t/g4eLj5OXm5+jp6uvs7e7v8PHy8/T19vf4+fr7/P3+/4CAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA=='));
 
-  // Pre-load both quickstart and logs on initialization
   useEffect(() => {
-    async function loadAll() {
-      // Load quickstart
+    async function loadQuickstart() {
       try {
         const quickstartResponse = await fetch('data/quickstart.md');
-        if (quickstartResponse.ok) {
-          const quickstartContent = await quickstartResponse.text();
-          setQuickStartContent(quickstartContent);
-          console.log("Quickstart loaded successfully");
-        } else {
-          console.error("Failed to load quickstart.md:", quickstartResponse.status);
-        }
+        const quickstartContent = await quickstartResponse.text();
+        setQuickStartContent(quickstartContent);
       } catch (error) {
         console.error("Error loading quickstart:", error);
-      }
-      
-      // Load logs index and content
-      try {
-        // First load the index
-        const logsIndexResponse = await fetch('data/logs_index.json');
-        
-        if (!logsIndexResponse.ok) {
-          console.error("Failed to load logs_index.json:", logsIndexResponse.status);
-          return;
-        }
-        
-        const logsIndexData = await logsIndexResponse.json();
-        
-        // Then load each log content
-        const logContentsObj = {};
-        
-        for (const log of logsIndexData.logs) {
-          try {
-            // Try multiple potential paths for each log
-            const paths = [
-              `data/log${log.day}.md`,                                // data/log76.md
-              `data/log_${log.day}.md`,                               // data/log_76.md
-              `data/logs/log_${log.day}_${log.title.toLowerCase()}.md` // data/logs/log_76_digital_entities.md
-            ];
-            
-            let loaded = false;
-            
-            for (const path of paths) {
-              try {
-                const response = await fetch(path);
-                
-                if (response.ok) {
-                  const content = await response.text();
-                  logContentsObj[log.day] = content;
-                  console.log(`Successfully loaded log ${log.day} from ${path}`);
-                  loaded = true;
-                  break;
-                }
-              } catch (e) {
-                console.log(`Could not load from ${path}`);
-              }
-            }
-            
-            if (!loaded && log.day === 76) {
-              // Fallback content for log 76
-              logContentsObj[76] = `---
-day: 76
-title: "Digital Entities"
-author: "[REDACTED]"
----
->>> PERSONAL LOG: Digital Entities
->>> DAY 76
-
-Nearly lost it today. Was rummaging through an abandoned N-Co shop when my torch died. Just like that - full charge to nothing in seconds. Could have sworn I heard something moving, but couldn't see a bloody thing.
-
-Then I remembered the RogueVision AR goggles I'd pocketed earlier. Put them on and there it was. A glowing blue... thing. Sort of like a jellyfish crossed with a lightning bolt. Some kind of pure digital entity, existing right there in physical space but completely invisible without the goggles.
-
-It was draining the electricity from anything I had powered up. My watch stopped. Phone died. Even the little LED keychain went dark. Could actually see little streams of energy (the goggles visualize it as blue particles) flowing from my devices into the creature.
-
-I panicked and chucked a spanner at it. Went straight through. No effect. Physical objects just pass right through digital entities - they don't exist on our physical plane, see? Tried punching it too - my hand passed right through, but I felt this weird tingle up my arm. Not painful, but not pleasant either.
-
-Then it "attacked" me. No physical damage, but it sent this electrical pulse that locked up my muscles for about 5 seconds. Like being tased, but milder. Still terrifying when you can't move.
-
-Finally figured out I could affect it by using other powered devices. Had an old taser in my pack - discharged it near the creature and it seemed to disrupt its form. Kept zapping until it dissipated entirely.
-
-Key findings about pure digital entities:
-- Invisible without AR glasses/goggles
-- Can't physically touch or harm you
-- Drain "Watts" from any powered device (measured the drain at about 10W/second)
-- Can deliver stun attacks that temporarily paralyze
-- Vulnerable to electrical surges, EM pulses, etc.
-- No blood or physical components - just disrupt their pattern enough and they dissipate
-
-Think I'll call these ones "Parasparks" - they seem to feed on electricity and resemble sparks of energy. Need to be careful about battery management in areas they inhabit. My rule now is always keep one device powered down as backup.
-
-I've started measuring battery life in "Watts" rather than percentage - more precise when dealing with these things. Will record more entity types as I encounter them.
-
-Also, discovered that certain music played through speakers seems to confuse them - something about the sound wave patterns disrupting their form. The Clash works particularly well. Digital entities don't like punk, apparently.`;
-              console.log("Using fallback content for log 76");
-            }
-          } catch (error) {
-            console.error(`Error loading log ${log.day}:`, error);
-          }
-        }
-        
-        // Store all the loaded log contents
-        setLogContents(logContentsObj);
-        
-      } catch (error) {
-        console.error("Error loading logs:", error);
+        addToTerminalHistory({ 
+          type: 'output', 
+          text: 'ERROR: Could not load quickstart data.' 
+        });
       }
     }
     
-    loadAll();
+    loadQuickstart();
   }, []);
 
   useEffect(() => {
@@ -213,7 +118,6 @@ Also, discovered that certain music played through speakers seems to confuse the
     }
   }, [terminalHistory]);
 
-  // Simplified loadLogs - just gets logs metadata
   const loadLogs = async () => {
     try {
       const logsIndexResponse = await fetch('data/logs_index.json');
@@ -233,9 +137,9 @@ Also, discovered that certain music played through speakers seems to confuse the
   const displayLogsList = (logs) => {
     let logsList = 'AVAILABLE LOGS:\n\n';
     
-    logs.forEach((log) => {
+    logs.forEach((log, index) => {
       const title = log.title.replace(/_/g, ' ');
-      logsList += `${log.day}. ${title}\n`;
+      logsList += `${index + 1}. Log ${log.day}: ${title}\n`;
     });
     
     logsList += '\nEnter log number to view, or type EXIT to return to main terminal.';
@@ -246,38 +150,39 @@ Also, discovered that certain music played through speakers seems to confuse the
     });
   };
 
-  // Simplified displayLog - uses pre-loaded content
-  const displayLog = (logNumber) => {
+  const displayLog = async (logIndex) => {
     try {
-      // Find the log with matching day number
-      const log = logsMode.logs.find(l => l.day === logNumber);
+      const log = logsMode.logs[logIndex];
+      const logDay = log.day.toString().padStart(3, '0');
+      const logTitle = log.title.toLowerCase();
       
-      if (!log) {
-        throw new Error(`Log ${logNumber} not found`);
+      let logPath = `data/logs/log_${logDay}_${logTitle}.md`;
+      let logResponse = await fetch(logPath);
+      
+      if (!logResponse.ok) {
+        logPath = `data/log_${logDay}.md`;
+        logResponse = await fetch(logPath);
       }
       
-      // Get the pre-loaded content
-      const logContent = logContents[logNumber];
-      
-      if (!logContent) {
-        throw new Error(`Content for log ${logNumber} not available`);
+      if (!logResponse.ok) {
+        throw new Error(`Failed to load log ${log.day}`);
       }
+      
+      const logContent = await logResponse.text();
       
       addToTerminalHistory({ 
         type: 'output', 
         text: `DISPLAYING LOG ${log.day}: ${log.title.replace(/_/g, ' ')}\n\n${logContent}`
       });
       
-      // After displaying log, show logs list again
       displayLogsList(logsMode.logs);
     } catch (error) {
-      console.error("Error displaying log:", error);
+      console.error("Error loading log:", error);
       addToTerminalHistory({ 
         type: 'output', 
-        text: `ERROR: Could not display log ${logNumber}. ${error.message}`
+        text: `ERROR: Could not load log. File may be corrupted or missing.`
       });
       
-      // Show logs list again
       displayLogsList(logsMode.logs);
     }
   };
@@ -333,26 +238,16 @@ Also, discovered that certain music played through speakers seems to confuse the
     
     const logNumber = parseInt(command);
     
-    if (isNaN(logNumber)) {
+    if (isNaN(logNumber) || logNumber < 1 || logNumber > logsMode.logs.length) {
       addToTerminalHistory({ 
         type: 'output', 
-        text: `Invalid input. Please enter a log number, or type EXIT to return to main terminal.`
+        text: `Invalid log number. Please enter a number between 1 and ${logsMode.logs.length}, or type EXIT to return to main terminal.`
       });
+      
       return;
     }
     
-    // Check if the log number exists in our logs array
-    const logExists = logsMode.logs.some(log => log.day === logNumber);
-    
-    if (!logExists) {
-      addToTerminalHistory({ 
-        type: 'output', 
-        text: `Log ${logNumber} not found. Please enter a valid log number.`
-      });
-      return;
-    }
-    
-    displayLog(logNumber);
+    displayLog(logNumber - 1);
   };
 
   const showQuickstartContent = () => {
