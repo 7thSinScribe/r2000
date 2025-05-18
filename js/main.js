@@ -238,42 +238,65 @@ Type "exit" or "back" to return to main terminal
         const logInfo = survivorLogsData.availableLogs.find(log => log.day === dayNumber);
         const logTitle = logInfo.title.toLowerCase().replace(/\s+/g, '_');
         
-        // Construct the filename
-        const filename = `logs/log_${paddedDay}_${logTitle}.md`;
+        // Construct the filename - UPDATED PATH to use data/logs/ instead of logs/
+        const filename = `data/logs/log_${paddedDay}_${logTitle}.md`;
         
-        // Fetch the log content
-        const response = await fetch(filename);
-        const content = await response.text();
-        
-        // Parse the markdown (remove frontmatter)
-        const contentWithoutFrontmatter = content.replace(/^---\n.*?\n---\n/s, '');
-        
-        // Update the state
-        setSurvivorLogsData(prev => ({
-          ...prev,
-          logContent: {
-            ...prev.logContent,
-            [dayNumber]: contentWithoutFrontmatter
-          }
-        }));
-        
-        // Display the content
+        // Add loading indicator
         addToTerminalHistory({ 
           type: 'output', 
-          text: contentWithoutFrontmatter
+          text: `Loading log entry ${day}...`
         });
+        
+        // Fetch the log content with error handling
+        try {
+          const response = await fetch(filename);
+          
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          
+          const content = await response.text();
+          
+          // Parse the markdown (remove frontmatter)
+          const contentWithoutFrontmatter = content.replace(/^---\n.*?\n---\n/s, '');
+          
+          // Update the state
+          setSurvivorLogsData(prev => ({
+            ...prev,
+            logContent: {
+              ...prev.logContent,
+              [dayNumber]: contentWithoutFrontmatter
+            }
+          }));
+          
+          // Display the content
+          addToTerminalHistory({ 
+            type: 'output', 
+            text: contentWithoutFrontmatter
+          });
+        } catch (fetchError) {
+          console.error("Error fetching log:", fetchError);
+          addToTerminalHistory({ 
+            type: 'output', 
+            text: `ERROR: Could not load log ${day}. The file may be corrupted or missing.
+            
+Path attempted: ${filename}
+
+Make sure the log file exists in the data/logs directory with the correct naming format.`
+          });
+        }
       } else {
-        // If already loaded, just display
+        // If already loaded, just display from cache
         addToTerminalHistory({ 
           type: 'output', 
           text: survivorLogsData.logContent[dayNumber]
         });
       }
     } catch (error) {
-      console.error("Error loading log:", error);
+      console.error("Error in showSpecificLog:", error);
       addToTerminalHistory({ 
         type: 'output', 
-        text: `Error loading log ${day}. The file may be missing or corrupt.`
+        text: `Error loading log ${day}. Please check the browser console for details.`
       });
     }
     
