@@ -1,10 +1,8 @@
 ---
-day: 76
 title: "Digital Entities"
 author: "[REDACTED]"
 ---
->>> PERSONAL LOG: Digital Entities
->>> DAY 76
+>>> PERSONAL LOG
 
 Nearly lost it today. Was rummaging through an abandoned N-Co shop when my torch died. Just like that - full charge to nothing in seconds. Could have sworn I heard something moving, but couldn't see a bloody thing.
 
@@ -25,9 +23,3 @@ Key findings about pure digital entities:
 - Can deliver stun attacks that temporarily paralyze
 - Vulnerable to electrical surges, EM pulses, etc.
 - No blood or physical components - just disrupt their pattern enough and they dissipate
-
-Think I'll call these ones "Parasparks" - they seem to feed on electricity and resemble sparks of energy. Need to be careful about battery management in areas they inhabit. My rule now is always keep one device powered down as backup.
-
-I've started measuring battery life in "Watts" rather than percentage - more precise when dealing with these things. Will record more entity types as I encounter them.
-
-Also, discovered that certain music played through speakers seems to confuse them - something about the sound wave patterns disrupting their form. The Clash works particularly well. Digital entities don't like punk, apparently.
