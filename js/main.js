@@ -213,7 +213,7 @@ Type "exit" or "back" to return to main terminal
     setTerminalInput('');
   };
   
-  // SIMPLIFIED LOG LOADING FUNCTION
+  // FIXED LOG LOADING FUNCTION - Using the path data/logs/log_076_digital_entities.md
   const showSpecificLog = async (day) => {
     const dayNumber = parseInt(day);
     
@@ -232,8 +232,17 @@ Type "exit" or "back" to return to main terminal
     try {
       // If not already loaded, load the content
       if (!survivorLogsData.logContent[dayNumber]) {
-        // Simple filename - just log_NUMBER.md directly in the data folder
-        const filename = `data/log_${dayNumber}.md`;
+        // Find the log info to get the title
+        const logInfo = survivorLogsData.availableLogs.find(log => log.day === dayNumber);
+        
+        // Format day with leading zeros
+        const paddedDay = dayNumber.toString().padStart(3, '0');
+        
+        // Format the title for use in the filename
+        const formattedTitle = logInfo.title.toLowerCase().replace(/\s+/g, '_');
+        
+        // Construct the filename using the exact format in the error message
+        const filename = `data/logs/log_${paddedDay}_${formattedTitle}.md`;
         
         // Add loading indicator
         addToTerminalHistory({ 
@@ -242,6 +251,7 @@ Type "exit" or "back" to return to main terminal
         });
         
         try {
+          console.log("Attempting to load file:", filename);
           const response = await fetch(filename);
           
           if (!response.ok) {
@@ -275,7 +285,7 @@ Type "exit" or "back" to return to main terminal
             
 Attempted to load: ${filename}
 
-Please make sure the file exists in the data directory.`
+Please make sure the file exists at data/logs/log_${paddedDay}_${formattedTitle}.md`
           });
         }
       } else {
