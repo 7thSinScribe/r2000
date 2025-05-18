@@ -213,6 +213,7 @@ Type "exit" or "back" to return to main terminal
     setTerminalInput('');
   };
   
+  // SIMPLIFIED LOG LOADING FUNCTION
   const showSpecificLog = async (day) => {
     const dayNumber = parseInt(day);
     
@@ -231,15 +232,8 @@ Type "exit" or "back" to return to main terminal
     try {
       // If not already loaded, load the content
       if (!survivorLogsData.logContent[dayNumber]) {
-        // Format the day with leading zeros
-        const paddedDay = dayNumber.toString().padStart(3, '0');
-        
-        // Find the log title
-        const logInfo = survivorLogsData.availableLogs.find(log => log.day === dayNumber);
-        const logTitle = logInfo.title.toLowerCase().replace(/\s+/g, '_');
-        
-        // Construct the filename - UPDATED PATH to use data/logs/ instead of logs/
-        const filename = `data/logs/log_${paddedDay}_${logTitle}.md`;
+        // Simple filename - just log_NUMBER.md directly in the data folder
+        const filename = `data/log_${dayNumber}.md`;
         
         // Add loading indicator
         addToTerminalHistory({ 
@@ -247,7 +241,6 @@ Type "exit" or "back" to return to main terminal
           text: `Loading log entry ${day}...`
         });
         
-        // Fetch the log content with error handling
         try {
           const response = await fetch(filename);
           
@@ -278,11 +271,11 @@ Type "exit" or "back" to return to main terminal
           console.error("Error fetching log:", fetchError);
           addToTerminalHistory({ 
             type: 'output', 
-            text: `ERROR: Could not load log ${day}. The file may be corrupted or missing.
+            text: `ERROR: Could not load log ${day}. The file may be missing.
             
-Path attempted: ${filename}
+Attempted to load: ${filename}
 
-Make sure the log file exists in the data/logs directory with the correct naming format.`
+Please make sure the file exists in the data directory.`
           });
         }
       } else {

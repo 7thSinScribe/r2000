@@ -1,4 +1,4 @@
-// ASCII art SurvivorOS logo
+// ASCII art 
 const survivorAsciiLogo = [
   "███████╗██╗   ██╗██████╗ ██╗   ██╗██╗██╗   ██╗ ██████╗ ██████╗      ██████╗ ███████╗",
   "██╔════╝██║   ██║██╔══██╗██║   ██║██║██║   ██║██╔═══██╗██╔══██╗    ██╔═══██╗██╔════╝",
@@ -10,7 +10,7 @@ const survivorAsciiLogo = [
   "                   terminal v0.5b | build: srv-2957f5a                              "
 ];
 
-// Display the terminal logo
+// terminal logo
 function renderTerminalLogo() {
   return (
     <div>
@@ -20,7 +20,7 @@ function renderTerminalLogo() {
   );
 }
 
-// Format text with markdown-like elements
+// Format text
 function formatText(text) {
   text = text.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
   text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
