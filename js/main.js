@@ -1,5 +1,5 @@
 const { useState, useEffect, useRef } = React;
-
+// I hate myself
 const SurvivorOSTerminal = () => {
   const [bootComplete, setBootComplete] = useState(false);
   const [terminalInput, setTerminalInput] = useState('');
