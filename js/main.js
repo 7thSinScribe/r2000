@@ -1,5 +1,5 @@
 const { useState, useEffect, useRef } = React;
-// I hate myself
+
 const SurvivorOSTerminal = () => {
   const [bootComplete, setBootComplete] = useState(false);
   const [terminalInput, setTerminalInput] = useState('');
@@ -15,6 +15,13 @@ const SurvivorOSTerminal = () => {
     items: [],
     name: "",
     completed: false
+  });
+  
+  // New logs mode state
+  const [logsMode, setLogsMode] = useState({
+    active: false,
+    logs: [],
+    selectedLog: null
   });
   
   const [quickStartContent, setQuickStartContent] = useState("");
@@ -310,6 +317,12 @@ const SurvivorOSTerminal = () => {
       return;
     }
     
+    // New logs command handler
+    if (command === 'logs') {
+      LogsSystem.enterLogsMode(setLogsMode, addToTerminalHistory, setTerminalInput);
+      return;
+    }
+    
     addToTerminalHistory({ type: 'input', text: `> ${cmd}` });
     
     let response = '';
@@ -325,6 +338,7 @@ about:    About SurvivorOS Terminal
 quickstart: Display Rogue 2000 game information
 whoami:   Run survivor identity questionnaire
 ascii:    Display SurvivorOS ASCII art logo
+logs:     Access survivor logs database
 
 For survivors in the zones: Type what you learn out there.
 Stay safe. Share knowledge. Survive.`;
@@ -364,10 +378,17 @@ Type 'help' for available commands.`;
     setTerminalInput(e.target.value);
   };
 
+  // Updated terminal key press handler to include logs mode
   const handleTerminalKeyPress = (e) => {
     if (e.key === 'Enter') {
       if (characterCreation.active) {
         processCharacterCreationAnswer(terminalInput);
+        setTerminalInput('');
+        return;
+      }
+      
+      if (logsMode.active) {
+        LogsSystem.processLogsCommand(terminalInput, logsMode, setLogsMode, addToTerminalHistory);
         setTerminalInput('');
         return;
       }
@@ -403,7 +424,7 @@ Type 'help' for available commands.`;
                 </div>
               ))}
               
-              {bootComplete && !characterCreation.active && (
+              {bootComplete && !characterCreation.active && !logsMode.active && (
                 <div className="flex command-input">
                   <span>{'>'}</span>
                   <input
@@ -422,6 +443,23 @@ Type 'help' for available commands.`;
               {bootComplete && characterCreation.active && (
                 <div className="flex command-input">
                   <span>IDENTITY></span>
+                  <input
+                    type="text"
+                    value={terminalInput}
+                    onChange={handleTerminalInput}
+                    onKeyPress={handleTerminalKeyPress}
+                    className="flex-1 bg-transparent outline-none border-none ml-1"
+                    style={{color: '#e0f8cf'}}
+                    autoFocus
+                  />
+                  <span className={blinkCursor ? 'opacity-100' : 'opacity-0'}>_</span>
+                </div>
+              )}
+              
+              {/* New logs mode input */}
+              {bootComplete && logsMode.active && (
+                <div className="flex command-input">
+                  <span>LOGS></span>
                   <input
                     type="text"
                     value={terminalInput}
