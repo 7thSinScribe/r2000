@@ -1,6 +1,5 @@
 const { useState, useEffect, useRef } = React;
 
-// Main component
 const SurvivorOSTerminal = () => {
   const [bootComplete, setBootComplete] = useState(false);
   const [terminalInput, setTerminalInput] = useState('');
@@ -9,7 +8,6 @@ const SurvivorOSTerminal = () => {
   const [shouldPlaySound, setShouldPlaySound] = useState(false);
   const terminalRef = useRef(null);
   
-  // Character creation
   const [characterCreation, setCharacterCreation] = useState({
     active: false,
     currentQuestion: 0,
@@ -19,19 +17,9 @@ const SurvivorOSTerminal = () => {
     completed: false
   });
   
-  // Survivor logs - simplified
-  const [survivorLogs, setSurvivorLogs] = useState({
-    active: false,
-    viewingLog: null
-  });
-
-  // Quickstart content
   const [quickStartContent, setQuickStartContent] = useState("");
+  const startupSound = useRef(new Audio('data:audio/wav;base64,UklGRu4MAABXQVZFZm10IBAAAAABAAEARKwAAESsAAABAAgAZGF0YckMAACAgICAgICAgICAgICAgICAgICAf3hxeH+AfXZ1eHx6dnR5fHx6eXh7f3+Af4B+gYWMlZuZlI+PkpWYmJeTlJmalo2FhIWEgXt2dXd3dXBrb3FxcG1vcXR2dnd5fICHjpWcpKuxuL7Cw8C9u7m3s66nop+cm5eRjImGgX55eHd2d3l9gYWHi46Sj5COjIuJhoiVqsrd8P3//fXp28zApJiRg3lsX1RKQj43Mi4vMzc7PkRNV2Vxf4yZp7W/ydHY3uPo7fDy9PT09/j4+vv8/f39/v7+/f39/Pz8/Pz8+/v7+/v6+vr6+ff08vDt6ebk4NvX0s7KxsK9ubazr6uopKCbl5OPi4eDf3t4dXJwbWtpZ2ViX11cWllaWltcXV5fYWNmamxwdHh9gYWLkJWZnqKmqq2wtLi7vcHDxMfIycvMzM3Ozs/Pz8/Pz8/Pzs7Nzc3MzMvLy8rJyMfGxMPBv727ubezrq2qpqKempWSjouHg4B8eHRxbWpmYl9bWFRRTktHREE/PTw6OTg3NjY2Njc4Ojs9P0FFSEtOUlVYW15hZGZpbG5wcnR2eHp7fX5/gIGCg4SEhYWFhYaGhoaGhoaGhoWFhYSEg4OCgYB/fn18e3p5d3Z1c3JxcG9tbGppaGdmZWRjYmFgX15dXFtaWVhXVlVUU1JRUE9OTUxLSklIR0ZFRENCQUA/Pj08Ozo5ODc2NTU0MzIyMTAwLy8uLi0tLCwrKyoqKSkpKCgoKCcnJycnJycnJyYmJiYmJiYmJiYmJiYmJiYnJycnJycnKCgoKCkpKSoqKissLC0tLi4vMDAxMjMzNDU2Nzg5Ojs8PT4/QEFDREVGR0lKS0xNT1BRUlNUVVZXWFlaW1xdXl9gYWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXp7fH1+f4CBgoOEhYaHiImKi4yNjo+QkZKTlJWWl5iZmpucnZ6foKGio6SlpqeoqaqrrK2ur7CxsrO0tba3uLm6u7y9vr/AwcLDxMXGx8jJysvMzc7P0NHS09TV1tfY2drb3N3e3+Dh4uPk5ebn6Onq6+zt7u/w8fLz9PX29/j5+vv8/f7/AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn+AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq+wsbKztLW2t7i5uru8vb6/wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t/g4eLj5OXm5+jp6uvs7e7v8PHy8/T19vf4+fr7/P3+/wABAgMEBQYHCAkKCwwNDg8QERITFBUWFxgZGhscHR4fICEiIyQlJicoKSorLC0uLzAxMjM0NTY3ODk6Ozw9Pj9AQUJDREVGR0hJSktMTU5PUFFSU1RVVldYWVpbXF1eX2BhYmNkZWZnaGlqa2xtbm9wcXJzdHV2d3h5ent8fX5/gIGCg4SFhoeIiYqLjI2Oj5CRkpOUlZaXmJmam5ydnp+goaKjpKWmp6ipqqusra6vsLGys7S1tre4ubq7vL2+v8DBwsPExcbHyMnKy8zNzs/Q0dLT1NXW19jZ2tvc3d7f4OHi4+Tl5ufo6err7O3u7/Dx8vP09fb3+Pn6+/z9/v8AAQIDBAUGBwgJCgsMDQ4PEBESExQVFhcYGRobHB0eHyAhIiMkJSYnKCkqKywtLi8wMTIzNDU2Nzg5Ojs8PT4/QEFCQ0RFRkdISUpLTE1OT1BRUlNUVVZXWFlaW1xdXl9gYWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXp7fH1+f4CBgoOEhYaHiImKi4yNjo+QkZKTlJWWl5iZmpucnZ6foKGio6SlpqeoqaqrrK2ur7CxsrO0tba3uLm6u7y9vr/AwcLDxMXGx8jJysvMzc7P0NHS09TV1tfY2drb3N3e3+Dh4uPk5ebn6Onq6+zt7u/w8fLz9PX29/j5+vv8/f7/AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn+AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq+wsbKztLW2t7i5uru8vb6/wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t/g4eLj5OXm5+jp6uvs7e7v8PHy8/T19vf4+fr7/P3+/4CAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA==')); 
 
-  // Audio for logo animation
-  const startupSound = useRef(new Audio('data:audio/wav;base64,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rq+wsbKztLW2t7i5uru8vb6/wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t/g4eLj5OXm5+jp6uvs7e7v8PHy8/T19vf4+fr7/P3+/4CAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA=='));
-
-  // Load quickstart content
   useEffect(() => {
     async function loadQuickstart() {
       try {
@@ -160,106 +148,6 @@ const SurvivorOSTerminal = () => {
     });
     
     setTerminalInput('');
-  };
-  
-  const showSurvivorLogs = () => {
-    addToTerminalHistory({ type: 'input', text: `> logs` });
-    
-    // Hardcoded log listing - simple and reliable
-    let logsText = `
-SURVIVOR LOGS DATABASE
----------------------
-Recovered personal logs from SurvivorOS creator
-1 entries found
-
-AVAILABLE LOGS:
-[76] Digital Entities
-
-To view a log, type the day number (e.g. "76")
-Type "exit" or "back" to return to main terminal
-`;
-    
-    addToTerminalHistory({ 
-      type: 'output', 
-      text: logsText
-    });
-    
-    setSurvivorLogs({
-      active: true,
-      viewingLog: null
-    });
-    
-    setTerminalInput('');
-  };
-  
-  // Uses exactly the same approach as showQuickstartContent
-  const showSpecificLog = (day) => {
-    const dayNumber = parseInt(day);
-    
-    if (isNaN(dayNumber) || dayNumber !== 76) { // Hardcoded to only log 76 for now
-      addToTerminalHistory({ 
-        type: 'output', 
-        text: `Log for day ${day} not found. Type "logs" to see available logs.`
-      });
-      setSurvivorLogs({
-        active: false,
-        viewingLog: null
-      });
-      return;
-    }
-    
-    addToTerminalHistory({ 
-      type: 'output', 
-      text: 'LOG FILE RETRIEVAL INITIATED',
-    });
-    
-    // Using the exact same approach as quickstart
-    fetch('data/logs/log_076_digital_entities')
-      .then(response => response.text())
-      .then(content => {
-        // Remove frontmatter
-        const contentWithoutFrontmatter = content.replace(/^---\n.*?\n---\n/s, '');
-        
-        setTimeout(() => {
-          addToTerminalHistory({ 
-            type: 'output', 
-            text: contentWithoutFrontmatter
-          });
-        }, 500);
-      })
-      .catch(error => {
-        console.error("Error loading log:", error);
-        addToTerminalHistory({ 
-          type: 'output', 
-          text: `Error loading log ${day}. The file may be missing or corrupted.`
-        });
-      });
-    
-    // Exit logs mode
-    setSurvivorLogs({
-      active: false,
-      viewingLog: null
-    });
-    
-    setTerminalInput('');
-  };
-  
-  const processSurvivorLogsInput = (input) => {
-    const command = input.toLowerCase().trim();
-    
-    if (command === 'exit' || command === 'back' || command === 'cancel') {
-      addToTerminalHistory({ 
-        type: 'output', 
-        text: 'Exiting logs database.'
-      });
-      setSurvivorLogs({
-        active: false,
-        viewingLog: null
-      });
-      return;
-    }
-    
-    showSpecificLog(command);
   };
 
   const startCharacterCreation = () => {
@@ -422,11 +310,6 @@ Type "exit" or "back" to return to main terminal
       return;
     }
     
-    if (command === 'logs') {
-      showSurvivorLogs();
-      return;
-    }
-    
     addToTerminalHistory({ type: 'input', text: `> ${cmd}` });
     
     let response = '';
@@ -441,7 +324,6 @@ clear:    Clear terminal
 about:    About SurvivorOS Terminal
 quickstart: Display Rogue 2000 game information
 whoami:   Run survivor identity questionnaire
-logs:     Access recovered survivor logs
 ascii:    Display SurvivorOS ASCII art logo
 
 For survivors in the zones: Type what you learn out there.
@@ -490,12 +372,6 @@ Type 'help' for available commands.`;
         return;
       }
       
-      if (survivorLogs.active) {
-        processSurvivorLogsInput(terminalInput);
-        setTerminalInput('');
-        return;
-      }
-      
       processCommand(terminalInput);
     }
   };
@@ -527,7 +403,7 @@ Type 'help' for available commands.`;
                 </div>
               ))}
               
-              {bootComplete && !characterCreation.active && !survivorLogs.active && (
+              {bootComplete && !characterCreation.active && (
                 <div className="flex command-input">
                   <span>{'>'}</span>
                   <input
@@ -546,22 +422,6 @@ Type 'help' for available commands.`;
               {bootComplete && characterCreation.active && (
                 <div className="flex command-input">
                   <span>IDENTITY></span>
-                  <input
-                    type="text"
-                    value={terminalInput}
-                    onChange={handleTerminalInput}
-                    onKeyPress={handleTerminalKeyPress}
-                    className="flex-1 bg-transparent outline-none border-none ml-1"
-                    style={{color: '#e0f8cf'}}
-                    autoFocus
-                  />
-                  <span className={blinkCursor ? 'opacity-100' : 'opacity-0'}>_</span>
-                </div>
-              )}
-              
-              {bootComplete && survivorLogs.active && (
-                <div className="flex command-input">
-                  <span>LOGS></span>
                   <input
                     type="text"
                     value={terminalInput}
