@@ -94,13 +94,11 @@ At the END of your turn, discard down to 7 dice if needed
 
 3. RESOLUTION
 
-The Gamemaster reveals 3 opposition dice
+The Gamemaster reveals 3 opposition dice, from NPCs or the environment. 
 
-The Gamemaster may challenge your declared values
+GM reveals their dice FIRST, then you reveal yours
 
-If challenged, GM reveals their dice FIRST, then you reveal yours
-
-Resolution is based on the actual revealed dice
+Resolution is based on rankings the revealed dice.
 
 4. HAND RANKINGS
 
@@ -120,30 +118,6 @@ If still tied, largest die type wins (d12 > d10 > d8 > d6)
 
 If completely unbreakable tie, player wins
 
-THE CHEATING GAMEMASTER
-
-The Gamemaster doesn't roll dice randomly. Instead:
-
-Creates a fixed pool at the start of each scene (5 dice per player + drama modifier)
-
-Assigns values to these dice (30% low, 40% medium, 20% high, 10% critical)
-
-Must choose when to challenge player bluffs
-
-Once dice are used, they're gone for the scene
-
-PROGRESSION
-
-Characters improve through:
-
-Equipment acquisition (better dice)
-
-Ally development
-
-Learning from failure (accumulate failures to gain attribute improvements)
-
-Attribute dice upgrades (when exceeding 5)
-
 LEARNING FROM FAILURE
 
 As you fail at challenges, you grow stronger:
@@ -155,5 +129,3 @@ After 5 tallies (quickstart default), gain a +1 to that attribute and reset the 
 Record failures specific to the attribute used (Power failures improve Power, etc.)
 
 Harder challenges may count as multiple tallies (GM's discretion)
-
-"In Rogue 2000, you win or you learn."
