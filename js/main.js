@@ -134,40 +134,6 @@ const SurvivorOSTerminal = () => {
     }
   }, [terminalHistory]);
 
-  // IMPROVED LOGS SYSTEM
-  const loadLogs = async () => {
-    try {
-      // Use the correct path with base URL
-      const logsIndexResponse = await fetch(getFilePath('/data/logs_index.json'));
-      const logsIndexData = await logsIndexResponse.json();
-      
-      return logsIndexData.logs;
-    } catch (error) {
-      console.error("Error loading logs:", error);
-      addToTerminalHistory({ 
-        type: 'output', 
-        text: 'ERROR: Could not load logs data.' 
-      });
-      return [];
-    }
-  };
-
-  const displayLogsList = (logs) => {
-    let logsList = 'AVAILABLE LOGS:\n\n';
-    
-    logs.forEach((log) => {
-      const title = log.title.replace(/_/g, ' ');
-      logsList += `${log.day}. ${title}\n`;
-    });
-    
-    logsList += '\nEnter log number to view, or type EXIT to return to main terminal.';
-    
-    addToTerminalHistory({ 
-      type: 'output', 
-      text: logsList
-    });
-  };
-
   const displayLog = async (logNumber) => {
     try {
       // Find the log with matching day number
@@ -177,51 +143,46 @@ const SurvivorOSTerminal = () => {
         throw new Error(`Log ${logNumber} not found`);
       }
       
-      // Use the same exact path pattern that works for quickstart
-      const logPath = getFilePath(`/data/log${logNumber}.md`);
+      // Use the SAME relative path pattern as quickstart - NO leading slash!
+      const logPath = `data/log${logNumber}.md`;
       console.log(`Trying to fetch log from: ${logPath}`);
       
       let logContent = null;
+      let foundPath = null;
       
       try {
         const response = await fetch(logPath);
         if (response.ok) {
           logContent = await response.text();
+          foundPath = logPath;
           console.log(`Successfully loaded log from ${logPath}`);
         } else {
           throw new Error(`Failed to fetch from ${logPath}`);
         }
       } catch (error) {
-        console.log(`Failed to fetch from ${logPath}`);
+        console.log(`Failed to fetch from ${logPath}, trying alternative`);
         
-        // Fallback for log 76 only
-        if (logNumber === 76) {
-          console.log("Using hardcoded content as fallback");
-          logContent = `--- 
-  day: 76
-  title: "Digital Entities"
-  author: "[REDACTED]"
-  ---
-  >>> PERSONAL LOG: Digital Entities
-  >>> DAY 76
-  
-  Nearly lost it today. Was rummaging through an abandoned N-Co shop when my torch died. Just like that - full charge to nothing in seconds. Could have sworn I heard something moving, but couldn't see a bloody thing.
-  
-  Then I remembered the RogueVision AR goggles I'd pocketed earlier. Put them on and there it was. A glowing blue... thing. Sort of like a jellyfish crossed with a lightning bolt. Some kind of pure digital entity, existing right there in physical space but completely invisible without the goggles.
-  
-  It was draining the electricity from anything I had powered up. My watch stopped. Phone died. Even the little LED keychain went dark. Could actually see little streams of energy (the goggles visualize it as blue particles) flowing from my devices into the creature.
-  
-  Key findings about pure digital entities:
-  - Invisible without AR glasses/goggles
-  - Can't physically touch or harm you
-  - Drain "Watts" from any powered device (measured the drain at about 10W/second)
-  - Can deliver stun attacks that temporarily paralyze
-  - Vulnerable to electrical surges, EM pulses, etc.
-  - No blood or physical components - just disrupt their pattern enough and they dissipate
-  
-  Think I'll call these ones "Parasparks" - they seem to feed on electricity and resemble sparks of energy. Need to be careful about battery management in areas they inhabit.`;
-        } else {
-          throw error;
+        // Try alternative path format - still using relative path
+        const altPath = `data/logs/log_${logNumber}_${log.title.toLowerCase()}.md`;
+        try {
+          const response = await fetch(altPath);
+          if (response.ok) {
+            logContent = await response.text();
+            foundPath = altPath;
+            console.log(`Successfully loaded log from ${altPath}`);
+          } else {
+            throw new Error(`Failed to fetch from ${altPath}`);
+          }
+        } catch (e) {
+          console.log(`All fetch attempts failed for log ${logNumber}`);
+          
+          // Fallback for log 76
+          if (logNumber === 76) {
+            logContent = `[FALLBACK LOG CONTENT for log ${logNumber}]`;
+            foundPath = "fallback";
+          } else {
+            throw new Error(`Could not load log ${logNumber}`);
+          }
         }
       }
       
@@ -229,6 +190,8 @@ const SurvivorOSTerminal = () => {
         type: 'output', 
         text: `DISPLAYING LOG ${log.day}: ${log.title.replace(/_/g, ' ')}\n\n${logContent}`
       });
+      
+      console.log(`Log content loaded from: ${foundPath}`);
       
       // After displaying log, show logs list again
       displayLogsList(logsMode.logs);
