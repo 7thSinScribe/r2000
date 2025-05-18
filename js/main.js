@@ -18,10 +18,7 @@ const SurvivorOSTerminal = () => {
   });
   
   const [quickStartContent, setQuickStartContent] = useState("");
-  // Add state variables for logs
-  const [logsContent, setLogsContent] = useState({});
-  const [availableLogs, setAvailableLogs] = useState([76]); // Start with just log76
-  
+  const [log76Content, setLog76Content] = useState("");
   const startupSound = useRef(new Audio('data:audio/wav;base64,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rq+wsbKztLW2t7i5uru8vb6/wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t/g4eLj5OXm5+jp6uvs7e7v8PHy8/T19vf4+fr7/P3+/4CAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA==')); 
 
   useEffect(() => {
@@ -42,27 +39,18 @@ const SurvivorOSTerminal = () => {
     loadQuickstart();
   }, []);
 
-  // Add function to load logs
   useEffect(() => {
-    async function loadLogs() {
+    async function loadLog76() {
       try {
-        // Load log76 initially
         const logResponse = await fetch('data/log76.md');
         const logContent = await logResponse.text();
-        setLogsContent(prev => ({
-          ...prev,
-          76: logContent
-        }));
+        setLog76Content(logContent);
       } catch (error) {
-        console.error("Error loading logs:", error);
-        addToTerminalHistory({ 
-          type: 'output', 
-          text: 'ERROR: Could not load logs data.' 
-        });
+        console.error("Error loading log76:", error);
       }
     }
     
-    loadLogs();
+    loadLog76();
   }, []);
 
   useEffect(() => {
@@ -177,23 +165,16 @@ const SurvivorOSTerminal = () => {
     setTerminalInput('');
   };
 
-  // Add functions to handle logs commands
   const showLogsList = () => {
     addToTerminalHistory({ type: 'input', text: `> logs` });
     
-    let logsList = `
+    const logsList = `
 AVAILABLE SURVIVOR LOGS:
-----------------------`;
+----------------------
 
-    if (availableLogs.length === 0) {
-      logsList += `\n\nNo logs available. Check connection.`;
-    } else {
-      logsList += `\n\n`;
-      availableLogs.forEach(logNumber => {
-        logsList += `log${logNumber}: Survivor Log Entry #${logNumber}\n`;
-      });
-      logsList += `\nTo view a log, type 'log' followed by the log number (e.g., 'log76')`;
-    }
+log76: Survivor Log Entry #76
+
+To view a log, type 'log' followed by the log number (e.g., 'log76')`;
     
     addToTerminalHistory({ 
       type: 'output', 
@@ -203,51 +184,21 @@ AVAILABLE SURVIVOR LOGS:
     setTerminalInput('');
   };
 
-  const showLogContent = async (logNumber) => {
-    addToTerminalHistory({ type: 'input', text: `> log${logNumber}` });
+  const showLog76 = () => {
+    addToTerminalHistory({ type: 'input', text: `> log76` });
     
-    if (!availableLogs.includes(Number(logNumber))) {
-      addToTerminalHistory({ 
-        type: 'output', 
-        text: `ERROR: Log #${logNumber} not found in database.`
-      });
-      setTerminalInput('');
-      return;
-    }
+    addToTerminalHistory({ 
+      type: 'output', 
+      text: 'ACCESSING LOG ENTRY #76',
+    });
     
-    try {
-      // If we don't have the log content cached, fetch it
-      if (!logsContent[logNumber]) {
-        const logResponse = await fetch(`data/log${logNumber}.md`);
-        if (!logResponse.ok) {
-          throw new Error(`Log file not found: log${logNumber}.md`);
-        }
-        const logContent = await logResponse.text();
-        setLogsContent(prev => ({
-          ...prev,
-          [logNumber]: logContent
-        }));
-      }
-      
+    setTimeout(() => {
       addToTerminalHistory({ 
         type: 'output', 
-        text: `ACCESSING LOG ENTRY #${logNumber}`,
+        text: log76Content,
+        isQuickstart: true
       });
-      
-      setTimeout(() => {
-        addToTerminalHistory({ 
-          type: 'output', 
-          text: logsContent[logNumber],
-          isQuickstart: true // Use the same formatting as quickstart
-        });
-      }, 500);
-    } catch (error) {
-      console.error(`Error loading log${logNumber}.md:`, error);
-      addToTerminalHistory({ 
-        type: 'output', 
-        text: `ERROR: Could not load log #${logNumber}. File may be corrupted.`
-      });
-    }
+    }, 500);
     
     setTerminalInput('');
   };
@@ -417,9 +368,8 @@ AVAILABLE SURVIVOR LOGS:
       return;
     }
     
-    if (command.match(/^log\d+$/)) {
-      const logNumber = command.replace('log', '');
-      showLogContent(logNumber);
+    if (command === 'log76') {
+      showLog76();
       return;
     }
     
