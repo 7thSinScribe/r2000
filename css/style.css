@@ -1,4 +1,4 @@
-/* Updated font declarations and markdown styling */
+/* Styled CSS for markdown rendering */
 @font-face {
   font-family: 'Pixelcastle';
   src: url('fonts/Pixelcastle-Regular.otf') format('opentype');
@@ -173,7 +173,7 @@ input:focus {
   padding-left: 40px;
 }
 
-/* Basic pre styling for plain text terminal output */
+/* Basic pre styling for plain terminal output */
 pre {
   margin: 0;
   white-space: pre-wrap;
@@ -182,104 +182,133 @@ pre {
   line-height: 1.5;
 }
 
-/* Markdown element styling */
-.terminal-quickstart,
-.terminal-log,
-.terminal-output {
-  color: #e0f8cf;
+/* Markdown content styling */
+.markdown-content {
   font-family: 'RuneScape', monospace;
+  color: #e0f8cf;
   line-height: 1.5;
-  padding: 10px 5px;
+  padding: 5px 0;
 }
 
-/* Headers */
-.terminal-quickstart h1,
-.terminal-log h1,
-.terminal-output h1 {
-  color: #86c06c;
-  font-size: 1.5em;
+/* Headings */
+.markdown-content h1 {
+  font-size: 1.4em;
   font-weight: bold;
+  color: #86c06c;
   margin: 1em 0 0.5em 0;
   border-bottom: 1px solid #86c06c;
-  padding-bottom: 5px;
+  padding-bottom: 0.2em;
 }
 
-.terminal-quickstart h2,
-.terminal-log h2,
-.terminal-output h2 {
-  color: #86c06c;
-  font-size: 1.25em;
+.markdown-content h2 {
+  font-size: 1.3em;
   font-weight: bold;
+  color: #86c06c;
   margin: 1em 0 0.5em 0;
 }
 
-.terminal-quickstart h3,
-.terminal-log h3,
-.terminal-output h3 {
+.markdown-content h3 {
+  font-size: 1.2em;
+  font-weight: bold;
   color: #86c06c;
+  margin: 1em 0 0.5em 0;
+}
+
+.markdown-content h4 {
   font-size: 1.1em;
   font-weight: bold;
+  color: #86c06c;
   margin: 1em 0 0.5em 0;
+}
+
+/* Paragraphs and spacing */
+.markdown-content p {
+  margin: 0 0 1em 0;
 }
 
 /* Lists */
-.terminal-quickstart ul,
-.terminal-log ul,
-.terminal-output ul {
-  list-style-type: disc;
-  margin: 0.5em 0 1em 0;
+.markdown-content ul,
+.markdown-content ol {
+  margin: 0 0 1em 0;
   padding-left: 2em;
 }
 
-.terminal-quickstart li,
-.terminal-log li,
-.terminal-output li {
-  margin-bottom: 0.25em;
+.markdown-content ul li,
+.markdown-content ol li {
+  margin-bottom: 0.5em;
 }
 
-/* Paragraphs */
-.terminal-quickstart p,
-.terminal-log p,
-.terminal-output p {
-  margin-bottom: 1em;
+/* Make sure bullets are visible */
+.markdown-content ul {
+  list-style-type: disc;
 }
 
-/* Inline formatting */
-.terminal-quickstart strong,
-.terminal-log strong,
-.terminal-output strong,
-.terminal-quickstart em,
-.terminal-log em,
-.terminal-output em {
-  color: #e0f8cf;
+.markdown-content ol {
+  list-style-type: decimal;
 }
 
-/* Code blocks and inline code */
-.terminal-quickstart code,
-.terminal-log code,
-.terminal-output code {
+/* Code blocks */
+.markdown-content code {
   font-family: 'RuneScape', monospace;
-  background-color: rgba(0, 0, 0, 0.2);
-  padding: 2px 4px;
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 0.2em 0.4em;
   border-radius: 3px;
 }
 
-.terminal-quickstart .code-block,
-.terminal-log .code-block,
-.terminal-output .code-block {
+.markdown-content pre {
   background-color: rgba(0, 0, 0, 0.3);
-  padding: 10px;
+  padding: 1em;
   border-radius: 5px;
-  margin: 1em 0;
+  margin: 0 0 1em 0;
+  overflow-x: auto;
+}
+
+.markdown-content pre code {
+  background-color: transparent;
+  padding: 0;
 }
 
 /* Blockquotes */
-.terminal-quickstart blockquote,
-.terminal-log blockquote,
-.terminal-output blockquote {
+.markdown-content blockquote {
   border-left: 3px solid #86c06c;
   padding: 0.5em 1em;
-  margin: 0 0 1em 0.5em;
-  background-color: rgba(0, 0, 0, 0.1);
+  margin: 0 0 1em 0;
+  background-color: rgba(0, 0, 0, 0.2);
   border-radius: 0 5px 5px 0;
+}
+
+/* Tables */
+.markdown-content table {
+  border-collapse: collapse;
+  margin: 0 0 1em 0;
+  width: 100%;
+}
+
+.markdown-content th,
+.markdown-content td {
+  border: 1px solid #86c06c;
+  padding: 0.5em;
+}
+
+.markdown-content th {
+  background-color: rgba(134, 192, 108, 0.2);
+  font-weight: bold;
+}
+
+/* Strong and emphasis */
+.markdown-content strong {
+  font-weight: bold;
+  color: #e0f8cf;
+}
+
+.markdown-content em {
+  font-style: italic;
+  color: #e0f8cf;
+}
+
+/* Specific styling for different content types */
+.terminal-quickstart,
+.terminal-log,
+.terminal-output {
+  margin-bottom: 10px;
 }
