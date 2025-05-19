@@ -1,6 +1,13 @@
-// terminal.js with professional markdown processing
+// Add a glitchy font transition effect to terminal.js
 
-// ASCII art for the logo
+// Modified terminal.js with font transition effect
+// Place at the beginning of the file, before any other code
+
+// Font transition effect variables
+let fontTransitionComplete = false;
+let bootMessagesComplete = false;
+
+// Define our ASCII art and other constants
 const survivorAsciiLogo = [
   "███████╗██╗   ██╗██████╗ ██╗   ██╗██╗██╗   ██╗ ██████╗ ██████╗      ██████╗ ███████╗",
   "██╔════╝██║   ██║██╔══██╗██║   ██║██║██║   ██║██╔═══██╗██╔══██╗    ██╔═══██╗██╔════╝",
@@ -36,8 +43,36 @@ function renderTerminalLogo() {
   );
 }
 
-// Output rendering with markdown processing
+// Output rendering with markdown processing and font transition effect
 function renderOutput(item) {
+  // Apply a specific class for boot sequence messages
+  let outputClassName = '';
+  
+  if (!fontTransitionComplete && item.type === 'output' && 
+      !item.isTerminalLogo && !item.isLogo && 
+      (item.text.includes('INITIALIZING') || 
+       item.text.includes('BYPASSING') || 
+       item.text.includes('HYPERNET') || 
+       item.text.includes('PATCHING') ||
+       item.text.includes('OVERRIDING') ||
+       item.text.includes('WARNING'))) {
+    outputClassName = 'boot-message';
+  } else if (item.text === 'OVERRIDE ACCEPTED - FULL ACCESS GRANTED') {
+    outputClassName = 'access-granted-message';
+    
+    // Trigger the transition only once
+    if (!fontTransitionComplete) {
+      fontTransitionComplete = true;
+      
+      // Add the transitioned class to body after a delay to trigger the CSS animation
+      setTimeout(() => {
+        document.body.classList.add('font-transitioned');
+      }, 500);
+    }
+  } else if (fontTransitionComplete && !item.isTerminalLogo && !item.isLogo) {
+    outputClassName = 'hacked-terminal-message';
+  }
+  
   if (item.isTerminalLogo) {
     return renderTerminalLogo();
   } else if (item.isLogo) {
@@ -51,13 +86,13 @@ function renderOutput(item) {
     if (typeof marked !== 'undefined' && item.text) {
       return (
         <div 
-          className={`terminal-${item.contentType} markdown-content`}
+          className={`terminal-${item.contentType} markdown-content ${outputClassName}`}
           dangerouslySetInnerHTML={{ __html: marked.parse(item.text) }}
         />
       );
     } else {
       // Fallback if marked isn't loaded yet
-      return <pre className={`terminal-${item.contentType}`}>{item.text}</pre>;
+      return <pre className={`terminal-${item.contentType} ${outputClassName}`}>{item.text}</pre>;
     }
   } else {
     // For regular output, check if it might be markdown content
@@ -70,14 +105,14 @@ function renderOutput(item) {
     )) {
       return (
         <div 
-          className="terminal-output markdown-content"
+          className={`terminal-output markdown-content ${outputClassName}`}
           dangerouslySetInnerHTML={{ __html: marked.parse(item.text) }}
         />
       );
     }
     
     // Otherwise, display as plain text
-    return <pre className="terminal-output">{item.text}</pre>;
+    return <pre className={`terminal-output ${outputClassName}`}>{item.text}</pre>;
   }
 }
 

@@ -1,4 +1,4 @@
-/* Styled CSS for markdown rendering */
+/* CSS with font transition effects */
 @font-face {
   font-family: 'Pixelcastle';
   src: url('fonts/Pixelcastle-Regular.otf') format('opentype');
@@ -15,14 +15,23 @@
   font-display: swap;
 }
 
-body, html {
+/* Added font transition mechanism */
+body {
   margin: 0;
   padding: 0;
   height: 100%;
   width: 100%;
   overflow: hidden;
   background-color: #000;
+  font-family: monospace; /* Start with default monospace */
+  font-size: 16px;
+}
+
+/* When the terminal has been "hacked" */
+body.font-transitioned {
   font-family: 'RuneScape', monospace;
+  font-size: 18px; /* Bigger font once hacked */
+  transition: font-size 0.8s ease;
 }
 
 #root {
@@ -108,6 +117,38 @@ body, html {
   animation: glitch-animation 0.3s forwards;
 }
 
+/* Font transition specific classes */
+.boot-message {
+  font-family: monospace;
+  font-size: 16px;
+}
+
+.access-granted-message {
+  font-family: 'Pixelcastle', monospace;
+  font-size: 18px;
+  color: #86c06c;
+  animation: text-flicker 0.5s linear;
+}
+
+.hacked-terminal-message {
+  font-family: 'RuneScape', monospace;
+  font-size: 18px;
+}
+
+@keyframes text-flicker {
+  0% { opacity: 0.8; }
+  10% { opacity: 0.1; }
+  20% { opacity: 0.9; }
+  30% { opacity: 0.2; }
+  40% { opacity: 1.0; }
+  50% { opacity: 0.3; }
+  60% { opacity: 0.8; }
+  70% { opacity: 0.2; }
+  80% { opacity: 0.9; }
+  90% { opacity: 0.7; }
+  100% { opacity: 1.0; }
+}
+
 .terminal-logo {
   font-family: 'Pixelcastle', monospace;
   font-size: 36px;
@@ -158,41 +199,45 @@ input:focus {
   color: #e0f8cf;
   background-color: #306850;
   padding: 0 40px;
-  font-family: 'RuneScape', monospace;
+  font-family: inherit; /* Use the inherited font family - changes with the transition */
 }
 
 .terminal-header {
   color: #e0f8cf;
   border-bottom: 1px solid #86c06c;
   padding: 0 40px;
-  font-family: 'RuneScape', monospace;
+  font-family: inherit; /* Use the inherited font family */
   letter-spacing: 1px;
+  font-size: 18px;
 }
 
 .command-input {
   padding-left: 40px;
+  font-size: 18px;
 }
 
 /* Basic pre styling for plain terminal output */
 pre {
   margin: 0;
   white-space: pre-wrap;
-  font-family: 'RuneScape', monospace;
   color: #e0f8cf;
   line-height: 1.5;
+  font-family: inherit; /* Use the inherited font family */
+  font-size: inherit; /* Use the inherited font size */
 }
 
 /* Markdown content styling */
 .markdown-content {
-  font-family: 'RuneScape', monospace;
   color: #e0f8cf;
   line-height: 1.5;
   padding: 5px 0;
+  font-family: inherit; /* Use the inherited font family */
+  font-size: inherit; /* Use the inherited font size */
 }
 
-/* Headings */
+/* Headings - Increased font sizes */
 .markdown-content h1 {
-  font-size: 1.4em;
+  font-size: 28px; /* Larger size */
   font-weight: bold;
   color: #86c06c;
   margin: 1em 0 0.5em 0;
@@ -201,21 +246,21 @@ pre {
 }
 
 .markdown-content h2 {
-  font-size: 1.3em;
+  font-size: 24px; /* Larger size */
   font-weight: bold;
   color: #86c06c;
   margin: 1em 0 0.5em 0;
 }
 
 .markdown-content h3 {
-  font-size: 1.2em;
+  font-size: 22px; /* Larger size */
   font-weight: bold;
   color: #86c06c;
   margin: 1em 0 0.5em 0;
 }
 
 .markdown-content h4 {
-  font-size: 1.1em;
+  font-size: 20px; /* Larger size */
   font-weight: bold;
   color: #86c06c;
   margin: 1em 0 0.5em 0;
@@ -249,10 +294,11 @@ pre {
 
 /* Code blocks */
 .markdown-content code {
-  font-family: 'RuneScape', monospace;
+  font-family: inherit;
   background-color: rgba(0, 0, 0, 0.3);
   padding: 0.2em 0.4em;
   border-radius: 3px;
+  font-size: inherit;
 }
 
 .markdown-content pre {
