@@ -1,5 +1,3 @@
-// Simple terminal.js that works
-// ASCII art for the logo
 const survivorAsciiLogo = [
   "███████╗██╗   ██╗██████╗ ██╗   ██╗██╗██╗   ██╗ ██████╗ ██████╗      ██████╗ ███████╗",
   "██╔════╝██║   ██║██╔══██╗██║   ██║██║██║   ██║██╔═══██╗██╔══██╗    ██╔═══██╗██╔════╝",
@@ -11,42 +9,36 @@ const survivorAsciiLogo = [
   "                   terminal v0.5b | build: srv-2957f5a                              "
 ];
 
-// Initialize marked with the settings we want
 if (typeof marked !== 'undefined') {
   marked.setOptions({
-    gfm: true,                // GitHub Flavored Markdown
-    breaks: true,             // Add <br> on a single line break
-    pedantic: false,          // Don't be overly conformant to markdown spec
-    headerIds: true,          // Generate IDs for headers
-    mangle: false,            // Don't escape HTML
-    smartLists: true,         // Use smarter list behavior
-    smartypants: false,       // Don't use "smart" typographic punctuation
-    xhtml: false              // Don't use XHTML style closing tags for singleton elements
+    gfm: true,
+    breaks: true,
+    pedantic: false,
+    headerIds: true,
+    mangle: false,
+    smartLists: true,
+    smartypants: false,
+    xhtml: false
   });
 }
 
-// Terminal logo component
-function renderTerminalLogo() {
+function renderTerminalLogo(isBooting) {
   return (
     <div>
-      <div className="terminal-logo blink-animation">SurvivorOS©</div>
+      <div className={isBooting ? "terminal-logo blink-animation-continuous" : "terminal-logo"}>SurvivorOS©</div>
       <div className="copyright-text">rogueboy override v0.5b | build: srv-2957f5a</div>
     </div>
   );
 }
 
-// Output rendering with font transition
-function renderOutput(item) {
-  // Check if this is the message that triggers the transition
+function renderOutput(item, isBooting) {
   if (item.text === 'OVERRIDE ACCEPTED - FULL ACCESS GRANTED') {
-    // Add the hacked class to the document body
     document.body.classList.add('hacked');
-    
     return <pre className="access-granted">{item.text}</pre>;
   }
   
   if (item.isTerminalLogo) {
-    return renderTerminalLogo();
+    return renderTerminalLogo(isBooting);
   } else if (item.isLogo) {
     return (
       <div className={item.shouldBlink ? "blink-animation" : ""}>
@@ -54,7 +46,6 @@ function renderOutput(item) {
       </div>
     );
   } else if (item.contentType === 'quickstart' || item.contentType === 'log') {
-    // Use marked.js to properly render markdown content
     if (typeof marked !== 'undefined' && item.text) {
       return (
         <div 
@@ -63,11 +54,9 @@ function renderOutput(item) {
         />
       );
     } else {
-      // Fallback if marked isn't loaded yet
       return <pre className={`terminal-${item.contentType}`}>{item.text}</pre>;
     }
   } else {
-    // For regular output, check if it might be markdown content
     if (typeof marked !== 'undefined' && item.text && (
       item.text.includes('#') || 
       item.text.includes('*') || 
@@ -83,12 +72,10 @@ function renderOutput(item) {
       );
     }
     
-    // Otherwise, display as plain text
     return <pre className="terminal-output">{item.text}</pre>;
   }
 }
 
-// Generate random glitch effect
 function renderRandomGlitch() {
   const shouldShow = Math.random() < 0.015;
   if (!shouldShow) return null;
