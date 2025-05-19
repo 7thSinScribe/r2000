@@ -367,6 +367,8 @@ about:    About SurvivorOS Terminal
 quickstart: Display Rogue 2000 game information
 whoami:   Run survivor identity questionnaire
 ascii:    Display SurvivorOS ASCII art logo
+logs:     List available survivor logs
+log [#]:  Display specific log entry
 
 For survivors in the zones: Type what you learn out there.
 Stay safe. Share knowledge. Survive.`;
@@ -389,6 +391,67 @@ good luck. You'll need it." - Note found with terminal
     else if (command === 'clear') {
       clearTerminal();
       return;
+    }
+    else if (command === 'logs') {
+      // Show available logs
+      response = `AVAILABLE LOGS:\n\n${availableLogs.map(logNum => `- Log #${logNum}`).join('\n')}\n\nType 'log [number]' to view a specific log.`;
+    } 
+    else if (command.startsWith('log ')) {
+      // Parse log number
+      const logNumber = parseInt(command.split('log ')[1], 10);
+      
+      if (isNaN(logNumber)) {
+        response = "Invalid log number. Type 'logs' to see available logs.";
+      } else {
+        // Display loading message
+        addToTerminalHistory({ type: 'output', text: `Accessing log #${logNumber}...` });
+        
+        // Load and display the log asynchronously
+        const loadLog = async (logNum) => {
+          // Check if log is in cache
+          if (logsCache[logNum]) {
+            return logsCache[logNum];
+          }
+          
+          try {
+            const logResponse = await fetch(`data/log${logNum}.md`);
+            if (!logResponse.ok) {
+              throw new Error(`Log ${logNum} not found.`);
+            }
+            const logContent = await logResponse.text();
+            
+            // Update cache
+            setLogsCache(prev => ({
+              ...prev,
+              [logNum]: logContent
+            }));
+            
+            return logContent;
+          } catch (error) {
+            console.error(`Error loading log ${logNum}:`, error);
+            return null;
+          }
+        };
+        
+        // Load and display the log
+        loadLog(logNumber).then(logContent => {
+          if (logContent) {
+            addToTerminalHistory({ 
+              type: 'output', 
+              text: logContent,
+              contentType: 'log'
+            });
+          } else {
+            addToTerminalHistory({ 
+              type: 'output', 
+              text: `ERROR: Log #${logNumber} not found or could not be loaded.`
+            });
+          }
+        });
+        
+        // Return without setting response to avoid duplicate messages
+        return;
+      }
     }
     else {
       response = `Command not recognized: '${command}'
