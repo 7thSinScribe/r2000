@@ -1,3 +1,4 @@
+/* This file retains the ASCII art for compatibility */
 const survivorAsciiLogo = [
   "███████╗██╗   ██╗██████╗ ██╗   ██╗██╗██╗   ██╗ ██████╗ ██████╗      ██████╗ ███████╗",
   "██╔════╝██║   ██║██╔══██╗██║   ██║██║██║   ██║██╔═══██╗██╔══██╗    ██╔═══██╗██╔════╝",
@@ -22,13 +23,189 @@ if (typeof marked !== 'undefined') {
   });
 }
 
+const logoStates = {
+  BOOTING: 'booting',
+  GLITCHING: 'glitching',
+  COMPLETE: 'complete'
+};
+
+let currentGlitchState = {
+  state: logoStates.BOOTING,
+  glitchTimer: null,
+  glitchCount: 0,
+  maxGlitches: 3
+};
+
 function renderTerminalLogo(isBooting) {
+  if (!isBooting && currentGlitchState.state === logoStates.BOOTING) {
+    currentGlitchState.state = logoStates.GLITCHING;
+    
+    if (!currentGlitchState.glitchTimer) {
+      startLogoGlitchSequence();
+    }
+  }
+  
+  let logoClass = "terminal-logo";
+  let logoContent = "";
+  let copyrightText = "";
+  
+  switch(currentGlitchState.state) {
+    case logoStates.BOOTING:
+      logoClass += " booting blink-animation-continuous";
+      logoContent = "Rogueboy";
+      copyrightText = <span>rogueboy<span className="trademark">™</span> 2000 | n-co proprietary technology</span>;
+      break;
+      
+    case logoStates.GLITCHING:
+      const glitchRandom = Math.random();
+      logoClass += " glitching";
+      
+      if (glitchRandom < 0.7) {
+        logoContent = "Rogueboy";
+        copyrightText = <span>rogueboy<span className="trademark">™</span> 2000 | n-co proprietary technology</span>;
+        
+        if (Math.random() < 0.5) {
+          logoClass += " glitch-text";
+        }
+      } else {
+        logoContent = "Survivor OS";
+        copyrightText = "rogueboy override v0.5b | build: srv-2957f5a";
+        
+        if (Math.random() < 0.5) {
+          logoClass += " glitch-text";
+        }
+      }
+      break;
+      
+    case logoStates.COMPLETE:
+      logoClass += " complete";
+      logoContent = "Survivor OS";
+      copyrightText = "rogueboy override v0.5b | build: srv-2957f5a";
+      break;
+  }
+  
   return (
     <div>
-      <div className={isBooting ? "terminal-logo blink-animation-continuous" : "terminal-logo"}>Survivor OS</div>
-      <div className="copyright-text">rogueboy override v0.5b | build: srv-2957f5a</div>
+      <div className={logoClass} data-text={logoContent}>{logoContent}</div>
+      <div 
+        className={currentGlitchState.state === logoStates.GLITCHING ? "copyright-text glitch-text" : "copyright-text"}
+        data-text={typeof copyrightText === 'string' ? copyrightText : 'rogueboy override v0.5b'}
+      >
+        {copyrightText}
+      </div>
+      
+      {currentGlitchState.state === logoStates.GLITCHING && Math.random() < 0.3 && (
+        <div className="artifact h-line" style={{ top: `${Math.random() * 100}%` }}></div>
+      )}
+      
+      {currentGlitchState.state === logoStates.GLITCHING && Math.random() < 0.3 && (
+        <div className="artifact v-line" style={{ left: `${Math.random() * 100}%` }}></div>
+      )}
     </div>
   );
+}
+
+function startLogoGlitchSequence() {
+  const rapidGlitchInterval = setInterval(() => {
+    const logoElement = document.querySelector('.terminal-logo');
+    if (logoElement) {
+      logoElement.classList.toggle('force-update');
+      
+      if (Math.random() < 0.4) {
+        const staticEl = document.createElement('div');
+        staticEl.className = 'glitch-static';
+        staticEl.style.position = 'absolute';
+        staticEl.style.width = `${Math.random() * 50 + 20}px`;
+        staticEl.style.height = `${Math.random() * 10 + 2}px`;
+        staticEl.style.backgroundColor = Math.random() > 0.5 ? '#86c06c' : '#e0f8cf';
+        staticEl.style.opacity = '0.7';
+        staticEl.style.left = `${Math.random() * 100}%`;
+        staticEl.style.top = `${Math.random() * 100}%`;
+        staticEl.style.zIndex = '10';
+        
+        logoElement.parentNode.appendChild(staticEl);
+        setTimeout(() => {
+          if (staticEl.parentNode) {
+            staticEl.parentNode.removeChild(staticEl);
+          }
+        }, 300);
+      }
+    }
+  }, 150);
+  
+  setTimeout(() => {
+    clearInterval(rapidGlitchInterval);
+    
+    currentGlitchState.glitchTimer = setInterval(() => {
+      const logoElement = document.querySelector('.terminal-logo');
+      if (logoElement) {
+        logoElement.classList.toggle('force-update');
+      }
+      
+      currentGlitchState.glitchCount++;
+      
+      if (Math.random() < 0.5) {
+        const screenGlitch = document.createElement('div');
+        screenGlitch.className = 'screen-glitch';
+        screenGlitch.style.position = 'fixed';
+        screenGlitch.style.top = '0';
+        screenGlitch.style.left = '0';
+        screenGlitch.style.width = '100%';
+        screenGlitch.style.height = '100%';
+        screenGlitch.style.backgroundColor = 'transparent';
+        screenGlitch.style.zIndex = '1000';
+        screenGlitch.style.pointerEvents = 'none';
+        
+        const xShift = Math.random() * 10 - 5 + 'px';
+        const yShift = Math.random() * 6 - 3 + 'px';
+        screenGlitch.style.transform = `translate(${xShift}, ${yShift})`;
+        
+        document.body.appendChild(screenGlitch);
+        
+        setTimeout(() => {
+          if (screenGlitch.parentNode) {
+            screenGlitch.parentNode.removeChild(screenGlitch);
+          }
+        }, 150);
+      }
+      
+      if (currentGlitchState.glitchCount >= currentGlitchState.maxGlitches) {
+        currentGlitchState.state = logoStates.COMPLETE;
+        clearInterval(currentGlitchState.glitchTimer);
+        currentGlitchState.glitchTimer = null;
+        
+        setTimeout(() => {
+          const logoElement = document.querySelector('.terminal-logo');
+          if (logoElement) {
+            logoElement.classList.add('force-update');
+            
+            const finalFlash = document.createElement('div');
+            finalFlash.style.position = 'fixed';
+            finalFlash.style.top = '0';
+            finalFlash.style.left = '0';
+            finalFlash.style.width = '100%';
+            finalFlash.style.height = '100%';
+            finalFlash.style.backgroundColor = '#86c06c';
+            finalFlash.style.opacity = '0.3';
+            finalFlash.style.zIndex = '999';
+            finalFlash.style.pointerEvents = 'none';
+            finalFlash.style.transition = 'opacity 0.5s ease-out';
+            
+            document.body.appendChild(finalFlash);
+            
+            setTimeout(() => {
+              finalFlash.style.opacity = '0';
+              setTimeout(() => {
+                if (finalFlash.parentNode) {
+                  finalFlash.parentNode.removeChild(finalFlash);
+                }
+              }, 500);
+            }, 50);
+          }
+        }, 100);
+      }
+    }, 800);
+  }, 1000);
 }
 
 function renderOutput(item, isBooting) {
