@@ -1,20 +1,4 @@
 @font-face {
-  font-family: 'GossipHighPixel';
-  src: url('fonts/Gossip-HighPixel.otf') format('opentype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'MedPixel';
-  src: url('fonts/Gossip-MedPixel.otf') format('opentype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
   font-family: 'Pixelcastle';
   src: url('https://cdn.jsdelivr.net/gh/dtinth/pixelcastle/dist/pixelcastle-regular.woff2') format('woff2');
   font-weight: normal;
@@ -122,9 +106,8 @@ body, html {
   animation: glitch-animation 0.3s forwards;
 }
 
-/* Updated to use GossipHighPixel font */
 .terminal-logo {
-  font-family: 'GossipHighPixel', monospace;
+  font-family: 'Pixelcastle', monospace;
   font-size: 36px;
   color: #e0f8cf;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
@@ -133,9 +116,8 @@ body, html {
   margin-bottom: 10px;
 }
 
-/* Updated to use MedPixel font */
 .copyright-text {
-  font-family: 'MedPixel', monospace;
+  font-family: 'Pixelcastle', monospace;
   font-size: 14px;
   color: #86c06c;
   text-align: center;
@@ -203,17 +185,10 @@ pre {
   padding: 10px 5px;
 }
 
-/* Updated to use GossipHighPixel for h1 and h2, MedPixel for h3 */
 .markdown-content h1, 
-.markdown-content h2 {
-  font-family: 'GossipHighPixel', monospace;
-  color: #86c06c;
-  margin-top: 1.25rem;
-  margin-bottom: 0.75rem;
-}
-
+.markdown-content h2, 
 .markdown-content h3 {
-  font-family: 'MedPixel', monospace;
+  font-family: 'Pixelcastle', monospace;
   color: #86c06c;
   margin-top: 1.25rem;
   margin-bottom: 0.75rem;
