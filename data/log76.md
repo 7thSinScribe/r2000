@@ -1,5 +1,6 @@
 ﻿> PERSONAL LOG
 > SATURDAY #76
+> AUTHOR [REDACTED]
 
 Nearly lost it today. Was rummaging through an abandoned N-Co shop when my torch died. Just like that - full charge to nothing in seconds. Could have sworn I heard something moving, but couldn't see a bloody thing.
 
