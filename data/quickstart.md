@@ -6,17 +6,20 @@ It's been January 1st, 2000 for nearly 13,000 Saturdays. The digital apocalypse 
 
 - Digital devices display the date as January 1, 2000 due to a bug in the original game
 - Game entities believe they're real, wandering the physical world
-- Reality glitches like bad code, with digital decay visible everywhere
-- The mysterious Gamemaster is always watching
+- The Gamemaster is always watching
 
 # THE P.O.W.E.R. SYSTEM
 
 Post-merge, all entities are governed by the five fundamental statistics:
 
 **P - POWER**: Raw physical strength and destructive capability.  
+
 **O - ODDITY**: Unconventional thinking and approach to problems.  
+
 **W - WISDOM**: Problem-solving, technical knowledge, and strategy.  
+
 **E - ENDURANCE**: Physical toughness and resilience.  
+
 **R - REFLEX**: Speed, coordination, and reaction time.  
 
 Stats are rated from 1-35. 
@@ -33,7 +36,7 @@ Like many RPGs of the time, Rogue 2000 used derived attributes, calculated & upd
 
 ### **BLOOD**
 
-    The last analogue interface. 
+> The last analogue interface.
 
 Run out of this stuff and you don't need to question what happens, because you won't be able to ask any questions. 
 
@@ -84,7 +87,7 @@ At the start of a new scene, you'll Build a Hand of dice & proceed to play a pok
 
 #### 2. PLAYING YOUR HAND
 
-- On your turn, draw 1 new die. In combat, additionally draw 1 weapon die per turn. 
+- On your turn, draw 1 attribute die. In combat, additionally draw 1 weapon die per turn. 
 - For major actions, play 3 dice from your hand
 - Declare their values (can lie about them)
 - Describe your action(s)

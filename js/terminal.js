@@ -25,7 +25,7 @@ if (typeof marked !== 'undefined') {
 function renderTerminalLogo(isBooting) {
   return (
     <div>
-      <div className={isBooting ? "terminal-logo blink-animation-continuous" : "terminal-logo"}>SurvivorOS©</div>
+      <div className={isBooting ? "terminal-logo blink-animation-continuous" : "terminal-logo"}>SurvivorOS</div>
       <div className="copyright-text">rogueboy override v0.5b | build: srv-2957f5a</div>
     </div>
   );

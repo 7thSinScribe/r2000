@@ -279,33 +279,74 @@ pre {
   list-style-type: decimal;
 }
 
-/* Code blocks */
+/* Code blocks - Updated with Pixelcastle font and better terminal-like styling */
 .markdown-content code {
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: rgba(48, 104, 80, 0.6); /* Darker green */
+  color: #b3ffcc; /* Brighter green text */
   padding: 0.2em 0.4em;
   border-radius: 3px;
+  font-family: 'Pixelcastle', monospace; /* Using Pixelcastle font */
+  font-size: 0.9em;
+  border: 1px solid #86c06c; /* Light green border */
 }
 
 .markdown-content pre {
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: rgba(24, 52, 40, 0.8); /* Even darker green background */
   padding: 1em;
   border-radius: 5px;
   margin: 0 0 1em 0;
   overflow-x: auto;
+  border: 1px solid #86c06c; /* Light green border */
+  position: relative; /* Needed for scan line effect */
 }
 
 .markdown-content pre code {
-  background-color: transparent;
+  background-color: transparent; /* Keep pre background showing through */
   padding: 0;
+  border: none; /* Remove border from inner code element */
+  color: #b3ffcc; /* Ensure code text within pre is bright green */
 }
 
-/* Blockquotes */
+/* Add a subtle scan line effect to code blocks */
+.markdown-content pre::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(134, 192, 108, 0),
+    rgba(134, 192, 108, 0) 1px,
+    rgba(134, 192, 108, 0.03) 1px,
+    rgba(134, 192, 108, 0.03) 2px
+  );
+  pointer-events: none;
+}
+
+/* Blockquotes - Italic text on darker background */
 .markdown-content blockquote {
-  border-left: 3px solid #86c06c;
+  border-left: 3px solid #86c06c; /* Light green border on left */
   padding: 0.5em 1em;
   margin: 0 0 1em 0;
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgba(24, 52, 40, 0.5); /* Dark green background */
   border-radius: 0 5px 5px 0;
+  font-family: 'Pixelcastle', monospace; /* Using Pixelcastle font */
+  font-style: italic; /* Italicized text as requested */
+  color: #c3e6b4; /* Slightly different green for blockquote text */
+}
+
+/* Make sure hacked state preserves these styles */
+body.hacked .markdown-content code,
+body.hacked .markdown-content blockquote {
+  font-family: 'Pixelcastle', monospace;
+}
+
+/* Add a subtle pixel-like border to code blocks and blockquotes */
+.markdown-content pre,
+.markdown-content blockquote {
+  box-shadow: 0 0 0 1px rgba(134, 192, 108, 0.3);
 }
 
 /* Tables */
