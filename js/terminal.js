@@ -1,4 +1,6 @@
+// Updated terminal.js with improved markdown rendering and logo
 
+// ASCII art 
 const survivorAsciiLogo = [
   "███████╗██╗   ██╗██████╗ ██╗   ██╗██╗██╗   ██╗ ██████╗ ██████╗      ██████╗ ███████╗",
   "██╔════╝██║   ██║██╔══██╗██║   ██║██║██║   ██║██╔═══██╗██╔══██╗    ██╔═══██╗██╔════╝",
@@ -10,11 +12,11 @@ const survivorAsciiLogo = [
   "                   terminal v0.5b | build: srv-2957f5a                              "
 ];
 
-// terminal logo
+// terminal logo - updated to match with custom font changes
 function renderTerminalLogo() {
   return (
     <div>
-      <div className="terminal-logo">SurvivorOS©</div>
+      <div className="terminal-logo blink-animation">SurvivorOS©</div>
       <div className="copyright-text">rogueboy override v0.5b | build: srv-2957f5a</div>
     </div>
   );
@@ -22,38 +24,42 @@ function renderTerminalLogo() {
 
 // Enhanced markdown formatting function
 function formatMarkdown(text, className = "") {
-
+  // First, handle code blocks with triple backticks
   let formattedText = text;
-
+  
+  // Process code blocks (triple backticks)
   formattedText = formattedText.replace(/```(\w*)\n([\s\S]*?)\n```/g, (match, language, code) => {
     return `<pre class="code-block ${language}"><code>${code.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`;
   });
   
-
+  // Process inline code
   formattedText = formattedText.replace(/`([^`]+)`/g, '<code>$1</code>');
   
-
+  // Process headers
   formattedText = formattedText
     .replace(/^### (.*?)$/gm, '<h3>$1</h3>')
     .replace(/^## (.*?)$/gm, '<h2>$1</h2>')
     .replace(/^# (.*?)$/gm, '<h1>$1</h1>');
   
-
+  // Process emphasis
   formattedText = formattedText
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.*?)\*/g, '<em>$1</em>');
   
+  // Process blockquotes
   formattedText = formattedText
     .replace(/^>>> (.*?)$/gm, '<blockquote>$1</blockquote>')
     .replace(/^> (.*?)$/gm, '<blockquote>$1</blockquote>');
-
+  
+  // Split into paragraphs
   const paragraphs = formattedText.split(/\n\n+/);
   
-
+  // Process each paragraph
   const processedParagraphs = paragraphs.map(para => {
-
+    // Skip if already contains HTML
     if (para.match(/<(h1|h2|h3|pre|blockquote)[^>]*>/)) return para;
     
+    // Handle unordered lists
     if (para.match(/^- .+(\n- .+)*$/)) {
       const items = para.split('\n').map(line => {
         if (line.startsWith('- ')) {
@@ -64,7 +70,7 @@ function formatMarkdown(text, className = "") {
       return `<ul>${items}</ul>`;
     }
     
-
+    // Handle ordered lists
     if (para.match(/^\d+\. .+(\n\d+\. .+)*$/)) {
       const items = para.split('\n').map(line => {
         const match = line.match(/^\d+\. (.+)/);
@@ -76,22 +82,22 @@ function formatMarkdown(text, className = "") {
       return `<ol>${items}</ol>`;
     }
     
-
+    // Look for all caps headers and make them h2
     if (/^[A-Z][A-Z\s]+[A-Z]$/.test(para)) {
       return `<h2>${para}</h2>`;
     }
     
-
+    // Default to paragraph
     return `<p>${para}</p>`;
   });
   
-
+  // Join processed paragraphs
   const finalText = processedParagraphs.join('');
   
   return <div dangerouslySetInnerHTML={{ __html: finalText }} className={`markdown-content ${className}`} />;
 }
 
-
+// Render output with appropriate formatting
 function renderOutput(item) {
   if (item.isTerminalLogo) {
     return renderTerminalLogo();
@@ -112,6 +118,8 @@ function renderOutput(item) {
     }
   }
 }
+
+// Generate random glitch effect
 function renderRandomGlitch() {
   const shouldShow = Math.random() < 0.015;
   if (!shouldShow) return null;
