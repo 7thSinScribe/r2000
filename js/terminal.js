@@ -1,4 +1,4 @@
-// terminal.js - simplified font transition
+// Simple terminal.js with reliable font transition
 // ASCII art for the logo
 const survivorAsciiLogo = [
   "███████╗██╗   ██╗██████╗ ██╗   ██╗██╗██╗   ██╗ ██████╗ ██████╗      ██████╗ ███████╗",
@@ -25,6 +25,9 @@ if (typeof marked !== 'undefined') {
   });
 }
 
+// Global flag for font transition
+let fontTransitioned = false;
+
 // Terminal logo component
 function renderTerminalLogo() {
   return (
@@ -35,12 +38,29 @@ function renderTerminalLogo() {
   );
 }
 
-// Output rendering with simple font transition
+// Output rendering with font transition
 function renderOutput(item) {
   // Check if this is the message that triggers the transition
   if (item.text === 'OVERRIDE ACCEPTED - FULL ACCESS GRANTED') {
-    // Trigger the font transition
-    document.body.classList.add('font-transitioned');
+    // Trigger the font transition once
+    if (!fontTransitioned) {
+      fontTransitioned = true;
+      
+      // Apply the transition immediately and add a class to body
+      document.body.classList.add('font-transitioned');
+      
+      // Optional: Add flicker effect to simulate hack
+      setTimeout(() => {
+        const terminal = document.querySelector('.terminal-content');
+        if (terminal) {
+          terminal.classList.add('flicker-effect');
+          setTimeout(() => {
+            terminal.classList.remove('flicker-effect');
+          }, 500);
+        }
+      }, 100);
+    }
+    
     return <pre className="access-granted-message">{item.text}</pre>;
   }
   

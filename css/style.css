@@ -1,4 +1,4 @@
-/* Fixed CSS with proper font inheritance */
+/* Fixed CSS with proper font transition */
 @font-face {
   font-family: 'Pixelcastle';
   src: url('fonts/Pixelcastle-Regular.otf') format('opentype');
@@ -15,7 +15,7 @@
   font-display: swap;
 }
 
-/* Simple body font transition */
+/* Base body styles with explicit font */
 body {
   margin: 0;
   padding: 0;
@@ -23,15 +23,44 @@ body {
   width: 100%;
   overflow: hidden;
   background-color: #000;
-  font-family: monospace; /* Start with default monospace */
+  font-family: monospace !important;
   font-size: 16px;
-  transition: font-family 0.5s, font-size 0.5s;
 }
 
-/* When the terminal has been "hacked" */
-body.font-transitioned {
-  font-family: 'RuneScape', monospace;
-  font-size: 18px; /* Bigger font once hacked */
+/* Font transition class applied by JS */
+body.font-transitioned,
+body.font-transitioned * {
+  /* !important to ensure it overrides any other styles */
+  font-family: 'RuneScape', monospace !important;
+  font-size: 18px !important;
+}
+
+/* Ensure headings are still larger */
+body.font-transitioned .markdown-content h1 {
+  font-size: 28px !important;
+}
+
+body.font-transitioned .markdown-content h2 {
+  font-size: 24px !important;
+}
+
+body.font-transitioned .markdown-content h3 {
+  font-size: 22px !important;
+}
+
+body.font-transitioned .markdown-content h4 {
+  font-size: 20px !important;
+}
+
+/* Keep logo font consistent */
+body.font-transitioned .terminal-logo {
+  font-family: 'Pixelcastle', monospace !important;
+  font-size: 36px !important;
+}
+
+body.font-transitioned .copyright-text {
+  font-family: 'Pixelcastle', monospace !important;
+  font-size: 14px !important;
 }
 
 #root {
@@ -117,12 +146,7 @@ body.font-transitioned {
   animation: glitch-animation 0.3s forwards;
 }
 
-/* Transition text effect */
-.access-granted-message {
-  color: #86c06c;
-  animation: text-flicker 0.5s linear;
-}
-
+/* Flicker effect for transition */
 @keyframes text-flicker {
   0% { opacity: 0.8; }
   10% { opacity: 0.1; }
@@ -135,6 +159,15 @@ body.font-transitioned {
   80% { opacity: 0.9; }
   90% { opacity: 0.7; }
   100% { opacity: 1.0; }
+}
+
+.flicker-effect {
+  animation: text-flicker 0.5s linear;
+}
+
+.access-granted-message {
+  color: #86c06c;
+  animation: text-flicker 0.5s linear;
 }
 
 .terminal-logo {
@@ -200,12 +233,11 @@ input:focus {
   padding-left: 40px;
 }
 
-/* IMPORTANT: This ensures the input field inherits the font family */
+/* CRITICAL: ensure input inherits font properties */
 input {
-  font-family: inherit;
-  font-size: inherit;
-  background: transparent;
+  background-color: transparent;
   color: #e0f8cf;
+  border: none;
 }
 
 /* Basic pre styling for plain terminal output */
