@@ -1,8 +1,9 @@
->>> PERSONAL LOG
+﻿> PERSONAL LOG
+> SATURDAY #76
 
 Nearly lost it today. Was rummaging through an abandoned N-Co shop when my torch died. Just like that - full charge to nothing in seconds. Could have sworn I heard something moving, but couldn't see a bloody thing.
 
-Then I remembered the RogueVision AR goggles I'd pocketed earlier. Put them on and there it was. A glowing blue... thing. Sort of like a jellyfish crossed with a lightning bolt. Some kind of pure digital entity, existing right there in physical space but completely invisible without the goggles.
+Then I remembered the Vision goggles I'd pocketed earlier. Put them on and there it was. A glowing blue... thing. Sort of like a jellyfish crossed with a lightning bolt. Some kind of pure digital entity, from the game files, existing right there in physical space but completely invisible without the goggles.
 
 It was draining the electricity from anything I had powered up. My watch stopped. Phone died. Even the little LED keychain went dark. Could actually see little streams of energy (the goggles visualize it as blue particles) flowing from my devices into the creature.
 
@@ -19,9 +20,3 @@ Key findings about pure digital entities:
 - Can deliver stun attacks that temporarily paralyze
 - Vulnerable to electrical surges, EM pulses, etc.
 - No blood or physical components - just disrupt their pattern enough and they dissipate
-
-Think I'll call these ones "Parasparks" - they seem to feed on electricity and resemble sparks of energy. Need to be careful about battery management in areas they inhabit. My rule now is always keep one device powered down as backup.
-
-I've started measuring battery life in "Watts" rather than percentage - more precise when dealing with these things. Will record more entity types as I encounter them.
-
-Also, discovered that certain music played through speakers seems to confuse them - something about the sound wave patterns disrupting their form. The Clash works particularly well. Digital entities don't like punk, apparently.
