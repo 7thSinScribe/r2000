@@ -1,6 +1,4 @@
-// Updated terminal.js with simplified rendering
 
-// ASCII art 
 const survivorAsciiLogo = [
   "███████╗██╗   ██╗██████╗ ██╗   ██╗██╗██╗   ██╗ ██████╗ ██████╗      ██████╗ ███████╗",
   "██╔════╝██║   ██║██╔══██╗██║   ██║██║██║   ██║██╔═══██╗██╔══██╗    ██╔═══██╗██╔════╝",
@@ -16,56 +14,84 @@ const survivorAsciiLogo = [
 function renderTerminalLogo() {
   return (
     <div>
-      <div className="terminal-logo blink-animation">SurvivorOS©</div>
+      <div className="terminal-logo">SurvivorOS©</div>
       <div className="copyright-text">rogueboy override v0.5b | build: srv-2957f5a</div>
     </div>
   );
 }
 
-// Format markdown text
+// Enhanced markdown formatting function
 function formatMarkdown(text, className = "") {
-  // Process the markdown text
-  const formattedText = text
-    // Process headers
+
+  let formattedText = text;
+
+  formattedText = formattedText.replace(/```(\w*)\n([\s\S]*?)\n```/g, (match, language, code) => {
+    return `<pre class="code-block ${language}"><code>${code.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`;
+  });
+  
+
+  formattedText = formattedText.replace(/`([^`]+)`/g, '<code>$1</code>');
+  
+
+  formattedText = formattedText
     .replace(/^### (.*?)$/gm, '<h3>$1</h3>')
     .replace(/^## (.*?)$/gm, '<h2>$1</h2>')
-    .replace(/^# (.*?)$/gm, '<h1>$1</h1>')
-    
-    // Process emphasis
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-    
-    // Process lists
-    .replace(/^- (.*?)$/gm, '<li>$1</li>')
-    
-    // Process blockquotes
-    .replace(/^>>> (.*?)$/gm, '<blockquote>$1</blockquote>')
-    .replace(/^> (.*?)$/gm, '<blockquote>$1</blockquote>')
-    
-    // Convert line breaks to paragraphs
-    .split('\n\n')
-    .map(para => {
-      // If paragraph already contains HTML tags, return as is
-      if (para.match(/<[^>]*>/)) return para;
-      
-      // Handle lists
-      if (para.includes('<li>')) {
-        return `<ul>${para}</ul>`;
-      }
-      
-      // Look for all caps headers (like in quickstart) and make them h2
-      if (/^[A-Z][A-Z\s]+[A-Z]$/.test(para)) {
-        return `<h2>${para}</h2>`;
-      }
-      
-      return `<p>${para}</p>`;
-    })
-    .join('');
+    .replace(/^# (.*?)$/gm, '<h1>$1</h1>');
   
-  return <div dangerouslySetInnerHTML={{ __html: formattedText }} className={`markdown-content ${className}`} />;
+
+  formattedText = formattedText
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>');
+  
+  formattedText = formattedText
+    .replace(/^>>> (.*?)$/gm, '<blockquote>$1</blockquote>')
+    .replace(/^> (.*?)$/gm, '<blockquote>$1</blockquote>');
+
+  const paragraphs = formattedText.split(/\n\n+/);
+  
+
+  const processedParagraphs = paragraphs.map(para => {
+
+    if (para.match(/<(h1|h2|h3|pre|blockquote)[^>]*>/)) return para;
+    
+    if (para.match(/^- .+(\n- .+)*$/)) {
+      const items = para.split('\n').map(line => {
+        if (line.startsWith('- ')) {
+          return `<li>${line.substring(2)}</li>`;
+        }
+        return line;
+      }).join('');
+      return `<ul>${items}</ul>`;
+    }
+    
+
+    if (para.match(/^\d+\. .+(\n\d+\. .+)*$/)) {
+      const items = para.split('\n').map(line => {
+        const match = line.match(/^\d+\. (.+)/);
+        if (match) {
+          return `<li>${match[1]}</li>`;
+        }
+        return line;
+      }).join('');
+      return `<ol>${items}</ol>`;
+    }
+    
+
+    if (/^[A-Z][A-Z\s]+[A-Z]$/.test(para)) {
+      return `<h2>${para}</h2>`;
+    }
+    
+
+    return `<p>${para}</p>`;
+  });
+  
+
+  const finalText = processedParagraphs.join('');
+  
+  return <div dangerouslySetInnerHTML={{ __html: finalText }} className={`markdown-content ${className}`} />;
 }
 
-// Render output with appropriate formatting
+
 function renderOutput(item) {
   if (item.isTerminalLogo) {
     return renderTerminalLogo();
@@ -75,10 +101,9 @@ function renderOutput(item) {
         <pre>{item.text}</pre>
       </div>
     );
-  } else if (item.contentType === 'quickstart') {
-    return formatMarkdown(item.text, "quickstart-content");
-  } else if (item.contentType === 'log') {
-    return formatMarkdown(item.text, "log-content");
+  } else if (item.contentType === 'quickstart' || item.contentType === 'log') {
+    // Use the same formatting for both quickstart and logs
+    return formatMarkdown(item.text, "terminal-markdown");
   } else {
     if (item.text.startsWith('\n') && !item.text.includes('<p>')) {
       return <pre style={{whiteSpace: 'pre-wrap'}}>{item.text}</pre>;
@@ -87,8 +112,6 @@ function renderOutput(item) {
     }
   }
 }
-
-// Generate random glitch effect
 function renderRandomGlitch() {
   const shouldShow = Math.random() < 0.015;
   if (!shouldShow) return null;
