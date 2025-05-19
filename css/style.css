@@ -1,4 +1,4 @@
-/* CSS with font transition effects */
+/* Fixed CSS with proper font inheritance */
 @font-face {
   font-family: 'Pixelcastle';
   src: url('fonts/Pixelcastle-Regular.otf') format('opentype');
@@ -15,7 +15,7 @@
   font-display: swap;
 }
 
-/* Added font transition mechanism */
+/* Simple body font transition */
 body {
   margin: 0;
   padding: 0;
@@ -25,13 +25,13 @@ body {
   background-color: #000;
   font-family: monospace; /* Start with default monospace */
   font-size: 16px;
+  transition: font-family 0.5s, font-size 0.5s;
 }
 
 /* When the terminal has been "hacked" */
 body.font-transitioned {
   font-family: 'RuneScape', monospace;
   font-size: 18px; /* Bigger font once hacked */
-  transition: font-size 0.8s ease;
 }
 
 #root {
@@ -117,22 +117,10 @@ body.font-transitioned {
   animation: glitch-animation 0.3s forwards;
 }
 
-/* Font transition specific classes */
-.boot-message {
-  font-family: monospace;
-  font-size: 16px;
-}
-
+/* Transition text effect */
 .access-granted-message {
-  font-family: 'Pixelcastle', monospace;
-  font-size: 18px;
   color: #86c06c;
   animation: text-flicker 0.5s linear;
-}
-
-.hacked-terminal-message {
-  font-family: 'RuneScape', monospace;
-  font-size: 18px;
 }
 
 @keyframes text-flicker {
@@ -199,21 +187,25 @@ input:focus {
   color: #e0f8cf;
   background-color: #306850;
   padding: 0 40px;
-  font-family: inherit; /* Use the inherited font family - changes with the transition */
 }
 
 .terminal-header {
   color: #e0f8cf;
   border-bottom: 1px solid #86c06c;
   padding: 0 40px;
-  font-family: inherit; /* Use the inherited font family */
   letter-spacing: 1px;
-  font-size: 18px;
 }
 
 .command-input {
   padding-left: 40px;
-  font-size: 18px;
+}
+
+/* IMPORTANT: This ensures the input field inherits the font family */
+input {
+  font-family: inherit;
+  font-size: inherit;
+  background: transparent;
+  color: #e0f8cf;
 }
 
 /* Basic pre styling for plain terminal output */
@@ -222,8 +214,6 @@ pre {
   white-space: pre-wrap;
   color: #e0f8cf;
   line-height: 1.5;
-  font-family: inherit; /* Use the inherited font family */
-  font-size: inherit; /* Use the inherited font size */
 }
 
 /* Markdown content styling */
@@ -231,13 +221,11 @@ pre {
   color: #e0f8cf;
   line-height: 1.5;
   padding: 5px 0;
-  font-family: inherit; /* Use the inherited font family */
-  font-size: inherit; /* Use the inherited font size */
 }
 
-/* Headings - Increased font sizes */
+/* Headings */
 .markdown-content h1 {
-  font-size: 28px; /* Larger size */
+  font-size: 28px;
   font-weight: bold;
   color: #86c06c;
   margin: 1em 0 0.5em 0;
@@ -246,29 +234,24 @@ pre {
 }
 
 .markdown-content h2 {
-  font-size: 24px; /* Larger size */
+  font-size: 24px;
   font-weight: bold;
   color: #86c06c;
   margin: 1em 0 0.5em 0;
 }
 
 .markdown-content h3 {
-  font-size: 22px; /* Larger size */
+  font-size: 22px;
   font-weight: bold;
   color: #86c06c;
   margin: 1em 0 0.5em 0;
 }
 
 .markdown-content h4 {
-  font-size: 20px; /* Larger size */
+  font-size: 20px;
   font-weight: bold;
   color: #86c06c;
   margin: 1em 0 0.5em 0;
-}
-
-/* Paragraphs and spacing */
-.markdown-content p {
-  margin: 0 0 1em 0;
 }
 
 /* Lists */
@@ -283,7 +266,6 @@ pre {
   margin-bottom: 0.5em;
 }
 
-/* Make sure bullets are visible */
 .markdown-content ul {
   list-style-type: disc;
 }
@@ -294,11 +276,9 @@ pre {
 
 /* Code blocks */
 .markdown-content code {
-  font-family: inherit;
   background-color: rgba(0, 0, 0, 0.3);
   padding: 0.2em 0.4em;
   border-radius: 3px;
-  font-size: inherit;
 }
 
 .markdown-content pre {
@@ -341,7 +321,7 @@ pre {
   font-weight: bold;
 }
 
-/* Strong and emphasis */
+/* Text formatting */
 .markdown-content strong {
   font-weight: bold;
   color: #e0f8cf;
