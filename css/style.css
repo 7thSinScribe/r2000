@@ -624,3 +624,58 @@ pre.ascii-logo {
   80% { opacity: 0.2; transform: translate(0, 0); }
   100% { opacity: 0; transform: translate(0, 0); }
 }
+
+/* Character sheet specific styling */
+.character-sheet {
+  font-family: monospace;
+  white-space: pre;
+  line-height: 1.2;
+  color: #e0f8cf;
+  background-color: #306850;
+  padding: 10px;
+  border: 1px solid #86c06c;
+  margin: 10px 0;
+  overflow-x: auto;
+  font-size: 14px;
+}
+
+/* Make sure it preserves spacing in the hacked state too */
+body.hacked .character-sheet {
+  font-family: monospace !important;
+  white-space: pre !important;
+}
+
+/* Additional stat bar styling for character sheet */
+.stat-bar {
+  display: inline-block;
+  height: 10px;
+  background-color: #86c06c;
+  margin-right: 5px;
+}
+
+.stat-bar-empty {
+  display: inline-block;
+  height: 10px;
+  background-color: #285840;
+  margin-right: 5px;
+}
+
+/* Dice display for dice pools */
+.dice-d6, .dice-d7, .dice-d8, .dice-d10, .dice-d12, .dice-d14, .dice-d16 {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 3px;
+  border: 1px solid #86c06c;
+  text-align: center;
+  line-height: 12px;
+  font-size: 8px;
+}
+
+.dice-d6 { background-color: #3a7a60; }
+.dice-d7 { background-color: #4a8a70; }
+.dice-d8 { background-color: #5a9a80; }
+.dice-d10 { background-color: #6aaa90; }
+.dice-d12 { background-color: #7abaa0; }
+.dice-d14 { background-color: #8acab0; }
+.dice-d16 { background-color: #9adac0; }

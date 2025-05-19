@@ -12,16 +12,22 @@ const SurvivorOSTerminal = () => {
     currentQuestion: 0,
     attributes: { power: 1, oddity: 1, wisdom: 1, endurance: 1, reflex: 1 },
     items: [],
+    background: null,
     name: "",
-    completed: false
+    completed: false,
+    // Track the points used and remaining
+    pointsAllocated: 5,  // Starting with 5 points (1 in each attribute)
+    pointsRemaining: 10  // 10 additional points to allocate
   });
   
   const [quickStartContent, setQuickStartContent] = useState("");
+  const startupSound = useRef(new Audio('data:audio/wav;base64,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rq+wsbKztLW2t7i5uru8vb6/wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t/g4eLj5OXm5+jp6uvs7e7v8PHy8/T19vf4+fr7/P3+/4CAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA==')); 
+  
   // Cache for storing loaded logs
   const [logsCache, setLogsCache] = useState({});
-  // List of available logs -
-  const availableLogs = [76];
-  
+  // List of available logs
+  const availableLogs = [76, 55];
+
   useEffect(() => {
     async function loadQuickstart() {
       try {
@@ -40,40 +46,11 @@ const SurvivorOSTerminal = () => {
     loadQuickstart();
   }, []);
 
-  // Preload log76 since it's the initial log
   useEffect(() => {
-    if (availableLogs.includes(76)) {
-      fetchLog(76);
+    if (bootComplete && terminalRef.current) {
+      terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
     }
-  }, []);
-
-  // Function to fetch a log and store it in the cache
-  const fetchLog = async (logNumber) => {
-    if (logsCache[logNumber]) {
-      return logsCache[logNumber]; // Return from cache if already loaded
-    }
-    
-    try {
-      const logResponse = await fetch(`data/log${logNumber}.md`);
-      if (!logResponse.ok) {
-        throw new Error(`Log ${logNumber} not found`);
-      }
-      
-      const logContent = await logResponse.text();
-      
-      // Update the cache
-      setLogsCache(prev => ({
-        ...prev,
-        [logNumber]: logContent
-      }));
-      
-      return logContent;
-    } catch (error) {
-      console.error(`Error loading log${logNumber}:`, error);
-      throw error;
-    }
-  };
-
+  }, [bootComplete, terminalHistory]);
 
   const addToTerminalHistory = (entry) => {
     setTerminalHistory(prev => [...prev, entry]);
@@ -90,7 +67,13 @@ const SurvivorOSTerminal = () => {
   };
 
   useEffect(() => {
-
+    // Play startup sound
+    try {
+      startupSound.current.volume = 0.3;
+      startupSound.current.play().catch(e => console.log('Audio play error:', e));
+    } catch (err) {
+      console.log('Audio error:', err);
+    }
     
     addToTerminalHistory({
       type: 'output',
@@ -175,71 +158,6 @@ const SurvivorOSTerminal = () => {
     setTerminalInput('');
   };
 
-  const showLogsList = () => {
-    addToTerminalHistory({ type: 'input', text: `> logs` });
-    
-    // Generate list of logs from the availableLogs array
-    let logsListContent = `
-AVAILABLE SURVIVOR LOGS:
-----------------------
-
-`;
-    availableLogs.forEach(logNumber => {
-      logsListContent += `log${logNumber}: Survivor Log Entry #${logNumber}\n`;
-    });
-    
-    logsListContent += `\nTo view a log, type 'log' followed by the log number (e.g., 'log76')`;
-    
-    addToTerminalHistory({ 
-      type: 'output', 
-      text: logsListContent
-    });
-    
-    setTerminalInput('');
-  };
-
-  // Generic log display function that works with any log number
-  const showLogByNumber = (logNumber) => {
-    addToTerminalHistory({ type: 'input', text: `> log${logNumber}` });
-    
-    addToTerminalHistory({ 
-      type: 'output', 
-      text: `ACCESSING LOG ENTRY #${logNumber}`,
-    });
-    
-    // Try to get from cache first, or fetch if needed
-    if (logsCache[logNumber]) {
-      // Log is in cache, display it
-      setTimeout(() => {
-        addToTerminalHistory({ 
-          type: 'output', 
-          text: logsCache[logNumber],
-          contentType: 'log'
-        });
-      }, 500);
-    } else {
-      // Log not in cache, fetch it
-      fetchLog(logNumber)
-        .then(content => {
-          setTimeout(() => {
-            addToTerminalHistory({ 
-              type: 'output', 
-              text: content,
-              contentType: 'log'
-            });
-          }, 500);
-        })
-        .catch(error => {
-          addToTerminalHistory({ 
-            type: 'output', 
-            text: `ERROR: ${error.message}. Log may not exist.`
-          });
-        });
-    }
-    
-    setTerminalInput('');
-  };
-
   const startCharacterCreation = () => {
     addToTerminalHistory({ type: 'input', text: `> whoami` });
     
@@ -251,10 +169,14 @@ AVAILABLE SURVIVOR LOGS:
     setCharacterCreation({
       active: true,
       currentQuestion: 0,
+      // Start with 1 in each attribute
       attributes: { power: 1, oddity: 1, wisdom: 1, endurance: 1, reflex: 1 },
       items: [],
+      background: null,
       name: "",
-      completed: false
+      completed: false,
+      pointsAllocated: 5, // 1 point in each of 5 attributes = 5 points
+      pointsRemaining: 10 // 10 additional points to allocate during character creation
     });
     
     displayCurrentQuestion(0);
@@ -277,6 +199,11 @@ AVAILABLE SURVIVOR LOGS:
     question.options.forEach((option, index) => {
       questionText += `${index + 1}. ${option.text}\n`;
     });
+    
+    // Show remaining points if we're still allocating attributes
+    if (characterCreation.pointsRemaining > 0) {
+      questionText += `\nRemaining attribute points: ${characterCreation.pointsRemaining}`;
+    }
     
     addToTerminalHistory({ 
       type: 'output', 
@@ -302,10 +229,12 @@ AVAILABLE SURVIVOR LOGS:
           text: `Name registered: ${name}`
         });
         
+        // Generate character sheet with name, attributes, items, and background
         const characterSheet = generateCharacterSheet(
           name, 
           characterCreation.attributes, 
-          characterCreation.items
+          characterCreation.items,
+          characterCreation.background || { title: "UNKNOWN", description: "Your past is a blur, forgotten in the chaos of the digital apocalypse." }
         );
         
         setCharacterCreation({
@@ -317,7 +246,8 @@ AVAILABLE SURVIVOR LOGS:
         
         addToTerminalHistory({ 
           type: 'output', 
-          text: characterSheet
+          text: characterSheet,
+          isCharacterSheet: true // Flag this for special rendering
         });
       } else {
         addToTerminalHistory({ 
@@ -349,30 +279,52 @@ AVAILABLE SURVIVOR LOGS:
     
     let updatedAttributes = {...characterCreation.attributes};
     let updatedItems = [...characterCreation.items];
+    let updatedBackground = characterCreation.background;
+    let pointsUsedInThisQuestion = 0;
     
-    for (const [attr, value] of Object.entries(selectedOption.attributes)) {
-      const newValue = updatedAttributes[attr] + value;
-      if (newValue > 5) {
-        updatedAttributes[attr] = 5;
-        const excess = newValue - 5;
-        distributeExcessPoints(updatedAttributes, attr, excess);
-      } else {
-        updatedAttributes[attr] = newValue;
-      }
+    // Add attributes from this question
+    for (const [attr, value] of Object.entries(selectedOption.attributes || {})) {
+      updatedAttributes[attr] += value;
+      pointsUsedInThisQuestion += value;
     }
     
+    // Add item if present in the option
     if (selectedOption.item) {
       updatedItems.push(selectedOption.item);
     }
     
+    // Set background if present in the option
+    if (selectedOption.background) {
+      updatedBackground = {
+        title: selectedOption.background,
+        description: selectedOption.backgroundDesc
+      };
+    }
+    
+    // Calculate remaining points
+    const newPointsRemaining = characterCreation.pointsRemaining - pointsUsedInThisQuestion;
+    
+    // Move to next question
     const nextQuestionIndex = questionIndex + 1;
     
     setCharacterCreation({
       ...characterCreation,
       currentQuestion: nextQuestionIndex,
       attributes: updatedAttributes,
-      items: updatedItems
+      items: updatedItems,
+      background: updatedBackground,
+      pointsAllocated: characterCreation.pointsAllocated + pointsUsedInThisQuestion,
+      pointsRemaining: newPointsRemaining
     });
+    
+    // If we've assigned more than max allowed points to an attribute, redistribute
+    for (const [attr, value] of Object.entries(updatedAttributes)) {
+      if (value > 35) {
+        const excess = value - 35;
+        updatedAttributes[attr] = 35;
+        distributeExcessPoints(updatedAttributes, attr, excess);
+      }
+    }
     
     setTimeout(() => displayCurrentQuestion(nextQuestionIndex), 500);
   };
@@ -400,19 +352,6 @@ AVAILABLE SURVIVOR LOGS:
       return;
     }
     
-    if (command === 'logs') {
-      showLogsList();
-      return;
-    }
-    
-    // Handle any log command with a single regex check
-    const logMatch = command.match(/^log(\d+)$/);
-    if (logMatch) {
-      const logNumber = parseInt(logMatch[1]);
-      showLogByNumber(logNumber);
-      return;
-    }
-    
     addToTerminalHistory({ type: 'input', text: `> ${cmd}` });
     
     let response = '';
@@ -428,8 +367,6 @@ about:    About SurvivorOS Terminal
 quickstart: Display Rogue 2000 game information
 whoami:   Run survivor identity questionnaire
 ascii:    Display SurvivorOS ASCII art logo
-logs:     Display a list of available survivor logs
-log#:     View a specific log entry (e.g., log76)
 
 For survivors in the zones: Type what you learn out there.
 Stay safe. Share knowledge. Survive.`;
