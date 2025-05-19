@@ -373,6 +373,34 @@ body.hacked .markdown-content blockquote {
   margin-bottom: 10px;
 }
 
+.blink-animation pre,
+pre.terminal-output {
+  white-space: pre;
+  letter-spacing: normal;
+  line-height: 1;
+  font-family: monospace !important;
+}
+
+div[class*="isLogo"] pre {
+  white-space: pre;
+  font-family: monospace !important;
+  letter-spacing: 0;
+  line-height: 1.2;
+  font-size: 12px;
+}
+
+.isLogo pre,
+pre.ascii-logo {
+  white-space: pre !important;
+  font-family: monospace !important;
+  letter-spacing: 0 !important;
+  line-height: 1.2 !important;
+  font-size: 11px !important;
+  display: inline-block !important;
+  margin: 10px auto !important;
+  text-align: left !important;
+}
+
 @keyframes text-glitch {
   0% {
     transform: translate(0);

@@ -192,8 +192,8 @@ function renderOutput(item, isBooting) {
     return renderTerminalLogo(isBooting);
   } else if (item.isLogo) {
     return (
-      <div className={item.shouldBlink ? "blink-animation" : ""}>
-        <pre>{item.text}</pre>
+      <div className={`${item.shouldBlink ? "blink-animation" : ""} isLogo`}>
+        <pre className="ascii-logo">{item.text}</pre>
       </div>
     );
   } else if (item.contentType === 'quickstart' || item.contentType === 'log') {
