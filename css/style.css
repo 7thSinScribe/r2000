@@ -1,4 +1,3 @@
-/* Very simple CSS with direct font styling */
 @font-face {
   font-family: 'Pixelcastle';
   src: url('fonts/Pixelcastle-Regular.otf') format('opentype');
@@ -15,7 +14,6 @@
   font-display: swap;
 }
 
-/* Base body styles */
 body {
   margin: 0;
   padding: 0;
@@ -27,7 +25,6 @@ body {
   font-size: 16px;
 }
 
-/* Hacked state - applied via JS */
 body.hacked,
 body.hacked .terminal-header,
 body.hacked .terminal-content,
@@ -38,7 +35,6 @@ body.hacked input {
   font-size: 18px;
 }
 
-/* Special Pixelcastle elements that should keep that font */
 body.hacked .terminal-logo {
   font-family: 'Pixelcastle', monospace;
 }
@@ -47,7 +43,6 @@ body.hacked .copyright-text {
   font-family: 'Pixelcastle', monospace;
 }
 
-/* Access granted highlight */
 .access-granted {
   color: #86c06c;
 }
@@ -57,7 +52,6 @@ body.hacked .copyright-text {
   width: 100%;
 }
 
-/* CRT Monitor effects */
 .crt-frame {
   position: relative;
   overflow: hidden;
@@ -145,14 +139,20 @@ body.hacked .copyright-text {
   animation: glitch-animation 0.3s forwards;
 }
 
+.terminal-logo-container {
+  text-align: center;
+  margin: 20px auto;
+  position: relative;
+}
+
 .terminal-logo {
   font-family: 'Pixelcastle', monospace;
   font-size: 36px;
   color: #e0f8cf;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
   text-align: center;
   padding: 30px 0;
   margin-bottom: 10px;
+  display: inline-block;
 }
 
 .copyright-text {
@@ -221,7 +221,6 @@ pre {
   line-height: 1.5;
 }
 
-/* Utility classes for alignment */
 .text-center {
   text-align: center;
 }
@@ -231,14 +230,12 @@ pre {
   text-align: left;
 }
 
-/* Markdown content styling */
 .markdown-content {
   color: #e0f8cf;
   line-height: 1.5;
   padding: 5px 0;
 }
 
-/* Headings */
 .markdown-content h1 {
   font-size: 28px;
   font-weight: bold;
@@ -269,7 +266,6 @@ pre {
   margin: 1em 0 0.5em 0;
 }
 
-/* Lists */
 .markdown-content ul,
 .markdown-content ol {
   margin: 0 0 1em 0;
@@ -289,35 +285,33 @@ pre {
   list-style-type: decimal;
 }
 
-/* Code blocks - Updated with Pixelcastle font and better terminal-like styling */
 .markdown-content code {
-  background-color: rgba(48, 104, 80, 0.6); /* Darker green */
-  color: #b3ffcc; /* Brighter green text */
+  background-color: rgba(48, 104, 80, 0.6);
+  color: #b3ffcc;
   padding: 0.2em 0.4em;
   border-radius: 3px;
-  font-family: 'Pixelcastle', monospace; /* Using Pixelcastle font */
+  font-family: 'Pixelcastle', monospace;
   font-size: 0.9em;
-  border: 1px solid #86c06c; /* Light green border */
+  border: 1px solid #86c06c;
 }
 
 .markdown-content pre {
-  background-color: rgba(24, 52, 40, 0.8); /* Even darker green background */
+  background-color: rgba(24, 52, 40, 0.8);
   padding: 1em;
   border-radius: 5px;
   margin: 0 0 1em 0;
   overflow-x: auto;
-  border: 1px solid #86c06c; /* Light green border */
-  position: relative; /* Needed for scan line effect */
+  border: 1px solid #86c06c;
+  position: relative;
 }
 
 .markdown-content pre code {
-  background-color: transparent; /* Keep pre background showing through */
+  background-color: transparent;
   padding: 0;
-  border: none; /* Remove border from inner code element */
-  color: #b3ffcc; /* Ensure code text within pre is bright green */
+  border: none;
+  color: #b3ffcc;
 }
 
-/* Add a subtle scan line effect to code blocks */
 .markdown-content pre::after {
   content: "";
   position: absolute;
@@ -335,31 +329,27 @@ pre {
   pointer-events: none;
 }
 
-/* Blockquotes - Italic text on darker background */
 .markdown-content blockquote {
-  border-left: 3px solid #86c06c; /* Light green border on left */
+  border-left: 3px solid #86c06c;
   padding: 0.5em 1em;
   margin: 0 0 1em 0;
-  background-color: rgba(24, 52, 40, 0.5); /* Dark green background */
+  background-color: rgba(24, 52, 40, 0.5);
   border-radius: 0 5px 5px 0;
-  font-family: 'Pixelcastle', monospace; /* Using Pixelcastle font */
-  font-style: italic; /* Italicized text as requested */
-  color: #c3e6b4; /* Slightly different green for blockquote text */
+  font-family: 'Pixelcastle', monospace;
+  font-style: italic;
+  color: #c3e6b4;
 }
 
-/* Make sure hacked state preserves these styles */
 body.hacked .markdown-content code,
 body.hacked .markdown-content blockquote {
   font-family: 'Pixelcastle', monospace;
 }
 
-/* Add a subtle pixel-like border to code blocks and blockquotes */
 .markdown-content pre,
 .markdown-content blockquote {
   box-shadow: 0 0 0 1px rgba(134, 192, 108, 0.3);
 }
 
-/* Tables */
 .markdown-content table {
   border-collapse: collapse;
   margin: 0 0 1em 0;
@@ -377,7 +367,6 @@ body.hacked .markdown-content blockquote {
   font-weight: bold;
 }
 
-/* Text formatting */
 .markdown-content strong {
   font-weight: bold;
   color: #e0f8cf;
@@ -388,14 +377,12 @@ body.hacked .markdown-content blockquote {
   color: #e0f8cf;
 }
 
-/* Specific styling for different content types */
 .terminal-quickstart,
 .terminal-log,
 .terminal-output {
   margin-bottom: 10px;
 }
 
-/* Character sheet specific styling */
 .character-sheet {
   font-family: monospace;
   white-space: pre;
@@ -409,13 +396,11 @@ body.hacked .markdown-content blockquote {
   font-size: 14px;
 }
 
-/* Make sure it preserves spacing in the hacked state too */
 body.hacked .character-sheet {
   font-family: monospace !important;
   white-space: pre !important;
 }
 
-/* Additional stat bar styling for character sheet */
 .stat-bar {
   display: inline-block;
   height: 10px;
@@ -430,7 +415,6 @@ body.hacked .character-sheet {
   margin-right: 5px;
 }
 
-/* Dice display for dice pools */
 .dice-d6, .dice-d7, .dice-d8, .dice-d10, .dice-d12, .dice-d14, .dice-d16 {
   display: inline-block;
   width: 12px;
@@ -449,3 +433,246 @@ body.hacked .character-sheet {
 .dice-d12 { background-color: #7abaa0; }
 .dice-d14 { background-color: #8acab0; }
 .dice-d16 { background-color: #9adac0; }
+
+/* ASCII logo styling */
+pre.ascii-logo {
+  font-family: monospace !important;
+  white-space: pre !important;
+  letter-spacing: 0 !important;
+  line-height: 1.2 !important;
+  font-size: 11px !important;
+  display: inline-block !important;
+  margin: 10px auto !important;
+  text-align: left !important;
+}
+
+/* Logo transition effects */
+@keyframes text-glitch {
+  0% {
+    transform: translate(0);
+    text-shadow: 0 0 0 #86c06c;
+  }
+  2% {
+    transform: translate(-2px, 2px);
+    text-shadow: -2px 0 0 rgba(134, 192, 108, 0.5);
+  }
+  4% {
+    transform: translate(-5px, -2px);
+    text-shadow: 2px 0 0 rgba(134, 192, 108, 0.5);
+    opacity: 0.8;
+  }
+  6% {
+    transform: translate(5px, 1px);
+    text-shadow: -1px -1px 0 rgba(224, 248, 207, 0.7);
+  }
+  8% {
+    transform: translate(0);
+    text-shadow: 0 0 0 transparent;
+    opacity: 1;
+  }
+  100% {
+    transform: translate(0);
+    text-shadow: 0 0 0 transparent;
+  }
+}
+
+.glitch-text {
+  animation: text-glitch 0.8s infinite;
+  position: relative;
+}
+
+.glitch-text::before, 
+.glitch-text::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  clip: rect(0, 0, 0, 0);
+}
+
+.glitch-text::before {
+  left: 2px;
+  text-shadow: -1px 0 #86c06c;
+  clip: rect(0, 900px, 0, 0);
+  animation: glitch-anim-1 2s infinite linear alternate-reverse;
+}
+
+.glitch-text::after {
+  left: -2px;
+  text-shadow: -1px 0 #e0f8cf;
+  clip: rect(0, 900px, 0, 0);
+  animation: glitch-anim-2 3s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-anim-1 {
+  0% {
+    clip: rect(20px, 9999px, 21px, 0);
+  }
+  20% {
+    clip: rect(40px, 9999px, 45px, 0);
+  }
+  40% {
+    clip: rect(10px, 9999px, 32px, 0);
+  }
+  60% {
+    clip: rect(5px, 9999px, 39px, 0);
+  }
+  80% {
+    clip: rect(32px, 9999px, 12px, 0);
+  }
+  100% {
+    clip: rect(49px, 9999px, 24px, 0);
+  }
+}
+
+@keyframes glitch-anim-2 {
+  0% {
+    clip: rect(32px, 9999px, 5px, 0);
+  }
+  20% {
+    clip: rect(12px, 9999px, 25px, 0);
+  }
+  40% {
+    clip: rect(49px, 9999px, 39px, 0);
+  }
+  60% {
+    clip: rect(5px, 9999px, 14px, 0);
+  }
+  80% {
+    clip: rect(32px, 9999px, 48px, 0);
+  }
+  100% {
+    clip: rect(22px, 9999px, 31px, 0);
+  }
+}
+
+.terminal-logo.booting {
+  color: #a0d8a0;
+  font-weight: normal;
+}
+
+.terminal-logo.complete {
+  color: #e0f8cf;
+  font-weight: normal;
+}
+
+.copyright-text .trademark {
+  font-family: 'RuneScape', monospace;
+  font-size: 12px;
+  position: relative;
+  top: -10px;
+}
+
+.force-update {
+}
+
+.terminal-logo.glitching::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="4" height="4" viewBox="0 0 4 4"><path fill="%2386c06c" d="M1 3h1v1H1V3zm2-2h1v1H3V1z"/></svg>');
+  background-size: cover;
+  opacity: 0;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  animation: static-glitch 1s linear;
+}
+
+@keyframes static-glitch {
+  0% {
+    background-position: 0% 0%;
+    opacity: 0;
+  }
+  10% {
+    background-position: -5% -5%;
+    opacity: 0.2;
+  }
+  20% {
+    background-position: -10% 5%;
+    opacity: 0.4;
+  }
+  30% {
+    background-position: 5% -10%;
+    opacity: 0.6;
+  }
+  40% {
+    background-position: -5% -5%;
+    opacity: 0.4;
+  }
+  50% {
+    background-position: -10% 5%;
+    opacity: 0.2;
+  }
+  60% {
+    background-position: 5% 5%;
+    opacity: 0;
+  }
+  100% {
+    background-position: 0% 0%;
+    opacity: 0;
+  }
+}
+
+.artifact {
+  position: absolute;
+  background: #86c06c;
+  opacity: 0.5;
+  z-index: 2;
+}
+
+.artifact.h-line {
+  height: 1px;
+  width: 100%;
+  left: 0;
+  animation: artifact-h-anim 0.2s ease-out forwards;
+}
+
+.artifact.v-line {
+  width: 1px;
+  height: 100%;
+  top: 0;
+  animation: artifact-v-anim 0.2s ease-out forwards;
+}
+
+@keyframes artifact-h-anim {
+  0% { transform: scaleX(0); opacity: 0.8; }
+  100% { transform: scaleX(1); opacity: 0; }
+}
+
+@keyframes artifact-v-anim {
+  0% { transform: scaleY(0); opacity: 0.8; }
+  100% { transform: scaleY(1); opacity: 0; }
+}
+
+@keyframes screen-shift {
+  0% { transform: translate(0, 0); }
+  20% { transform: translate(-10px, 5px); }
+  40% { transform: translate(8px, -4px); }
+  60% { transform: translate(-6px, 3px); }
+  80% { transform: translate(4px, -2px); }
+  100% { transform: translate(0, 0); }
+}
+
+.screen-glitch {
+  animation: screen-shift 0.2s linear;
+}
+
+.glitch-static {
+  animation: static-noise 0.3s ease-out forwards;
+}
+
+@keyframes static-noise {
+  0% { opacity: 0.7; }
+  10% { opacity: 0.6; transform: translate(2px, 1px); }
+  20% { opacity: 0.8; transform: translate(-3px, -2px); }
+  30% { opacity: 0.7; transform: translate(1px, 3px); }
+  40% { opacity: 0.5; transform: translate(-1px, -1px); }
+  50% { opacity: 0.6; transform: translate(2px, 2px); }
+  60% { opacity: 0.4; transform: translate(-2px, -1px); }
+  70% { opacity: 0.3; transform: translate(1px, 1px); }
+  80% { opacity: 0.2; transform: translate(0, 0); }
+  100% { opacity: 0; transform: translate(0, 0); }
+}
