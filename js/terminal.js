@@ -1,3 +1,5 @@
+// Updated terminal.js with simplified rendering
+
 // ASCII art 
 const survivorAsciiLogo = [
   "███████╗██╗   ██╗██████╗ ██╗   ██╗██╗██╗   ██╗ ██████╗ ██████╗      ██████╗ ███████╗",
@@ -20,36 +22,47 @@ function renderTerminalLogo() {
   );
 }
 
-// Format text
-function formatText(text) {
-  text = text.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
-  text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
-  text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-  text = text.replace(/\*([^\*]+)\*/g, '<em>$1</em>');
-  text = text.replace(/^##\s+(.*?)$/gm, '<h2>$1</h2>');
-  text = text.replace(/^-\s+(.*?)$/gm, '<li>$1</li>');
+// Format markdown text
+function formatMarkdown(text, className = "") {
+  // Process the markdown text
+  const formattedText = text
+    // Process headers
+    .replace(/^### (.*?)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.*?)$/gm, '<h2>$1</h2>')
+    .replace(/^# (.*?)$/gm, '<h1>$1</h1>')
+    
+    // Process emphasis
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    
+    // Process lists
+    .replace(/^- (.*?)$/gm, '<li>$1</li>')
+    
+    // Process blockquotes
+    .replace(/^>>> (.*?)$/gm, '<blockquote>$1</blockquote>')
+    .replace(/^> (.*?)$/gm, '<blockquote>$1</blockquote>')
+    
+    // Convert line breaks to paragraphs
+    .split('\n\n')
+    .map(para => {
+      // If paragraph already contains HTML tags, return as is
+      if (para.match(/<[^>]*>/)) return para;
+      
+      // Handle lists
+      if (para.includes('<li>')) {
+        return `<ul>${para}</ul>`;
+      }
+      
+      // Look for all caps headers (like in quickstart) and make them h2
+      if (/^[A-Z][A-Z\s]+[A-Z]$/.test(para)) {
+        return `<h2>${para}</h2>`;
+      }
+      
+      return `<p>${para}</p>`;
+    })
+    .join('');
   
-  let inList = false;
-  const lines = text.split('\n');
-  for (let i = 0; i < lines.length; i++) {
-    if (lines[i].startsWith('<li>') && !inList) {
-      lines[i] = '<ul>' + lines[i];
-      inList = true;
-    } else if (!lines[i].startsWith('<li>') && inList) {
-      lines[i-1] = lines[i-1] + '</ul>';
-      inList = false;
-    }
-  }
-  if (inList) {
-    lines[lines.length-1] = lines[lines.length-1] + '</ul>';
-  }
-  text = lines.join('\n');
-  
-  text = text.replace(/\n\n/g, '</p><p>');
-  text = '<p>' + text + '</p>';
-  text = text.replace(/<p><\/p>/g, '');
-  
-  return text;
+  return <div dangerouslySetInnerHTML={{ __html: formattedText }} className={`markdown-content ${className}`} />;
 }
 
 // Render output with appropriate formatting
@@ -62,38 +75,15 @@ function renderOutput(item) {
         <pre>{item.text}</pre>
       </div>
     );
-  } else if (item.isQuickstart) {
-    const sections = item.text.split('\n\n');
-    return (
-      <div className="quickstart">
-        {sections.map((section, index) => {
-          const lines = section.split('\n');
-          const title = lines[0];
-          const content = lines.slice(1).join('\n');
-          
-          if (lines.length === 1 || title.toUpperCase() === title) {
-            return (
-              <div key={index} className="mb-3">
-                <h2 className="text-lg font-bold" style={{color: '#e0f8cf'}}>{title}</h2>
-                {content && <div dangerouslySetInnerHTML={{ __html: formatText(content) }} />}
-              </div>
-            );
-          } else {
-            return (
-              <div key={index} className="mb-2">
-                <div dangerouslySetInnerHTML={{ __html: formatText(section) }} />
-              </div>
-            );
-          }
-        })}
-      </div>
-    );
+  } else if (item.contentType === 'quickstart') {
+    return formatMarkdown(item.text, "quickstart-content");
+  } else if (item.contentType === 'log') {
+    return formatMarkdown(item.text, "log-content");
   } else {
     if (item.text.startsWith('\n') && !item.text.includes('<p>')) {
       return <pre style={{whiteSpace: 'pre-wrap'}}>{item.text}</pre>;
     } else {
-      let formattedText = formatText(item.text);
-      return <div className="formatted-text" dangerouslySetInnerHTML={{ __html: formattedText }} />;
+      return formatMarkdown(item.text);
     }
   }
 }

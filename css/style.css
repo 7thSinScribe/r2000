@@ -206,3 +206,86 @@ pre {
   margin-top: 1rem;
   margin-bottom: 0.5rem;
 }
+
+/* MARKDOWN  */
+.markdown-content {
+  color: #e0f8cf;
+  font-family: 'CogmindLike', monospace;
+  line-height: 1.5;
+  padding: 10px 5px;
+}
+
+.markdown-content h1 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #86c06c;
+  margin-bottom: 1rem;
+  margin-top: 1.5rem;
+}
+
+.markdown-content h2 {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #86c06c;
+  margin-bottom: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.markdown-content h3 {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #86c06c;
+  margin-bottom: 0.5rem;
+  margin-top: 1rem;
+}
+
+.markdown-content p {
+  margin-bottom: 1rem;
+}
+
+.markdown-content ul {
+  list-style-type: none;
+  padding-left: 1rem;
+  margin-bottom: 1rem;
+}
+
+.markdown-content li {
+  margin-bottom: 0.25rem;
+  position: relative;
+  padding-left: 1rem;
+}
+
+.markdown-content li:before {
+  content: "-";
+  position: absolute;
+  left: 0;
+}
+
+.markdown-content blockquote {
+  border-left: 3px solid #86c06c;
+  padding-left: 10px;
+  margin-left: 10px;
+  font-style: italic;
+  margin-bottom: 1rem;
+  color: #bef0ad;
+}
+
+.markdown-content code {
+  font-family: 'CogmindLike', monospace;
+  background-color: rgba(134, 192, 108, 0.2);
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+
+/* Specific quickstart styling */
+.quickstart-content h2 {
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Specific log styling */
+.log-content blockquote {
+  background-color: rgba(134, 192, 108, 0.1);
+  padding: 10px;
+  border-radius: 5px;
+}

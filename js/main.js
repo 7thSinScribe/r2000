@@ -139,7 +139,7 @@ const SurvivorOSTerminal = () => {
       addToTerminalHistory({ 
         type: 'output', 
         text: quickStartContent,
-        isQuickstart: true
+        contentType: 'quickstart'  // Using contentType instead of isQuickstart
       });
     }, 500);
     
@@ -196,7 +196,7 @@ To view a log, type 'log' followed by the log number (e.g., 'log76')`;
       addToTerminalHistory({ 
         type: 'output', 
         text: log76Content,
-        isQuickstart: true
+        contentType: 'log'  // Using contentType instead of isLog
       });
     }, 500);
     
