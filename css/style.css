@@ -1,4 +1,4 @@
-/* Updated font declarations */
+/* Updated font declarations and markdown styling */
 @font-face {
   font-family: 'Pixelcastle';
   src: url('fonts/Pixelcastle-Regular.otf') format('opentype');
@@ -173,7 +173,7 @@ input:focus {
   padding-left: 40px;
 }
 
-/* Basic pre styling for all terminal output */
+/* Basic pre styling for plain text terminal output */
 pre {
   margin: 0;
   white-space: pre-wrap;
@@ -182,59 +182,104 @@ pre {
   line-height: 1.5;
 }
 
-/* Additional styling for content types */
+/* Markdown element styling */
 .terminal-quickstart,
-.terminal-log {
+.terminal-log,
+.terminal-output {
+  color: #e0f8cf;
+  font-family: 'RuneScape', monospace;
+  line-height: 1.5;
   padding: 10px 5px;
-  /* This ensures the terminal markdown gets displayed correctly */
-  white-space: pre-wrap;
 }
 
-/* Make headers stand out */
+/* Headers */
 .terminal-quickstart h1,
 .terminal-log h1,
-pre h1 {
+.terminal-output h1 {
   color: #86c06c;
-  font-weight: bold;
   font-size: 1.5em;
+  font-weight: bold;
   margin: 1em 0 0.5em 0;
+  border-bottom: 1px solid #86c06c;
+  padding-bottom: 5px;
 }
 
 .terminal-quickstart h2,
 .terminal-log h2,
-pre h2 {
+.terminal-output h2 {
   color: #86c06c;
-  font-weight: bold;
   font-size: 1.25em;
+  font-weight: bold;
   margin: 1em 0 0.5em 0;
 }
 
 .terminal-quickstart h3,
 .terminal-log h3,
-pre h3 {
+.terminal-output h3 {
   color: #86c06c;
-  font-weight: bold;
   font-size: 1.1em;
+  font-weight: bold;
   margin: 1em 0 0.5em 0;
 }
 
-/* Style code blocks */
+/* Lists */
+.terminal-quickstart ul,
+.terminal-log ul,
+.terminal-output ul {
+  list-style-type: disc;
+  margin: 0.5em 0 1em 0;
+  padding-left: 2em;
+}
+
+.terminal-quickstart li,
+.terminal-log li,
+.terminal-output li {
+  margin-bottom: 0.25em;
+}
+
+/* Paragraphs */
+.terminal-quickstart p,
+.terminal-log p,
+.terminal-output p {
+  margin-bottom: 1em;
+}
+
+/* Inline formatting */
+.terminal-quickstart strong,
+.terminal-log strong,
+.terminal-output strong,
+.terminal-quickstart em,
+.terminal-log em,
+.terminal-output em {
+  color: #e0f8cf;
+}
+
+/* Code blocks and inline code */
 .terminal-quickstart code,
 .terminal-log code,
-pre code {
+.terminal-output code {
+  font-family: 'RuneScape', monospace;
   background-color: rgba(0, 0, 0, 0.2);
   padding: 2px 4px;
   border-radius: 3px;
 }
 
-/* Style blockquotes */
+.terminal-quickstart .code-block,
+.terminal-log .code-block,
+.terminal-output .code-block {
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 10px;
+  border-radius: 5px;
+  margin: 1em 0;
+}
+
+/* Blockquotes */
 .terminal-quickstart blockquote,
-.terminal-log blockquote {
+.terminal-log blockquote,
+.terminal-output blockquote {
   border-left: 3px solid #86c06c;
-  padding-left: 10px;
-  margin-left: 10px;
-  color: #bef0ad;
+  padding: 0.5em 1em;
+  margin: 0 0 1em 0.5em;
   background-color: rgba(0, 0, 0, 0.1);
-  padding: 5px 10px;
   border-radius: 0 5px 5px 0;
 }
