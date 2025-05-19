@@ -16,7 +16,7 @@ const survivorAsciiLogo = [
 function renderTerminalLogo() {
   return (
     <div>
-      <div className="terminal-logo blink-animation">SurvivorOS©</div>
+      <div className="terminal-logo blink-animation">SurvivorOS</div>
       <div className="copyright-text">rogueboy override v0.5b | build: srv-2957f5a</div>
     </div>
   );
