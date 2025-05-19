@@ -335,14 +335,14 @@ pre {
   margin: 0 0 1em 0;
   background-color: rgba(24, 52, 40, 0.5);
   border-radius: 0 5px 5px 0;
-  font-family: 'Pixelcastle', monospace;
+  font-family: 'RuneScape', monospace;
   font-style: italic;
   color: #c3e6b4;
 }
 
 body.hacked .markdown-content code,
 body.hacked .markdown-content blockquote {
-  font-family: 'Pixelcastle', monospace;
+  font-family: 'RuneScape', monospace;
 }
 
 .markdown-content pre,
