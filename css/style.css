@@ -220,6 +220,16 @@ pre {
   line-height: 1.5;
 }
 
+.terminal-output {
+  font-family: "RuneScape", monospace; 
+  white-space: pre;
+  line-height: 1.2;
+}
+
+body.hacked .terminal-output {
+  font-family: "RuneScape", monospace;
+}
+
 .markdown-content {
   color: #e0f8cf;
   line-height: 1.5;
@@ -371,22 +381,6 @@ body.hacked .markdown-content blockquote {
 .terminal-log,
 .terminal-output {
   margin-bottom: 10px;
-}
-
-.blink-animation pre,
-pre.terminal-output {
-  white-space: pre;
-  letter-spacing: normal;
-  line-height: 1;
-  font-family: monospace !important;
-}
-
-div[class*="isLogo"] pre {
-  white-space: pre;
-  font-family: monospace !important;
-  letter-spacing: 0;
-  line-height: 1.2;
-  font-size: 12px;
 }
 
 .isLogo pre,
