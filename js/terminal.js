@@ -208,9 +208,8 @@ function renderOutput(item, isBooting) {
       return <pre className={`terminal-${item.contentType}`}>{item.text}</pre>;
     }
   } else if (item.isCharacterSheet) {
-    // Special rendering for character sheets - pure monospace, no markdown
     return (
-      <pre className="character-sheet">
+      <pre className="terminal-output">
         {item.text}
       </pre>
     );
