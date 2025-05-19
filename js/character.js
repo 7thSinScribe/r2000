@@ -2,194 +2,289 @@
 const characterCreationData = {
   questions: [
     {
-      text: "When the hypernet first glitched, where were you?",
+      text: "When the Hypernet collapsed and digital entities started glitching into reality, what were you doing?",
       options: [
-        { text: "In the gym, working out", attributes: { power: 2 } },
-        { text: "At a weird underground techno-seance", attributes: { oddity: 2 } },
-        { text: "Studying at the university library", attributes: { wisdom: 2 } },
-        { text: "Hiking in the wilderness for days", attributes: { endurance: 2 } },
-        { text: "Running parkour with friends", attributes: { reflex: 2 } }
+        { text: "Fighting off looters at the local mall", attributes: { power: 1 } },
+        { text: "Tinkering with a homebrew faraday cage", attributes: { oddity: 1 } },
+        { text: "Collecting data on the glitch patterns", attributes: { wisdom: 1 } },
+        { text: "Running a supply marathon to stock up", attributes: { endurance: 1 } },
+        { text: "Navigating through panic-filled streets", attributes: { reflex: 1 } }
       ]
     },
     {
-      text: "As a child, while others played normal games, you often...",
+      text: "Which digital device did you keep even after it started behaving strangely?",
       options: [
-        { text: "Challenged other kids to wrestling matches", attributes: { power: 1, endurance: 1 } },
-        { text: "Ate bugs and investigated weird phenomena", attributes: { oddity: 2 } },
-        { text: "Built elaborate structures from anything available", attributes: { wisdom: 1, oddity: 1 } },
-        { text: "Could run for hours without tiring", attributes: { endurance: 2 } },
-        { text: "Were always the fastest at tag and dodgeball", attributes: { reflex: 2 } }
+        { text: "A modified power tool with unstable energy output", attributes: { power: 1 } },
+        { text: "A glitching Tamagotchi that seems aware of your thoughts", attributes: { oddity: 1 } },
+        { text: "An old PDA that occasionally displays accurate predictions", attributes: { wisdom: 1 } },
+        { text: "A fitness tracker that enhances your stamina when charged", attributes: { endurance: 1 } },
+        { text: "A pair of AR glasses that reveal hidden movement patterns", attributes: { reflex: 1 } }
       ]
     },
     {
-      text: "When facing a Glitch Beast, your first instinct is to...",
+      text: "What skill helped you survive the first week of digital chaos?",
       options: [
-        { text: "Charge directly at it, weapons ready", attributes: { power: 2 } },
-        { text: "Try communicating with it in binary or strange sounds", attributes: { oddity: 2 } },
-        { text: "Observe its patterns and search for weaknesses", attributes: { wisdom: 2 } },
-        { text: "Stand your ground, prepared to take hits if needed", attributes: { endurance: 1, power: 1 } },
-        { text: "Dodge and weave to avoid its attacks", attributes: { reflex: 2 } }
+        { text: "Ability to break down doors and barriers when escaping", attributes: { power: 1 } },
+        { text: "Understanding how to communicate with glitched entities", attributes: { oddity: 1 } },
+        { text: "Knowledge of which areas would be least affected by the merge", attributes: { wisdom: 1 } },
+        { text: "Capacity to go days with minimal sleep or resources", attributes: { endurance: 1 } },
+        { text: "Instinct for avoiding digital anomalies before they manifest", attributes: { reflex: 1 } }
       ]
     },
     {
-      text: "Your approach to surviving in the glitched world is...",
+      text: "What's your approach to surviving Gamemaster's challenges?",
       options: [
-        { text: "Overcome obstacles through sheer force", attributes: { power: 2 } },
-        { text: "Try unconventional solutions no one else would think of", attributes: { oddity: 2 } },
-        { text: "Learn as much as possible about how the world works now", attributes: { wisdom: 2 } },
-        { text: "Build yourself up to withstand whatever comes", attributes: { endurance: 2 } },
-        { text: "Stay mobile and never get cornered", attributes: { reflex: 2 } }
+        { text: "Confronting threats directly - better to face danger head-on", attributes: { power: 1 } },
+        { text: "Testing reality's limits - the rules have changed, why not exploit them?", attributes: { oddity: 1 } },
+        { text: "Analyzing patterns - everything follows some kind of logic", attributes: { wisdom: 1 } },
+        { text: "Outlasting dangers - most threats dissipate if you can endure", attributes: { endurance: 1 } },
+        { text: "Staying constantly mobile - never present a stationary target", attributes: { reflex: 1 } }
       ]
     },
-    // Psychological assessment questions
     {
-      text: "You discover a sealed bunker with strange markings. Do you...",
+      text: "What unusual ability manifested in you after extended Hypernet exposure?",
       options: [
-        { text: "Bust the door open with whatever tools you have", 
+        { text: "Brief surges of impossible strength when glitches occur nearby", 
           attributes: { power: 1 }, 
-          item: "Crowbar (d8 damage, advantage on forcing things open)" },
-        { text: "Study the markings to understand their meaning first", 
-          attributes: { wisdom: 1 }, 
-          item: "Cryptography Guide (+1 to decoding messages and symbols)" },
-        { text: "Try various unusual combinations and approaches", 
+          item: "Power Gloves (enhance strength during digital anomalies)" },
+        { text: "Occasional visual distortions that reveal hidden code fragments", 
           attributes: { oddity: 1 }, 
-          item: "Lockpick Set (helps bypass simple locks and mechanisms)" },
-        { text: "Carefully test the structural integrity before proceeding", 
+          item: "Reality Lens (helps decipher glitch patterns)" },
+        { text: "Dreams that contain fragmented memories from digital entities", 
+          attributes: { wisdom: 1 }, 
+          item: "Dream Journal (records information from subconscious connections)" },
+        { text: "Resistance to digital corruption that would harm others", 
           attributes: { endurance: 1 }, 
-          item: "Reinforced Gloves (protect hands, +1 to climbing checks)" },
-        { text: "Look for alternative, less obvious entrances", 
+          item: "Anti-Corruption Amulet (reduces digital damage by 1)" },
+        { text: "Moments where time seems to slow during digital anomalies", 
           attributes: { reflex: 1 }, 
-          item: "Grappling Hook (helps with vertical traversal)" }
+          item: "Temporal Refractor (occasional +1 to initiative during anomalies)" }
       ]
     },
     {
-      text: "A stranger approaches your camp at night. You...",
+      text: "How do you navigate the merged reality's dangerous zones?",
       options: [
-        { text: "Grab your weapon and confront them directly", 
+        { text: "Destroy glitched obstacles blocking the path", 
           attributes: { power: 1 }, 
-          item: "Combat Knife (d6 damage, concealable)" },
-        { text: "Set up an elaborate decoy to test their intentions", 
+          item: "Bitmap Breaker (d8 damage against digital objects)" },
+        { text: "Reprogram small areas of the environment temporarily", 
           attributes: { oddity: 1 }, 
-          item: "Motion Sensors (alerts you to movement within 50m)" },
-        { text: "Observe them carefully before deciding how to act", 
+          item: "Pocket Terminal (can make minor adjustments to digital matter)" },
+        { text: "Track patterns in the glitch field to find safe passages", 
           attributes: { wisdom: 1 }, 
-          item: "Tactical Binoculars (see clearly at night and distance)" },
-        { text: "Hide and prepare for potential conflict", 
+          item: "Corruption Compass (points toward stable areas)" },
+        { text: "Push through corrupted areas others can't tolerate", 
           attributes: { endurance: 1 }, 
-          item: "Kevlar Vest (reduces physical damage by 2)" },
-        { text: "Disappear into the shadows, ready to strike or flee", 
+          item: "Stabilization Patches (reduce corruption accumulation)" },
+        { text: "Dart through temporarily stable pathways between anomalies", 
           attributes: { reflex: 1 }, 
-          item: "Smoke Grenades (creates cover, enables escape)" }
+          item: "Glitch Timer (predicts window of opportunity between anomalies)" }
       ]
     },
     {
-      text: "Your group is low on food. You suggest...",
-      options: [
-        { text: "Raiding the nearest settlement for supplies", 
-          attributes: { power: 1 }, 
-          item: "Combat Rations (nutritious emergency food, 3 days worth)" },
-        { text: "Experimenting with cooking digital entities", 
-          attributes: { oddity: 1 }, 
-          item: "Data-Nutrient Converter (turns some digital matter into edible paste)" },
-        { text: "Creating a sustainable farm with salvaged tech", 
-          attributes: { wisdom: 1 }, 
-          item: "Seed Vault (contains various vegetable and fruit seeds)" },
-        { text: "Reducing rations and pushing through hunger", 
-          attributes: { endurance: 1 }, 
-          item: "Nutrient Optimizer (makes food 30% more filling)" },
-        { text: "Setting multiple traps to catch small game", 
-          attributes: { reflex: 1 }, 
-          item: "Snare Kit (can catch small animals for food)" }
-      ]
-    },
-    // Background selection question
-    {
-      text: "Before the digital apocalypse, what was your role in society?",
+      text: "What did you do during the Week of Madness ad campaign before the collapse?",
       options: [
         { 
-          text: "I was in law enforcement or military service", 
-          attributes: { power: 1, endurance: 1 },
-          background: "ENFORCER",
-          backgroundDesc: "Your training as a law enforcement officer or military personnel has proven invaluable in the post-apocalyptic world. You understand discipline, tactics, and how to handle yourself in violent situations. Some survivors look to you for protection, while others fear you might try to impose the old world's laws on the new reality."
+          text: "Participated in a strength challenge at an N-CO promotional event", 
+          attributes: { power: 1 },
+          background: "CONTEST WINNER",
+          backgroundDesc: "You won an N-CO promotional contest during the Week of Madness campaign. The prize was one of the first Rogueboy 2000 units, delivered to your home moments before midnight. You sometimes wonder if your early connection to the device is why you can perceive certain glitches others can't."
         },
         { 
-          text: "I was a programmer or tech specialist", 
+          text: "Explored rumors about hidden easter eggs in the game", 
+          attributes: { oddity: 1 },
+          background: "CURIOSITY SEEKER",
+          backgroundDesc: "You were obsessed with uncovering the secrets N-CO had supposedly hidden in Rogue 2000. You'd discovered three of the five rumored 'reality shifting' easter eggs before the collapse. Sometimes you catch glimpses of game text only you can see, hinting at the final secrets that were never meant to be found."
+        },
+        { 
+          text: "Wrote analyses predicting the game would underperform", 
+          attributes: { wisdom: 1 },
+          background: "TECH ANALYST",
+          backgroundDesc: "You predicted the Rogueboy 2000 would be a commercial disaster due to unrealistic promises. Your final article critiquing N-CO's impossible claims about 'intelligent procedural generation' was scheduled to publish at 12:01am on January 1st, 2000. The draft still sits in a defunct server somewhere in the digital realm."
+        },
+        { 
+          text: "Camped outside an electronics store for the midnight release", 
+          attributes: { endurance: 1 },
+          background: "DEDICATED FAN",
+          backgroundDesc: "You spent three days and nights waiting to be first in line for the Rogueboy 2000 release. When the collapse happened, you were at the register, with the device in your hands. You've had recurring dreams of the store clerk's face, frozen in the exact moment everything changed."
+        },
+        { 
+          text: "Practiced speedrunning strategies based on preview footage", 
+          attributes: { reflex: 1 },
+          background: "COMPETITIVE GAMER",
+          backgroundDesc: "You were determined to set the first world record speedrun for Rogue 2000. You memorized map layouts from leak footage and practiced button combinations for hours. Now those muscle memories sometimes activate involuntarily when you encounter similar patterns in the merged reality."
+        },
+        { 
+          text: "Avoided the hype completely, thinking it was just another game", 
+          attributes: { power: 1, oddity: 1 },
+          background: "SKEPTIC",
+          backgroundDesc: "You ignored the Rogue 2000 marketing blitz, convinced it was overhyped nonsense. Being untouched by the pre-release conditioning might explain why you see the world differently than many survivors. Digital entities occasionally mistake you for an NPC rather than a player."
+        },
+        { 
+          text: "Investigated N-CO's unusual server activity that week", 
           attributes: { wisdom: 1, oddity: 1 },
-          background: "CODER",
-          backgroundDesc: "Your understanding of code and systems gives you unique insight into how the Gamemaster operates. You can sometimes predict glitches or manipulate digital entities in ways others can't comprehend. You're haunted by the possibility that someone like you might have helped create this nightmare."
+          background: "WHISTLEBLOWER",
+          backgroundDesc: "You were tracking unusual data patterns from N-CO's servers in the days before launch. You compiled evidence of unprecedented data collection through their marketing ARG. Your investigation was cut short by the collapse, but you still have encrypted fragments of what you found."
         },
         { 
-          text: "I was a doctor or healthcare provider", 
-          attributes: { wisdom: 2 },
-          background: "HEALER",
-          backgroundDesc: "Your medical knowledge is a precious resource in the glitched world. You've had to adapt conventional medicine to treat hybrid afflictions and digital infections. You're driven by your oath to help others, but the endless suffering sometimes makes you question if survival is worth the cost."
-        },
-        { 
-          text: "I was a skilled tradesperson or engineer", 
-          attributes: { power: 1, wisdom: 1 },
-          background: "BUILDER",
-          backgroundDesc: "Your practical knowledge of how things work has allowed you to jury-rig solutions from the wreckage of civilization. You can repurpose scrap into shelter, weapons, or tools. You take pride in creating islands of functionality amidst the chaos."
-        },
-        { 
-          text: "I was an athlete or physical trainer", 
-          attributes: { power: 1, reflex: 1 },
-          background: "ATHLETE",
-          backgroundDesc: "Your physical conditioning gave you an edge when the world collapsed. You can outrun, outfight, and outlast most threats. You sometimes struggle with the loss of the structured competition and recognition you once enjoyed, replacing it with the raw competition for survival."
-        },
-        { 
-          text: "I was an academic or researcher", 
-          attributes: { wisdom: 1, oddity: 1 },
-          background: "SCHOLAR",
-          backgroundDesc: "Your analytical mind helps you understand the new rules of reality. You document patterns in the chaos and theorize about the nature of the Gamemaster. Some see your knowledge as valuable, while others think your focus on understanding rather than surviving is a luxury they can't afford."
-        },
-        { 
-          text: "I was a wilderness guide or survivalist", 
-          attributes: { endurance: 1, reflex: 1 },
-          background: "SURVIVALIST",
-          backgroundDesc: "You were prepared for a disaster, though not this specific one. Your knowledge of hunting, foraging, and living off the land has helped you stay alive away from population centers. You've had to adapt your skills to account for glitched flora and fauna."
-        },
-        { 
-          text: "I was an artist or entertainer", 
-          attributes: { oddity: 2 },
-          background: "PERFORMER",
-          backgroundDesc: "Your creative thinking helps you navigate the bizarre logic of the glitched world. You find ways to bring moments of joy to other survivors through improvised performances. You believe preserving humanity's spirit is as important as preserving their bodies."
-        },
-        { 
-          text: "I was involved in organized crime", 
-          attributes: { reflex: 1, oddity: 1 },
-          background: "CRIMINAL",
-          backgroundDesc: "Your experience operating outside the law prepared you for when the law ceased to exist. You understand how to acquire resources, forge alliances, and identify threats in chaotic environments. You're not proud of everything you've done to survive, but pride is a luxury few can afford now."
-        },
-        { 
-          text: "I was a corporate executive or businessperson", 
-          attributes: { wisdom: 1, power: 1 },
-          background: "EXECUTIVE",
-          backgroundDesc: "Your leadership skills and strategic thinking have helped you organize survivor communities. You understand resource management and how to negotiate between competing interests. Some resent your attempt to recreate hierarchical structures in the new world."
-        },
-        { 
-          text: "I was just a regular person with a normal job", 
-          attributes: { endurance: 2 },
-          background: "EVERYMAN",
-          backgroundDesc: "You had no special training or skills when the world changed, just a stubborn determination to survive. Your adaptability and willingness to learn have kept you alive when many specialists couldn't adjust. You represent what humanity can endure when pushed to its limits."
-        },
-        { 
-          text: "I was a child or teenager", 
-          attributes: { reflex: 1, oddity: 1 },
-          background: "DIGITAL NATIVE",
-          backgroundDesc: "You've grown up in the glitched world, with only vague memories or stories of what came before. You navigate the merged reality instinctively, without the conceptual barriers adults struggle with. The older survivors try to protect you, not realizing you often understand this new world better than they do."
+          text: "Documented yourself unboxing and testing a review copy", 
+          attributes: { wisdom: 1, reflex: 1 },
+          background: "CONTENT CREATOR",
+          backgroundDesc: "You received an early review unit of the Rogueboy 2000 from N-CO's marketing team. Your livestream of the unboxing was running when the collapse occurred. Sometimes you encounter digital entities who quote fragments of your final broadcast back to you."
         }
+      ]
+    },
+    {
+      text: "What personal item from before the collapse do you still keep with you?",
+      options: [
+        { text: "A well-worn multi-tool that seems immune to digital corruption", 
+          attributes: { power: 1 },
+          item: "Reliable Multi-tool (advantage on physical repair attempts)" 
+        },
+        { text: "A mixtape that plays different songs than what was recorded", 
+          attributes: { oddity: 1 },
+          item: "Glitched Mixtape (can sometimes influence digital entities' behavior)" 
+        },
+        { text: "A journal where you mapped the first glitch patterns", 
+          attributes: { wisdom: 1 },
+          item: "Anomaly Journal (+1 to identifying glitch patterns)" 
+        },
+        { text: "A family photo that occasionally shows different poses", 
+          attributes: { endurance: 1 },
+          item: "Shifting Photo (stabilizes your mental state during digital storms)" 
+        },
+        { text: "A keychain with reflexes that occasionally move on their own", 
+          attributes: { reflex: 1 },
+          item: "Predictive Keychain (gives warning vibrations near hidden dangers)" 
+        }
+      ]
+    },
+    {
+      text: "Which habit have you developed since the digital apocalypse?",
+      options: [
+        { text: "Testing physical boundaries of objects to see if they're real", 
+          attributes: { power: 1 } },
+        { text: "Whispering to your devices as if they can understand you", 
+          attributes: { oddity: 1 } },
+        { text: "Cataloging recurring glitches in your surroundings", 
+          attributes: { wisdom: 1 } },
+        { text: "Practicing functioning on minimal sleep and resources", 
+          attributes: { endurance: 1 } },
+        { text: "Constantly scanning environments for movement anomalies", 
+          attributes: { reflex: 1 } }
+      ]
+    },
+    {
+      text: "What recurring nightmare haunts your rare moments of deep sleep?",
+      options: [
+        { text: "Being unable to move while digital entities reconstruct your body", 
+          attributes: { power: 1 } },
+        { text: "Conversations with a glitched version of yourself from another timeline", 
+          attributes: { oddity: 1 } },
+        { text: "Seeing code beneath everyone's skin, revealing they're all NPCs", 
+          attributes: { wisdom: 1 } },
+        { text: "Endlessly running through repeating environments that never change", 
+          attributes: { endurance: 1 } },
+        { text: "Watching digital hazards in slow-motion but being unable to warn others", 
+          attributes: { reflex: 1 } }
       ]
     }
   ],
   
   startingGear: {
-    power: ["Sledgehammer (d10 damage, two-handed)", "Work Gloves (+1 to climbing checks)"],
-    oddity: ["Glitched PDA (sometimes displays useful information)", "Kaleidoscope Goggles (see digital wavelengths)"],
-    wisdom: ["Pocket Reference Manual (+1 to technical checks)", "High-Capacity Flashlight"],
-    endurance: ["First Aid Kit (heal 2 health points, 3 uses)", "Canteen (purifies water automatically)"],
-    reflex: ["Switchblade (d6 damage, quick draw)", "Climbing Harness (advantage on climbing checks)"]
+    power: ["Impact Wrench (d8 damage, effective against physical barriers)", "Reinforced Workgloves (+1 to breaking objects)"],
+    oddity: ["Glitched Calculator (sometimes displays useful information about digital anomalies)", "Signal Disruptor (creates temporary interference in digital fields)"],
+    wisdom: ["N-CO Technical Manual (reference for understanding game entities)", "UV Flashlight (reveals hidden digital trace elements)"],
+    endurance: ["Emergency Medkit (restore 1d4 BLOOD, 3 uses)", "Purification Tablets (make corrupted water drinkable)"],
+    reflex: ["Concussion Grenade (stuns entities in small area)", "Grappling Hook (quick vertical movement)"]
   }
 };
+
+function generateCharacterSheet(name, attributes, items, background) {
+  const blood = 3 + attributes.power + attributes.endurance;
+  const sweat = 2 + attributes.endurance + attributes.reflex;
+  const tears = 1 + attributes.wisdom + attributes.oddity;
+  const powerLevel = (attributes.power + attributes.oddity + attributes.wisdom + attributes.endurance + attributes.reflex) * 100;
+  
+  let highestAttr = 'power';
+  let highestValue = attributes.power;
+  
+  for (const [attr, value] of Object.entries(attributes)) {
+    if (value > highestValue) {
+      highestValue = value;
+      highestAttr = attr;
+    }
+  }
+  
+  const startingGear = characterCreationData.startingGear[highestAttr];
+  
+  // Build plain text character sheet
+  let characterSheet = `
+SURVIVOR IDENTITY: ${name.toUpperCase()}
+BACKGROUND: ${background.title}
+
+P.O.W.E.R ATTRIBUTES:
+--------------------
+POWER:     ${attributes.power.toString().padEnd(2)} | ${generateDicePoolText(attributes.power)}
+ODDITY:    ${attributes.oddity.toString().padEnd(2)} | ${generateDicePoolText(attributes.oddity)}
+WISDOM:    ${attributes.wisdom.toString().padEnd(2)} | ${generateDicePoolText(attributes.wisdom)}
+ENDURANCE: ${attributes.endurance.toString().padEnd(2)} | ${generateDicePoolText(attributes.endurance)}
+REFLEX:    ${attributes.reflex.toString().padEnd(2)} | ${generateDicePoolText(attributes.reflex)}
+
+DERIVED ATTRIBUTES:
+------------------
+BLOOD: ${blood}
+SWEAT: ${sweat}
+TEARS: ${tears}
+POWER LEVEL: ${powerLevel}
+
+EQUIPMENT:
+---------
+${startingGear.join('\n')}
+${items.map(item => item).join('\n')}
+
+BACKGROUND:
+----------
+${background.description}
+
+STATUS: Physical
+SATURDAY #12,957
+
+"Stay alert, stay alive. The Gamemaster is always watching."
+`;
+  
+  return characterSheet;
+}
+
+function generateDicePoolText(attributeValue) {
+  if (attributeValue <= 5) {
+    return `${attributeValue}d6`;
+  }
+  
+  // Calculate dice pool for values above 5
+  const fullSets = Math.floor(attributeValue / 5);
+  const remainder = attributeValue % 5;
+  
+  let diceText = "";
+  
+  // Handle upgraded dice
+  if (fullSets >= 1) {
+    if (fullSets === 1) diceText += "5d7";
+    else if (fullSets === 2) diceText += "5d8";
+    else if (fullSets === 3) diceText += "5d10";
+    else if (fullSets === 4) diceText += "5d12";
+    else if (fullSets === 5) diceText += "5d14";
+    else if (fullSets >= 6) diceText += "5d16";
+  }
+  
+  // Add remaining d6s
+  if (remainder > 0) {
+    if (diceText !== "") diceText += " + ";
+    diceText += `${remainder}d6`;
+  }
+  
+  return diceText;
+}
 
 function distributeExcessPoints(attributes, sourceAttr, excess) {
   const attributeRelationships = {
@@ -224,94 +319,4 @@ function distributeExcessPoints(attributes, sourceAttr, excess) {
       if (remainingExcess <= 0) break;
     }
   }
-}
-
-function generateDicePoolText(attributeValue) {
-  if (attributeValue <= 5) {
-    return `${attributeValue}d6`;
-  }
-  
-  // Calculate dice pool for values above 5
-  const fullSets = Math.floor(attributeValue / 5);
-  const remainder = attributeValue % 5;
-  
-  let diceText = "";
-  
-  // Handle upgraded dice
-  if (fullSets >= 1) {
-    if (fullSets === 1) diceText += "5d7";
-    else if (fullSets === 2) diceText += "5d8";
-    else if (fullSets === 3) diceText += "5d10";
-    else if (fullSets === 4) diceText += "5d12";
-    else if (fullSets === 5) diceText += "5d14";
-    else if (fullSets >= 6) diceText += "5d16";
-  }
-  
-  // Add remaining d6s
-  if (remainder > 0) {
-    if (diceText !== "") diceText += " + ";
-    diceText += `${remainder}d6`;
-  }
-  
-  return diceText;
-}
-
-function generateCharacterSheet(name, attributes, items, background) {
-  const blood = 3 + attributes.power + attributes.endurance;
-  const sweat = 2 + attributes.endurance + attributes.reflex;
-  const tears = 1 + attributes.wisdom + attributes.oddity;
-  const powerLevel = (attributes.power + attributes.oddity + attributes.wisdom + attributes.endurance + attributes.reflex) * 100;
-  
-  let highestAttr = 'power';
-  let highestValue = attributes.power;
-  
-  for (const [attr, value] of Object.entries(attributes)) {
-    if (value > highestValue) {
-      highestValue = value;
-      highestAttr = attr;
-    }
-  }
-  
-  const startingGear = characterCreationData.startingGear[highestAttr];
-  
-  // Build ASCII character sheet
-  let characterSheet = `
-=======================================================================
-                   SURVIVOR IDENTITY: ${name.toUpperCase()}
-                   BACKGROUND: ${background.title}
-=======================================================================
-
-P.O.W.E.R ATTRIBUTES:
----------------------
-POWER:     ${attributes.power.toString().padEnd(2)} | DICE POOL: ${generateDicePoolText(attributes.power)}
-ODDITY:    ${attributes.oddity.toString().padEnd(2)} | DICE POOL: ${generateDicePoolText(attributes.oddity)}
-WISDOM:    ${attributes.wisdom.toString().padEnd(2)} | DICE POOL: ${generateDicePoolText(attributes.wisdom)}
-ENDURANCE: ${attributes.endurance.toString().padEnd(2)} | DICE POOL: ${generateDicePoolText(attributes.endurance)}
-REFLEX:    ${attributes.reflex.toString().padEnd(2)} | DICE POOL: ${generateDicePoolText(attributes.reflex)}
-
-DERIVED ATTRIBUTES:
-------------------
-BLOOD (Health): ${blood}
-SWEAT (Stamina): ${sweat}
-TEARS (Mental): ${tears}
-POWER LEVEL: ${powerLevel}
-
-EQUIPMENT:
----------
-${startingGear.join('\n')}
-${items.map(item => item).join('\n')}
-
-BACKGROUND:
-----------
-${background.description}
-
-STATUS: Physical
-CYCLE: Saturday, January 1, 2000 #12,957
-LOCATION: Unknown
-
-"Stay alert, stay alive. The hypernet is always watching."
-=======================================================================
-`;
-  
-  return characterSheet;
 }

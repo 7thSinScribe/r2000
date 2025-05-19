@@ -383,24 +383,6 @@ body.hacked .markdown-content blockquote {
   margin-bottom: 10px;
 }
 
-.character-sheet {
-  font-family: monospace;
-  white-space: pre;
-  line-height: 1.2;
-  color: #e0f8cf;
-  background-color: #306850;
-  padding: 10px;
-  border: 1px solid #86c06c;
-  margin: 10px 0;
-  overflow-x: auto;
-  font-size: 14px;
-}
-
-body.hacked .character-sheet {
-  font-family: monospace !important;
-  white-space: pre !important;
-}
-
 .stat-bar {
   display: inline-block;
   height: 10px;
@@ -426,6 +408,21 @@ body.hacked .character-sheet {
   font-size: 8px;
 }
 
+pre.terminal-output {
+  font-family: monospace;
+  white-space: pre;
+  line-height: 1.3;
+  color: #e0f8cf;
+  overflow-x: auto;
+  margin: 10px 0;
+  padding: 5px 0;
+  font-size: 14px;
+}
+
+body.hacked pre.terminal-output {
+  font-family: 'RuneScape', monospace;
+  font-size: 16px;
+}
 .dice-d6 { background-color: #3a7a60; }
 .dice-d7 { background-color: #4a8a70; }
 .dice-d8 { background-color: #5a9a80; }

@@ -15,17 +15,12 @@ const SurvivorOSTerminal = () => {
     background: null,
     name: "",
     completed: false,
-    // Track the points used and remaining
-    pointsAllocated: 5,  // Starting with 5 points (1 in each attribute)
-    pointsRemaining: 10  // 10 additional points to allocate
+    pointsAllocated: 5,
+    pointsRemaining: 10
   });
   
   const [quickStartContent, setQuickStartContent] = useState("");
-  const startupSound = useRef(new Audio('data:audio/wav;base64,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rq+wsbKztLW2t7i5uru8vb6/wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t/g4eLj5OXm5+jp6uvs7e7v8PHy8/T19vf4+fr7/P3+/4CAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA==')); 
-  
-  // Cache for storing loaded logs
   const [logsCache, setLogsCache] = useState({});
-  // List of available logs
   const availableLogs = [76, 55];
 
   useEffect(() => {
@@ -67,14 +62,6 @@ const SurvivorOSTerminal = () => {
   };
 
   useEffect(() => {
-    // Play startup sound
-    try {
-      startupSound.current.volume = 0.3;
-      startupSound.current.play().catch(e => console.log('Audio play error:', e));
-    } catch (err) {
-      console.log('Audio error:', err);
-    }
-    
     addToTerminalHistory({
       type: 'output',
       text: '',
@@ -163,20 +150,19 @@ const SurvivorOSTerminal = () => {
     
     addToTerminalHistory({ 
       type: 'output', 
-      text: 'IDENTITY PROTOCOL ACTIVATED\n\nYou woke up when everyone else did - Saturday, January 1, 2000. But who are you?\n\nANSWER THE QUESTIONS BELOW TO DETERMINE YOUR IDENTITY.\n\nType the number of your answer and press ENTER. Type "cancel" to abort.'
+      text: 'IDENTITY PROTOCOL ACTIVATED\n\nNearly 13,000 Saturdays since the collapse. You\'ve survived somehow, but who are you?\n\nANSWER THE QUESTIONS BELOW TO DETERMINE YOUR IDENTITY.\n\nType the number of your answer and press ENTER. Type "cancel" to abort.'
     });
     
     setCharacterCreation({
       active: true,
       currentQuestion: 0,
-      // Start with 1 in each attribute
       attributes: { power: 1, oddity: 1, wisdom: 1, endurance: 1, reflex: 1 },
       items: [],
       background: null,
       name: "",
       completed: false,
-      pointsAllocated: 5, // 1 point in each of 5 attributes = 5 points
-      pointsRemaining: 10 // 10 additional points to allocate during character creation
+      pointsAllocated: 5,
+      pointsRemaining: 10
     });
     
     displayCurrentQuestion(0);
@@ -200,7 +186,6 @@ const SurvivorOSTerminal = () => {
       questionText += `${index + 1}. ${option.text}\n`;
     });
     
-    // Show remaining points if we're still allocating attributes
     if (characterCreation.pointsRemaining > 0) {
       questionText += `\nRemaining attribute points: ${characterCreation.pointsRemaining}`;
     }
@@ -229,7 +214,6 @@ const SurvivorOSTerminal = () => {
           text: `Name registered: ${name}`
         });
         
-        // Generate character sheet with name, attributes, items, and background
         const characterSheet = generateCharacterSheet(
           name, 
           characterCreation.attributes, 
@@ -247,8 +231,15 @@ const SurvivorOSTerminal = () => {
         addToTerminalHistory({ 
           type: 'output', 
           text: characterSheet,
-          isCharacterSheet: true // Flag this for special rendering
+          isCharacterSheet: true
         });
+        
+        setTimeout(() => {
+          addToTerminalHistory({
+            type: 'output',
+            text: 'TIP: You can copy and paste your character sheet to a text editor to save it for your game.'
+          });
+        }, 1000);
       } else {
         addToTerminalHistory({ 
           type: 'output', 
@@ -282,18 +273,15 @@ const SurvivorOSTerminal = () => {
     let updatedBackground = characterCreation.background;
     let pointsUsedInThisQuestion = 0;
     
-    // Add attributes from this question
     for (const [attr, value] of Object.entries(selectedOption.attributes || {})) {
       updatedAttributes[attr] += value;
       pointsUsedInThisQuestion += value;
     }
     
-    // Add item if present in the option
     if (selectedOption.item) {
       updatedItems.push(selectedOption.item);
     }
     
-    // Set background if present in the option
     if (selectedOption.background) {
       updatedBackground = {
         title: selectedOption.background,
@@ -301,10 +289,7 @@ const SurvivorOSTerminal = () => {
       };
     }
     
-    // Calculate remaining points
     const newPointsRemaining = characterCreation.pointsRemaining - pointsUsedInThisQuestion;
-    
-    // Move to next question
     const nextQuestionIndex = questionIndex + 1;
     
     setCharacterCreation({
@@ -317,11 +302,10 @@ const SurvivorOSTerminal = () => {
       pointsRemaining: newPointsRemaining
     });
     
-    // If we've assigned more than max allowed points to an attribute, redistribute
     for (const [attr, value] of Object.entries(updatedAttributes)) {
-      if (value > 35) {
-        const excess = value - 35;
-        updatedAttributes[attr] = 35;
+      if (value > 5) {
+        const excess = value - 5;
+        updatedAttributes[attr] = 5;
         distributeExcessPoints(updatedAttributes, attr, excess);
       }
     }
@@ -393,22 +377,17 @@ good luck. You'll need it." - Note found with terminal
       return;
     }
     else if (command === 'logs') {
-      // Show available logs
       response = `AVAILABLE LOGS:\n\n${availableLogs.map(logNum => `- Log #${logNum}`).join('\n')}\n\nType 'log [number]' to view a specific log.`;
     } 
     else if (command.startsWith('log ')) {
-      // Parse log number
       const logNumber = parseInt(command.split('log ')[1], 10);
       
       if (isNaN(logNumber)) {
         response = "Invalid log number. Type 'logs' to see available logs.";
       } else {
-        // Display loading message
         addToTerminalHistory({ type: 'output', text: `Accessing log #${logNumber}...` });
         
-        // Load and display the log asynchronously
         const loadLog = async (logNum) => {
-          // Check if log is in cache
           if (logsCache[logNum]) {
             return logsCache[logNum];
           }
@@ -420,7 +399,6 @@ good luck. You'll need it." - Note found with terminal
             }
             const logContent = await logResponse.text();
             
-            // Update cache
             setLogsCache(prev => ({
               ...prev,
               [logNum]: logContent
@@ -433,7 +411,6 @@ good luck. You'll need it." - Note found with terminal
           }
         };
         
-        // Load and display the log
         loadLog(logNumber).then(logContent => {
           if (logContent) {
             addToTerminalHistory({ 
@@ -449,7 +426,6 @@ good luck. You'll need it." - Note found with terminal
           }
         });
         
-        // Return without setting response to avoid duplicate messages
         return;
       }
     }
