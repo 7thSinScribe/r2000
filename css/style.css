@@ -1,7 +1,7 @@
 /* Updated font declarations */
 @font-face {
   font-family: 'Pixelcastle';
-  src: url('css/fonts/Pixelcastle-Regular.otf') format('opentype');
+  src: url('fonts/Pixelcastle-Regular.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -9,7 +9,7 @@
 
 @font-face {
   font-family: 'RuneScape';
-  src: url('css/fonts/RuneScape-Plain-12.otf') format('opentype');
+  src: url('fonts/RuneScape-Plain-12.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
