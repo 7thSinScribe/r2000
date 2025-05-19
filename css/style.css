@@ -625,9 +625,9 @@ pre.ascii-logo {
   100% { opacity: 0; transform: translate(0, 0); }
 }
 
-/* Character sheet specific styling */
+/*Character sheet*/
 .character-sheet {
-  font-family: monospace;
+  font-family: Pixelcastle;
   white-space: pre;
   line-height: 1.2;
   color: #e0f8cf;
@@ -639,13 +639,6 @@ pre.ascii-logo {
   font-size: 14px;
 }
 
-/* Make sure it preserves spacing in the hacked state too */
-body.hacked .character-sheet {
-  font-family: monospace !important;
-  white-space: pre !important;
-}
-
-/* Additional stat bar styling for character sheet */
 .stat-bar {
   display: inline-block;
   height: 10px;
