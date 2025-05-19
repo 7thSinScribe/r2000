@@ -24,7 +24,7 @@ if (typeof marked !== 'undefined') {
 
 function renderTerminalLogo(isBooting) {
   return (
-    <div>
+    <div className="text-center">
       <div className={isBooting ? "terminal-logo blink-animation-continuous" : "terminal-logo"}>Survivor OS</div>
       <div className="copyright-text">rogueboy override v0.5b | build: srv-2957f5a</div>
     </div>
@@ -41,8 +41,8 @@ function renderOutput(item, isBooting) {
     return renderTerminalLogo(isBooting);
   } else if (item.isLogo) {
     return (
-      <div className={item.shouldBlink ? "blink-animation" : ""}>
-        <pre>{item.text}</pre>
+      <div className={`${item.shouldBlink ? "blink-animation" : ""} text-center`}>
+        <pre className="inline-block">{item.text}</pre>
       </div>
     );
   } else if (item.contentType === 'quickstart' || item.contentType === 'log') {
