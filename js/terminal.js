@@ -36,11 +36,16 @@ let currentGlitchState = {
 };
 
 function renderTerminalLogo(isBooting) {
-  if (!isBooting && currentGlitchState.state === logoStates.BOOTING) {
+  if (isBooting && !currentGlitchState.glitchTimer && Math.random() < 0.3) {
     currentGlitchState.state = logoStates.GLITCHING;
-    
-    if (!currentGlitchState.glitchTimer) {
-      startLogoGlitchSequence();
+    startLogoGlitchSequence();
+  }
+  
+  if (!isBooting && currentGlitchState.state !== logoStates.COMPLETE) {
+    currentGlitchState.state = logoStates.COMPLETE;
+    if (currentGlitchState.glitchTimer) {
+      clearInterval(currentGlitchState.glitchTimer);
+      currentGlitchState.glitchTimer = null;
     }
   }
   
@@ -121,26 +126,22 @@ function startLogoGlitchSequence() {
         staticEl.style.top = `${Math.random() * 100}%`;
         staticEl.style.zIndex = '10';
         
-        document.querySelector('.terminal-logo-container').appendChild(staticEl);
-        setTimeout(() => {
-          if (staticEl.parentNode) {
-            staticEl.parentNode.removeChild(staticEl);
-          }
-        }, 300);
+        const container = document.querySelector('.terminal-logo-container');
+        if (container) {
+          container.appendChild(staticEl);
+          setTimeout(() => {
+            if (staticEl.parentNode) {
+              staticEl.parentNode.removeChild(staticEl);
+            }
+          }, 300);
+        }
       }
     }
-  }, 150);
-  
-  setTimeout(() => {
-    clearInterval(rapidGlitchInterval);
     
-    currentGlitchState.glitchTimer = setInterval(() => {
-      const logoElement = document.querySelector('.terminal-logo');
-      if (logoElement) {
-        logoElement.classList.toggle('force-update');
-      }
-      
-      currentGlitchState.glitchCount++;
+    currentGlitchState.glitchCount++;
+    
+    if (currentGlitchState.glitchCount >= 5) {
+      clearInterval(rapidGlitchInterval);
       
       if (Math.random() < 0.5) {
         const screenGlitch = document.createElement('div');
@@ -167,25 +168,23 @@ function startLogoGlitchSequence() {
         }, 150);
       }
       
-      if (currentGlitchState.glitchCount >= currentGlitchState.maxGlitches) {
-        currentGlitchState.state = logoStates.COMPLETE;
-        clearInterval(currentGlitchState.glitchTimer);
+      setTimeout(() => {
+        if (currentGlitchState.state === logoStates.GLITCHING) {
+          currentGlitchState.state = logoStates.BOOTING;
+        }
+        currentGlitchState.glitchCount = 0;
         currentGlitchState.glitchTimer = null;
-        
-        setTimeout(() => {
-          const logoElement = document.querySelector('.terminal-logo');
-          if (logoElement) {
-            logoElement.classList.add('force-update');
-          }
-        }, 100);
-      }
-    }, 800);
-  }, 1000);
+      }, 200);
+    }
+  }, 150);
+  
+  currentGlitchState.glitchTimer = rapidGlitchInterval;
 }
 
 function renderOutput(item, isBooting) {
   if (item.text === 'OVERRIDE ACCEPTED - FULL ACCESS GRANTED') {
     document.body.classList.add('hacked');
+    currentGlitchState.state = logoStates.COMPLETE;
     return <pre className="access-granted">{item.text}</pre>;
   }
   
