@@ -1,4 +1,3 @@
-/* This file retains the ASCII art for compatibility */
 const survivorAsciiLogo = [
   "███████╗██╗   ██╗██████╗ ██╗   ██╗██╗██╗   ██╗ ██████╗ ██████╗      ██████╗ ███████╗",
   "██╔════╝██║   ██║██╔══██╗██║   ██║██║██║   ██║██╔═══██╗██╔══██╗    ██╔═══██╗██╔════╝",
@@ -78,14 +77,13 @@ function renderTerminalLogo(isBooting) {
       break;
       
     case logoStates.COMPLETE:
-      logoClass += " complete";
       logoContent = "Survivor OS";
       copyrightText = "rogueboy override v0.5b | build: srv-2957f5a";
       break;
   }
   
   return (
-    <div>
+    <div className="terminal-logo-container">
       <div className={logoClass} data-text={logoContent}>{logoContent}</div>
       <div 
         className={currentGlitchState.state === logoStates.GLITCHING ? "copyright-text glitch-text" : "copyright-text"}
@@ -123,7 +121,7 @@ function startLogoGlitchSequence() {
         staticEl.style.top = `${Math.random() * 100}%`;
         staticEl.style.zIndex = '10';
         
-        logoElement.parentNode.appendChild(staticEl);
+        document.querySelector('.terminal-logo-container').appendChild(staticEl);
         setTimeout(() => {
           if (staticEl.parentNode) {
             staticEl.parentNode.removeChild(staticEl);
@@ -178,29 +176,6 @@ function startLogoGlitchSequence() {
           const logoElement = document.querySelector('.terminal-logo');
           if (logoElement) {
             logoElement.classList.add('force-update');
-            
-            const finalFlash = document.createElement('div');
-            finalFlash.style.position = 'fixed';
-            finalFlash.style.top = '0';
-            finalFlash.style.left = '0';
-            finalFlash.style.width = '100%';
-            finalFlash.style.height = '100%';
-            finalFlash.style.backgroundColor = '#86c06c';
-            finalFlash.style.opacity = '0.3';
-            finalFlash.style.zIndex = '999';
-            finalFlash.style.pointerEvents = 'none';
-            finalFlash.style.transition = 'opacity 0.5s ease-out';
-            
-            document.body.appendChild(finalFlash);
-            
-            setTimeout(() => {
-              finalFlash.style.opacity = '0';
-              setTimeout(() => {
-                if (finalFlash.parentNode) {
-                  finalFlash.parentNode.removeChild(finalFlash);
-                }
-              }, 500);
-            }, 50);
           }
         }, 100);
       }
