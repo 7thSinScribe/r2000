@@ -9,9 +9,6 @@ const survivorAsciiLogo = [
   "                   terminal v0.5b | build: srv-2957f5a                              "
 ];
 
-// Available log numbers
-const availableLogs = [76, 55];
-
 if (typeof marked !== 'undefined') {
   marked.setOptions({
     gfm: true,
@@ -24,108 +21,6 @@ if (typeof marked !== 'undefined') {
     xhtml: false
   });
 }
-
-// Cache for storing loaded logs
-let logsCache = {};
-
-// Function to fetch a log and store it in the cache
-const fetchLog = async (logNumber) => {
-  if (logsCache[logNumber]) {
-    return logsCache[logNumber]; // Return from cache if already loaded
-  }
-  
-  try {
-    const logResponse = await fetch(`data/log${logNumber}.md`);
-    if (!logResponse.ok) {
-      throw new Error(`Log ${logNumber} not found`);
-    }
-    
-    const logContent = await logResponse.text();
-    
-    // Update the cache
-    logsCache[logNumber] = logContent;
-    
-    return logContent;
-  } catch (error) {
-    console.error(`Error loading log${logNumber}:`, error);
-    throw error;
-  }
-};
-
-const showLogsList = () => {
-  addToTerminalHistory({ type: 'input', text: `> logs` });
-  
-  // Generate list of logs from the availableLogs array
-  let logsListContent = `
-AVAILABLE SURVIVOR LOGS:
-----------------------
-
-`;
-  availableLogs.forEach(logNumber => {
-    logsListContent += `log${logNumber}: Survivor Log Entry #${logNumber}\n`;
-  });
-  
-  logsListContent += `\nTo view a log, type 'log' followed by the log number (e.g., 'log76')`;
-  
-  addToTerminalHistory({ 
-    type: 'output', 
-    text: logsListContent
-  });
-  
-  setTerminalInput('');
-};
-
-// Generic log display function that works with any log number
-const showLogByNumber = (logNumber) => {
-  addToTerminalHistory({ type: 'input', text: `> log${logNumber}` });
-  
-  addToTerminalHistory({ 
-    type: 'output', 
-    text: `ACCESSING LOG ENTRY #${logNumber}`,
-  });
-  
-  // Check if the log exists in the available logs
-  if (!availableLogs.includes(logNumber)) {
-    addToTerminalHistory({ 
-      type: 'output', 
-      text: `ERROR: Log ${logNumber} not found in the survivor database.`
-    });
-    setTerminalInput('');
-    return;
-  }
-  
-  // Try to get from cache first, or fetch if needed
-  if (logsCache[logNumber]) {
-    // Log is in cache, display it
-    setTimeout(() => {
-      addToTerminalHistory({ 
-        type: 'output', 
-        text: logsCache[logNumber],
-        contentType: 'log'
-      });
-    }, 500);
-  } else {
-    // Log not in cache, fetch it
-    fetchLog(logNumber)
-      .then(content => {
-        setTimeout(() => {
-          addToTerminalHistory({ 
-            type: 'output', 
-            text: content,
-            contentType: 'log'
-          });
-        }, 500);
-      })
-      .catch(error => {
-        addToTerminalHistory({ 
-          type: 'output', 
-          text: `ERROR: ${error.message}. Log may not exist.`
-        });
-      });
-  }
-  
-  setTerminalInput('');
-};
 
 const logoStates = {
   BOOTING: 'booting',
