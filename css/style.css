@@ -1,16 +1,18 @@
+/* Updated font declarations */
 @font-face {
   font-family: 'Pixelcastle';
-  src: url('https://cdn.jsdelivr.net/gh/dtinth/pixelcastle/dist/pixelcastle-regular.woff2') format('woff2');
+  src: url('css/fonts/Pixelcastle-Regular.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'CogmindLike';
-  src: url('https://fonts.cdnfonts.com/s/19899/JetBrainsMono-Regular.woff') format('woff');
+  font-family: 'RuneScape';
+  src: url('css/fonts/RuneScape-Plain-12.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
 }
 
 body, html {
@@ -20,7 +22,7 @@ body, html {
   width: 100%;
   overflow: hidden;
   background-color: #000;
-  font-family: monospace;
+  font-family: 'RuneScape', monospace;
 }
 
 #root {
@@ -156,13 +158,14 @@ input:focus {
   color: #e0f8cf;
   background-color: #306850;
   padding: 0 40px;
+  font-family: 'RuneScape', monospace;
 }
 
 .terminal-header {
   color: #e0f8cf;
   border-bottom: 1px solid #86c06c;
   padding: 0 40px;
-  font-family: 'CogmindLike', monospace;
+  font-family: 'RuneScape', monospace;
   letter-spacing: 1px;
 }
 
@@ -170,113 +173,68 @@ input:focus {
   padding-left: 40px;
 }
 
+/* Basic pre styling for all terminal output */
 pre {
   margin: 0;
   white-space: pre-wrap;
-  font-family: monospace;
+  font-family: 'RuneScape', monospace;
   color: #e0f8cf;
-}
-
-/* Unified Markdown Styling */
-.markdown-content {
-  color: #e0f8cf;
-  font-family: 'CogmindLike', monospace;
   line-height: 1.5;
+}
+
+/* Additional styling for content types */
+.terminal-quickstart,
+.terminal-log {
   padding: 10px 5px;
+  /* This ensures the terminal markdown gets displayed correctly */
+  white-space: pre-wrap;
 }
 
-.markdown-content h1, 
-.markdown-content h2, 
-.markdown-content h3 {
-  font-family: 'Pixelcastle', monospace;
+/* Make headers stand out */
+.terminal-quickstart h1,
+.terminal-log h1,
+pre h1 {
   color: #86c06c;
-  margin-top: 1.25rem;
-  margin-bottom: 0.75rem;
+  font-weight: bold;
+  font-size: 1.5em;
+  margin: 1em 0 0.5em 0;
 }
 
-.markdown-content h1 {
-  font-size: 1.6rem;
-  letter-spacing: 1px;
-}
-
-.markdown-content h2 {
-  font-size: 1.3rem;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-}
-
-.markdown-content h3 {
-  font-size: 1.1rem;
-}
-
-.markdown-content p {
-  margin-bottom: 1rem;
-}
-
-.markdown-content ul, 
-.markdown-content ol {
-  list-style-type: none;
-  padding-left: 1rem;
-  margin-bottom: 1rem;
-}
-
-.markdown-content li {
-  margin-bottom: 0.5rem;
-  position: relative;
-  padding-left: 1rem;
-}
-
-.markdown-content ul li:before {
-  content: "•";
-  position: absolute;
-  left: 0;
+.terminal-quickstart h2,
+.terminal-log h2,
+pre h2 {
   color: #86c06c;
+  font-weight: bold;
+  font-size: 1.25em;
+  margin: 1em 0 0.5em 0;
 }
 
-.markdown-content ol {
-  counter-reset: item;
-}
-
-.markdown-content ol li:before {
-  counter-increment: item;
-  content: counter(item) ".";
-  position: absolute;
-  left: 0;
+.terminal-quickstart h3,
+.terminal-log h3,
+pre h3 {
   color: #86c06c;
+  font-weight: bold;
+  font-size: 1.1em;
+  margin: 1em 0 0.5em 0;
 }
 
-.markdown-content blockquote {
+/* Style code blocks */
+.terminal-quickstart code,
+.terminal-log code,
+pre code {
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+
+/* Style blockquotes */
+.terminal-quickstart blockquote,
+.terminal-log blockquote {
   border-left: 3px solid #86c06c;
   padding-left: 10px;
   margin-left: 10px;
-  margin-bottom: 1rem;
-  font-style: italic;
   color: #bef0ad;
-}
-
-.markdown-content code {
-  font-family: 'CogmindLike', monospace;
-  background-color: rgba(26, 56, 45, 0.6);
-  padding: 2px 4px;
-  border-radius: 3px;
-  color: #e0f8cf;
-}
-
-.markdown-content .code-block {
-  background-color: rgba(26, 56, 45, 0.6);
-  padding: 10px;
-  margin: 1rem 0;
-  border-radius: 5px;
-  border-left: 3px solid #86c06c;
-  overflow-x: auto;
-}
-
-/* Ensure all terminal markdown uses the same style */
-.terminal-markdown {
-  /* We'll use this class to ensure all markdown content is styled the same */
-}
-
-/* Character sheet styling */
-pre {
-  font-family: 'CogmindLike', monospace;
+  background-color: rgba(0, 0, 0, 0.1);
+  padding: 5px 10px;
+  border-radius: 0 5px 5px 0;
 }
