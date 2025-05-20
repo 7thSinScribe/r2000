@@ -1,8 +1,8 @@
-// js/catalogue.js
+
 const catalogueEntities = [
     {
       id: '001',
-      name: 'TORIEL, THE UNVANQUISHED (RED DRAGON)',
+      name: 'TORIEL, THE UNVANQUISHED',
       origin: 'Tutorial_Boss_001.arc',
       state: 'HYBRID',
       powerLevel: 9100,
@@ -15,12 +15,12 @@ const catalogueEntities = [
       blood: { current: 62, max: 62 },
       sweat: { current: 50, max: 50 },
       tears: { current: 52, max: 52 },
-      threat: 'Draconic entity serving as gateway guardian to new areas. Controls both PHYSICAL and DIGITAL space within 30m radius. Special ability: "Maternal Reset" restores 50% BLOOD when low.',
-      history: 'Originally designed as tutorial guide, corrupted during game/reality merger, now tests survivors through combat trials. First encountered in Sector N-3 by Survivor Group "Deadbeef".',
+      threat: 'Toriel should not be approached or reasoned with, her mind is as sharp as her talons.',
+      history: 'Originally designed as tutorial guide, corrupted during game/reality merger, now tests survivors through combat trials. First encountered by Survivor Group "Deadmeat", an apt name, as they were the first victims.',
       notes: [
         'She\'s trying to help, in her way. Doesn\'t make her less deadly.',
-        'The fire breath isn\'t real. The pain is. - Log #55',
-        'Color flickers before breath attack. DODGE LATERAL. - Log #87'
+        'The fire breath isn\'t 100%  real. The pain is.',
+        'Color flickers before breath attack. DODGE LATERAL.'
       ]
     },
     {
@@ -38,7 +38,7 @@ const catalogueEntities = [
       blood: { current: 32, max: 32 },
       sweat: { current: 40, max: 40 },
       tears: { current: 43, max: 43 },
-      threat: 'Intangible digital entity capable of possessing electronic devices. Can travel through power lines and electrical connections. Special ability: "Glitch Step" enables teleportation through digital space.',
+      threat: 'Intangible digital entity capable of possessing electronic devices. Can travel through power lines and electrical connections.',
       history: 'Appears to be fragmented shadow data from the original game\'s stealth enemies. Gained sentience during the merge. Often found near abandoned N-CO facilities.',
       notes: [
         'They don\'t see you if you don\'t look at screens. - Log #23',
