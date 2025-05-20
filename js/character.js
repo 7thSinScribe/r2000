@@ -32,10 +32,10 @@ const characterCreationData = {
       ]
     },
     {
-      text: "What's your approach to surviving Gamemaster's challenges?",
+      text: "How do you approach surviving the Gamemaster challenges?", // Modified to remove apostrophes
       options: [
         { text: "Confronting threats directly - better to face danger head-on", attributes: { power: 1 } },
-        { text: "Testing reality's limits - the rules have changed, why not exploit them?", attributes: { oddity: 1 } },
+        { text: "Testing reality limits - the rules have changed, why not exploit them?", attributes: { oddity: 1 } },
         { text: "Analyzing patterns - everything follows some kind of logic", attributes: { wisdom: 1 } },
         { text: "Outlasting dangers - most threats dissipate if you can endure", attributes: { endurance: 1 } },
         { text: "Staying constantly mobile - never present a stationary target", attributes: { reflex: 1 } }
@@ -62,7 +62,7 @@ const characterCreationData = {
       ]
     },
     {
-      text: "How do you navigate the merged reality's dangerous zones?",
+      text: "How do you navigate the merged reality dangerous zones?", // Modified to be consistent
       options: [
         { text: "Destroy glitched obstacles blocking the path", 
           attributes: { power: 1 }, 
@@ -73,7 +73,7 @@ const characterCreationData = {
         { text: "Track patterns in the glitch field to find safe passages", 
           attributes: { wisdom: 1 }, 
           item: "Corruption Compass (points toward stable areas)" },
-        { text: "Push through corrupted areas others can't tolerate", 
+        { text: "Push through corrupted areas others cannot tolerate", 
           attributes: { endurance: 1 }, 
           item: "Stabilization Patches (reduce corruption accumulation)" },
         { text: "Dart through temporarily stable pathways between anomalies", 
@@ -88,25 +88,25 @@ const characterCreationData = {
           text: "Participated in a strength challenge at an N-CO promotional event", 
           attributes: { power: 1 },
           background: "CONTEST WINNER",
-          backgroundDesc: "You won an N-CO promotional contest during the Week of Madness campaign. The prize was one of the first Rogueboy 2000 units, delivered to your home moments before midnight. You sometimes wonder if your early connection to the device is why you can perceive certain glitches others can't."
+          backgroundDesc: "You won an N-CO promotional contest during the Week of Madness campaign. The prize was one of the first Rogueboy 2000 units, delivered to your home moments before midnight. You sometimes wonder if your early connection to the device is why you can perceive certain glitches others cannot."
         },
         { 
           text: "Explored rumors about hidden easter eggs in the game", 
           attributes: { oddity: 1 },
           background: "CURIOSITY SEEKER",
-          backgroundDesc: "You were obsessed with uncovering the secrets N-CO had supposedly hidden in Rogue 2000. You'd discovered three of the five rumored 'reality shifting' easter eggs before the collapse. Sometimes you catch glimpses of game text only you can see, hinting at the final secrets that were never meant to be found."
+          backgroundDesc: "You were obsessed with uncovering the secrets N-CO had supposedly hidden in Rogue 2000. You discovered three of the five rumored reality shifting easter eggs before the collapse. Sometimes you catch glimpses of game text only you can see, hinting at the final secrets that were never meant to be found."
         },
         { 
           text: "Wrote analyses predicting the game would underperform", 
           attributes: { wisdom: 1 },
           background: "TECH ANALYST",
-          backgroundDesc: "You predicted the Rogueboy 2000 would be a commercial disaster due to unrealistic promises. Your final article critiquing N-CO's impossible claims about 'intelligent procedural generation' was scheduled to publish at 12:01am on January 1st, 2000. The draft still sits in a defunct server somewhere in the digital realm."
+          backgroundDesc: "You predicted the Rogueboy 2000 would be a commercial disaster due to unrealistic promises. Your final article critiquing N-CO claims about intelligent procedural generation was scheduled to publish at 12:01am on January 1st, 2000. The draft still sits in a defunct server somewhere in the digital realm."
         },
         { 
           text: "Camped outside an electronics store for the midnight release", 
           attributes: { endurance: 1 },
           background: "DEDICATED FAN",
-          backgroundDesc: "You spent three days and nights waiting to be first in line for the Rogueboy 2000 release. When the collapse happened, you were at the register, with the device in your hands. You've had recurring dreams of the store clerk's face, frozen in the exact moment everything changed."
+          backgroundDesc: "You spent three days and nights waiting to be first in line for the Rogueboy 2000 release. When the collapse happened, you were at the register, with the device in your hands. You have recurring dreams of the store clerk face, frozen in the exact moment everything changed."
         },
         { 
           text: "Practiced speedrunning strategies based on preview footage", 
@@ -121,16 +121,16 @@ const characterCreationData = {
           backgroundDesc: "You ignored the Rogue 2000 marketing blitz, convinced it was overhyped nonsense. Being untouched by the pre-release conditioning might explain why you see the world differently than many survivors. Digital entities occasionally mistake you for an NPC rather than a player."
         },
         { 
-          text: "Investigated N-CO's unusual server activity that week", 
+          text: "Investigated N-CO unusual server activity that week", 
           attributes: { wisdom: 1, oddity: 1 },
           background: "WHISTLEBLOWER",
-          backgroundDesc: "You were tracking unusual data patterns from N-CO's servers in the days before launch. You compiled evidence of unprecedented data collection through their marketing ARG. Your investigation was cut short by the collapse, but you still have encrypted fragments of what you found."
+          backgroundDesc: "You were tracking unusual data patterns from N-CO servers in the days before launch. You compiled evidence of unprecedented data collection through their marketing ARG. Your investigation was cut short by the collapse, but you still have encrypted fragments of what you found."
         },
         { 
           text: "Documented yourself unboxing and testing a review copy", 
           attributes: { wisdom: 1, reflex: 1 },
           background: "CONTENT CREATOR",
-          backgroundDesc: "You received an early review unit of the Rogueboy 2000 from N-CO's marketing team. Your livestream of the unboxing was running when the collapse occurred. Sometimes you encounter digital entities who quote fragments of your final broadcast back to you."
+          backgroundDesc: "You received an early review unit of the Rogueboy 2000 from N-CO marketing team. Your livestream of the unboxing was running when the collapse occurred. Sometimes you encounter digital entities who quote fragments of your final broadcast back to you."
         }
       ]
     },
@@ -143,7 +143,7 @@ const characterCreationData = {
         },
         { text: "A mixtape that plays different songs than what was recorded", 
           attributes: { oddity: 1 },
-          item: "Glitched Mixtape (can sometimes influence digital entities' behavior)" 
+          item: "Glitched Mixtape (can sometimes influence digital entities behavior)" 
         },
         { text: "A journal where you mapped the first glitch patterns", 
           attributes: { wisdom: 1 },
@@ -162,7 +162,7 @@ const characterCreationData = {
     {
       text: "Which habit have you developed since the digital apocalypse?",
       options: [
-        { text: "Testing physical boundaries of objects to see if they're real", 
+        { text: "Testing physical boundaries of objects to see if they are real", 
           attributes: { power: 1 } },
         { text: "Whispering to your devices as if they can understand you", 
           attributes: { oddity: 1 } },
@@ -181,7 +181,7 @@ const characterCreationData = {
           attributes: { power: 1 } },
         { text: "Conversations with a glitched version of yourself from another timeline", 
           attributes: { oddity: 1 } },
-        { text: "Seeing code beneath everyone's skin, revealing they're all NPCs", 
+        { text: "Seeing code beneath everyone skin, revealing they are all NPCs", 
           attributes: { wisdom: 1 } },
         { text: "Endlessly running through repeating environments that never change", 
           attributes: { endurance: 1 } },

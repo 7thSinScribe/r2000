@@ -182,17 +182,17 @@ const SurvivorOSTerminal = () => {
     const question = characterCreationData.questions[questionIndex];
     let questionText = `QUESTION ${questionIndex + 1}/${characterCreationData.questions.length}: ${question.text}\n\n`;
     
+    // Make sure the formatting is consistent for all options
     question.options.forEach((option, index) => {
+      // Use a consistent format without any special characters
       questionText += `${index + 1} ${option.text}\n`;
     });
-    
-    // Removed the "remaining attribute points" display
     
     addToTerminalHistory({ 
       type: 'output', 
       text: questionText
     });
-  };
+  };;
   
   const processCharacterCreationAnswer = (answer) => {
     if (answer.toLowerCase() === 'cancel') {
