@@ -1,4 +1,102 @@
-// Collection of existentialist quotes for death screen
+function createGlitchArtifacts(container, subtle = false) {
+  // Number of artifacts based on intensity
+  const numArtifacts = subtle ? 10 : 25;
+  const numStaticEffects = subtle ? 7 : 18;
+  
+  // Create several glitch elements
+  for (let i = 0; i < numArtifacts; i++) {
+    setTimeout(() => {
+      const artifact = document.createElement('div');
+      
+      // Randomly choose horizontal or vertical line
+      if (Math.random() > 0.5) {
+        // Horizontal line
+        artifact.className = 'artifact h-line';
+        artifact.style.height = `${Math.random() * 3 + 1}px`;
+        artifact.style.width = `${Math.random() * 100}%`;
+        artifact.style.left = `${Math.random() * 100}%`;
+        artifact.style.top = `${Math.random() * 100}%`;
+      } else {
+        // Vertical line
+        artifact.className = 'artifact v-line';
+        artifact.style.width = `${Math.random() * 3 + 1}px`;
+        artifact.style.height = `${Math.random() * 100}%`;
+        artifact.style.top = `${Math.random() * 100}%`;
+        artifact.style.left = `${Math.random() * 100}%`;
+      }
+      
+      // Set base styles
+      artifact.style.position = 'absolute';
+      
+      // Use game palette colors
+      const colorChoice = Math.random();
+      if (colorChoice < 0.2) {
+        artifact.style.backgroundColor = '#e0f8cf'; // Light green
+      } else if (colorChoice < 0.7) {
+        artifact.style.backgroundColor = '#86c06c'; // Medium green
+      } else {
+        artifact.style.backgroundColor = '#306850'; // Dark green
+      }
+      
+      // Adjust opacity based on subtle setting
+      artifact.style.opacity = subtle ? 
+                              (Math.random() * 0.5 + 0.2) : 
+                              (Math.random() * 0.7 + 0.3);
+      artifact.style.zIndex = '5';
+      
+      // Add random animation duration for variety
+      const duration = Math.random() * 0.5 + 0.2;
+      artifact.style.animation = `artifact-${Math.random() > 0.5 ? 'h' : 'v'}-anim ${duration}s ease-out forwards`;
+      
+      container.appendChild(artifact);
+      
+      // Remove after animation completes
+      setTimeout(() => {
+        if (artifact.parentNode) {
+          artifact.parentNode.removeChild(artifact);
+        }
+      }, duration * 1000 + 100);
+    }, Math.random() * (subtle ? 3000 : 5000)); // Random start time
+  }
+  
+  // Add some flashing/static effects
+  for (let i = 0; i < numStaticEffects; i++) {
+    setTimeout(() => {
+      const staticEffect = document.createElement('div');
+      staticEffect.className = 'death-static';
+      staticEffect.style.position = 'absolute';
+      staticEffect.style.width = `${Math.random() * 300 + 50}px`;
+      staticEffect.style.height = `${Math.random() * 200 + 20}px`;
+      staticEffect.style.top = `${Math.random() * 100}%`;
+      staticEffect.style.left = `${Math.random() * 100}%`;
+      staticEffect.style.backgroundColor = '#86c06c'; // From your palette
+      staticEffect.style.opacity = subtle ? '0.1' : '0.2';
+      staticEffect.style.mixBlendMode = 'overlay';
+      staticEffect.style.animation = 'static-noise 0.3s ease-out forwards';
+      
+      container.appendChild(staticEffect);
+      
+      setTimeout(() => {
+        if (staticEffect.parentNode) {
+          staticEffect.parentNode.removeChild(staticEffect);
+        }
+      }, 300);
+    }, Math.random() * (subtle ? 4000 : 7000)); // Random start time
+  }
+  
+  // Screen shake effect
+  if (!subtle) {
+    setTimeout(() => {
+      const terminalContainer = document.querySelector('.crt-screen');
+      if (terminalContainer) {
+        terminalContainer.classList.add('screen-glitch');
+        setTimeout(() => {
+          terminalContainer.classList.remove('screen-glitch');
+        }, 200);
+      }
+    }, 500);
+  }
+}// Collection of existentialist quotes for death screen
 const existentialistQuotes = [
   "Man is condemned to be free; because once thrown into the world, he is responsible for everything he does. - Jean-Paul Sartre",
   "Anxiety is the dizziness of freedom. - Søren Kierkegaard",
@@ -35,7 +133,7 @@ const existentialistQuotes = [
 ];
 
 function handleOutOfBlood() {
-  // Create death screen overlay
+  // Create death screen overlay with initial dark state
   const deathScreen = document.createElement('div');
   deathScreen.className = 'death-screen';
   deathScreen.style.position = 'fixed';
@@ -43,168 +141,186 @@ function handleOutOfBlood() {
   deathScreen.style.left = '0';
   deathScreen.style.width = '100%';
   deathScreen.style.height = '100%';
-  deathScreen.style.backgroundColor = 'rgba(7, 24, 33, 0.95)';
+  deathScreen.style.backgroundColor = 'rgba(7, 24, 33, 0.98)'; // Almost black
   deathScreen.style.zIndex = '10000';
   deathScreen.style.display = 'flex';
   deathScreen.style.flexDirection = 'column';
   deathScreen.style.justifyContent = 'center';
   deathScreen.style.alignItems = 'center';
-  deathScreen.style.animation = 'deathFadeIn 2s forwards';
+  document.body.appendChild(deathScreen);
+
+  // Create matrix rain container
+  const matrixContainer = document.createElement('div');
+  matrixContainer.className = 'matrix-container';
+  matrixContainer.style.position = 'absolute';
+  matrixContainer.style.top = '0';
+  matrixContainer.style.left = '0';
+  matrixContainer.style.width = '100%';
+  matrixContainer.style.height = '100%';
+  matrixContainer.style.overflow = 'hidden';
+  matrixContainer.style.opacity = '0.2'; // Start subtle
+  matrixContainer.style.zIndex = '0'; // Behind other elements
+  deathScreen.appendChild(matrixContainer);
   
-  // Create animated death message
+  // Initialize matrix rain
+  createMatrixRain(matrixContainer);
+  
+  // Create animated death message (initially hidden)
   const deathMessage = document.createElement('div');
   deathMessage.textContent = 'YOU DIED';
   deathMessage.style.color = '#e0f8cf'; // Lightest green from the palette
   deathMessage.style.fontFamily = 'Pixelcastle, monospace';
   deathMessage.style.fontSize = '64px';
-  deathMessage.style.textShadow = '0 0 10px rgba(134, 192, 108, 0.8)'; // Green glow from your palette
+  deathMessage.style.textShadow = '0 0 10px rgba(134, 192, 108, 0.8)'; // Green glow
   deathMessage.style.marginBottom = '40px';
-  deathMessage.style.animation = 'pulseGlow 2s infinite';
+  deathMessage.style.opacity = '0'; // Start hidden
+  deathMessage.style.transition = 'opacity 3s ease-in';
+  deathMessage.style.zIndex = '2';
   
   // Select a random quote
   const randomQuote = existentialistQuotes[Math.floor(Math.random() * existentialistQuotes.length)];
   
-  // Create quote container
+  // Create quote container (initially hidden)
   const quoteContainer = document.createElement('div');
   quoteContainer.style.maxWidth = '600px';
   quoteContainer.style.textAlign = 'center';
-  quoteContainer.style.color = '#86c06c'; // From your palette
+  quoteContainer.style.color = '#86c06c'; // Medium green from palette
   quoteContainer.style.fontFamily = 'RuneScape, monospace';
   quoteContainer.style.fontSize = '18px';
-  quoteContainer.style.opacity = '0';
-  quoteContainer.style.animation = 'quoteAppear 2s forwards 1s';
+  quoteContainer.style.opacity = '0'; // Start hidden
+  quoteContainer.style.transform = 'translateY(20px)';
+  quoteContainer.style.transition = 'opacity 2s, transform 2s';
   quoteContainer.style.padding = '0 20px';
   quoteContainer.textContent = randomQuote;
+  quoteContainer.style.zIndex = '2';
   
   // Create glitchy effects container
   const glitchEffects = document.createElement('div');
   glitchEffects.className = 'death-glitch-effects';
+  glitchEffects.style.zIndex = '1';
   
-  // Add elements to DOM
+  // Add elements to DOM in correct order
+  deathScreen.appendChild(glitchEffects);
   deathScreen.appendChild(deathMessage);
   deathScreen.appendChild(quoteContainer);
-  deathScreen.appendChild(glitchEffects);
-  document.body.appendChild(deathScreen);
   
   // Add keyframe animations
   const styleSheet = document.createElement('style');
   styleSheet.textContent = `
-    @keyframes deathFadeIn {
-      0% { background-color: rgba(7, 24, 33, 0.3); }
-      100% { background-color: rgba(7, 24, 33, 0.95); }
-    }
-    
     @keyframes pulseGlow {
-      0% { text-shadow: 0 0 10px rgba(134, 192, 108, 0.5); color: #e0f8cf; }
-      50% { text-shadow: 0 0 20px rgba(134, 192, 108, 0.8), 0 0 40px rgba(134, 192, 108, 0.6); color: #e0f8cf; }
-      100% { text-shadow: 0 0 10px rgba(134, 192, 108, 0.5); color: #e0f8cf; }
+      0% { text-shadow: 0 0 10px rgba(134, 192, 108, 0.5); }
+      50% { text-shadow: 0 0 20px rgba(134, 192, 108, 0.8), 0 0 40px rgba(134, 192, 108, 0.6); }
+      100% { text-shadow: 0 0 10px rgba(134, 192, 108, 0.5); }
     }
     
-    @keyframes quoteAppear {
-      0% { opacity: 0; transform: translateY(20px); }
-      100% { opacity: 1; transform: translateY(0); }
+    @keyframes matrixFadeIn {
+      0% { opacity: 0.2; }
+      100% { opacity: 0.6; }
     }
   `;
   document.head.appendChild(styleSheet);
   
-  // Add glitch artifacts
-  createGlitchArtifacts(glitchEffects);
+  // Add glitch artifacts (subtle at first)
+  createGlitchArtifacts(glitchEffects, true);
   
-  // Refresh page after delay
+  // Sequence the animations
+  
+  // 1. Let the screen sit dark for a moment
+  setTimeout(() => {
+    // 2. Fade in the matrix effect
+    matrixContainer.style.transition = 'opacity 2s';
+    matrixContainer.style.opacity = '0.6';
+    
+    // 3. Then add more intense glitches
+    createGlitchArtifacts(glitchEffects, false);
+    
+    // 4. Then fade in the YOU DIED message
+    setTimeout(() => {
+      deathMessage.style.opacity = '1';
+      deathMessage.style.animation = 'pulseGlow 2s infinite';
+      
+      // 5. Then fade in the quote
+      setTimeout(() => {
+        quoteContainer.style.opacity = '1';
+        quoteContainer.style.transform = 'translateY(0)';
+        
+        // Continue to add glitches during the display
+        createGlitchArtifacts(glitchEffects, false);
+      }, 3000);
+    }, 2000);
+  }, 1500);
+  
+  // Refresh page after a longer delay (12 seconds total)
   setTimeout(() => {
     window.location.reload();
-  }, 8000); // 8 seconds
+  }, 12000);
 }
 
-function createGlitchArtifacts(container) {
-  // Create several glitch elements
-  for (let i = 0; i < 20; i++) {
-    setTimeout(() => {
-      const artifact = document.createElement('div');
-      
-      // Randomly choose horizontal or vertical line
-      if (Math.random() > 0.5) {
-        // Horizontal line
-        artifact.className = 'artifact h-line';
-        artifact.style.height = `${Math.random() * 3 + 1}px`;
-        artifact.style.width = `${Math.random() * 100}%`;
-        artifact.style.left = `${Math.random() * 100}%`;
-        artifact.style.top = `${Math.random() * 100}%`;
-      } else {
-        // Vertical line
-        artifact.className = 'artifact v-line';
-        artifact.style.width = `${Math.random() * 3 + 1}px`;
-        artifact.style.height = `${Math.random() * 100}%`;
-        artifact.style.top = `${Math.random() * 100}%`;
-        artifact.style.left = `${Math.random() * 100}%`;
-      }
-      
-      // Set base styles
-      artifact.style.position = 'absolute';
-      
-      // Use game palette colors
-      const colorChoice = Math.random();
-      if (colorChoice < 0.2) {
-        artifact.style.backgroundColor = '#e0f8cf'; // Light green
-      } else if (colorChoice < 0.7) {
-        artifact.style.backgroundColor = '#86c06c'; // Medium green
-      } else {
-        artifact.style.backgroundColor = '#306850'; // Dark green
-      }
-      
-      artifact.style.opacity = Math.random() * 0.7 + 0.3;
-      artifact.style.zIndex = '5';
-      
-      // Add random animation duration for variety
-      const duration = Math.random() * 0.5 + 0.2;
-      artifact.style.animation = `artifact-${Math.random() > 0.5 ? 'h' : 'v'}-anim ${duration}s ease-out forwards`;
-      
-      container.appendChild(artifact);
-      
-      // Remove after animation completes
-      setTimeout(() => {
-        if (artifact.parentNode) {
-          artifact.parentNode.removeChild(artifact);
-        }
-      }, duration * 1000 + 100);
-    }, Math.random() * 5000); // Random start time within 5 seconds
+function createMatrixRain(container) {
+  // Set up the matrix character columns
+  const width = window.innerWidth;
+  const fontSize = 20;
+  const columns = Math.floor(width / fontSize);
+  
+  // Matrix characters - using ASCII characters between code 33 and 126
+  const getRandomChar = () => {
+    return String.fromCharCode(33 + Math.floor(Math.random() * 94));
+  };
+  
+  // Create color array from palette
+  const colors = ['#e0f8cf', '#86c06c', '#306850'];
+  
+  // Create drops starting position for each column
+  const drops = [];
+  for (let i = 0; i < columns; i++) {
+    drops[i] = Math.random() * -20;
   }
   
-  // Add some flashing/static effects
-  for (let i = 0; i < 15; i++) {
-    setTimeout(() => {
-      const staticEffect = document.createElement('div');
-      staticEffect.className = 'death-static';
-      staticEffect.style.position = 'absolute';
-      staticEffect.style.width = `${Math.random() * 300 + 50}px`;
-      staticEffect.style.height = `${Math.random() * 200 + 20}px`;
-      staticEffect.style.top = `${Math.random() * 100}%`;
-      staticEffect.style.left = `${Math.random() * 100}%`;
-      staticEffect.style.backgroundColor = '#86c06c'; // From your palette
-      staticEffect.style.opacity = '0.2';
-      staticEffect.style.mixBlendMode = 'overlay';
-      staticEffect.style.animation = 'static-noise 0.3s ease-out forwards';
-      
-      container.appendChild(staticEffect);
-      
-      setTimeout(() => {
-        if (staticEffect.parentNode) {
-          staticEffect.parentNode.removeChild(staticEffect);
-        }
-      }, 300);
-    }, Math.random() * 7000); // Random start time within 7 seconds
-  }
+  // Create canvas for matrix
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = window.innerHeight;
+  canvas.style.position = 'absolute';
+  canvas.style.top = '0';
+  canvas.style.left = '0';
+  container.appendChild(canvas);
   
-  // Screen shake effect
-  setTimeout(() => {
-    const terminalContainer = document.querySelector('.crt-screen');
-    if (terminalContainer) {
-      terminalContainer.classList.add('screen-glitch');
-      setTimeout(() => {
-        terminalContainer.classList.remove('screen-glitch');
-      }, 200);
+  const ctx = canvas.getContext('2d');
+  ctx.font = fontSize + 'px monospace';
+  
+  // Draw the matrix animation
+  const drawMatrix = () => {
+    // Add semi-transparent black to create fade effect
+    ctx.fillStyle = 'rgba(7, 24, 33, 0.05)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    for (let i = 0; i < drops.length; i++) {
+      // Randomly choose a character and color
+      const text = getRandomChar();
+      
+      // Determine color - small chance for the brightest color to create "highlights"
+      const colorIndex = Math.random() < 0.1 ? 0 : (Math.random() < 0.5 ? 1 : 2);
+      ctx.fillStyle = colors[colorIndex];
+      
+      // Draw the character
+      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+      
+      // Move drop down
+      drops[i]++;
+      
+      // Send drop back to top randomly after it crosses the screen
+      // Also randomize the reset position to create varied flow
+      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+        drops[i] = Math.random() * -20;
+      }
     }
-  }, 500);
+  };
+  
+  // Start animation loop
+  const matrixInterval = setInterval(drawMatrix, 33); // Approx 30 fps
+  
+  // Clean up function to stop animation when needed
+  return () => clearInterval(matrixInterval);
 }
 
 // Export the handler function
