@@ -1,23 +1,23 @@
 function createGlitchArtifacts(container, subtle = false) {
-  // Number of artifacts based on intensity
+
   const numArtifacts = subtle ? 10 : 25;
   const numStaticEffects = subtle ? 7 : 18;
   
-  // Create several glitch elements
+
   for (let i = 0; i < numArtifacts; i++) {
     setTimeout(() => {
       const artifact = document.createElement('div');
       
-      // Randomly choose horizontal or vertical line
+
       if (Math.random() > 0.5) {
-        // Horizontal line
+
         artifact.className = 'artifact h-line';
         artifact.style.height = `${Math.random() * 3 + 1}px`;
         artifact.style.width = `${Math.random() * 100}%`;
         artifact.style.left = `${Math.random() * 100}%`;
         artifact.style.top = `${Math.random() * 100}%`;
       } else {
-        // Vertical line
+        
         artifact.className = 'artifact v-line';
         artifact.style.width = `${Math.random() * 3 + 1}px`;
         artifact.style.height = `${Math.random() * 100}%`;
@@ -25,10 +25,10 @@ function createGlitchArtifacts(container, subtle = false) {
         artifact.style.left = `${Math.random() * 100}%`;
       }
       
-      // Set base styles
+      
       artifact.style.position = 'absolute';
       
-      // Use game palette colors
+      
       const colorChoice = Math.random();
       if (colorChoice < 0.2) {
         artifact.style.backgroundColor = '#e0f8cf'; // Light green
@@ -38,28 +38,28 @@ function createGlitchArtifacts(container, subtle = false) {
         artifact.style.backgroundColor = '#306850'; // Dark green
       }
       
-      // Adjust opacity based on subtle setting
+     
       artifact.style.opacity = subtle ? 
                               (Math.random() * 0.5 + 0.2) : 
                               (Math.random() * 0.7 + 0.3);
       artifact.style.zIndex = '5';
       
-      // Add random animation duration for variety
+      
       const duration = Math.random() * 0.5 + 0.2;
       artifact.style.animation = `artifact-${Math.random() > 0.5 ? 'h' : 'v'}-anim ${duration}s ease-out forwards`;
       
       container.appendChild(artifact);
       
-      // Remove after animation completes
+      
       setTimeout(() => {
         if (artifact.parentNode) {
           artifact.parentNode.removeChild(artifact);
         }
       }, duration * 1000 + 100);
-    }, Math.random() * (subtle ? 3000 : 5000)); // Random start time
+    }, Math.random() * (subtle ? 3000 : 5000));
   }
   
-  // Add some flashing/static effects
+  
   for (let i = 0; i < numStaticEffects; i++) {
     setTimeout(() => {
       const staticEffect = document.createElement('div');
@@ -69,7 +69,7 @@ function createGlitchArtifacts(container, subtle = false) {
       staticEffect.style.height = `${Math.random() * 200 + 20}px`;
       staticEffect.style.top = `${Math.random() * 100}%`;
       staticEffect.style.left = `${Math.random() * 100}%`;
-      staticEffect.style.backgroundColor = '#86c06c'; // From your palette
+      staticEffect.style.backgroundColor = '#86c06c'; 
       staticEffect.style.opacity = subtle ? '0.1' : '0.2';
       staticEffect.style.mixBlendMode = 'overlay';
       staticEffect.style.animation = 'static-noise 0.3s ease-out forwards';
@@ -81,7 +81,7 @@ function createGlitchArtifacts(container, subtle = false) {
           staticEffect.parentNode.removeChild(staticEffect);
         }
       }, 300);
-    }, Math.random() * (subtle ? 4000 : 7000)); // Random start time
+    }, Math.random() * (subtle ? 4000 : 7000)); 
   }
   
   // Screen shake effect
@@ -167,9 +167,9 @@ function handleOutOfBlood() {
   
   // Create animated death message (initially hidden)
   const deathMessage = document.createElement('div');
-  deathMessage.textContent = 'YOU DIED';
+  deathMessage.textContent = 'Insert Soul to Continue';
   deathMessage.style.color = '#e0f8cf'; // Lightest green from the palette
-  deathMessage.style.fontFamily = 'Pixelcastle, monospace';
+  deathMessage.style.fontFamily = 'PixelCastle, monospace';
   deathMessage.style.fontSize = '64px';
   deathMessage.style.textShadow = '0 0 10px rgba(134, 192, 108, 0.8)'; // Green glow
   deathMessage.style.marginBottom = '40px';
