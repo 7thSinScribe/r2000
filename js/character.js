@@ -46,7 +46,7 @@ const characterCreationData = {
       options: [
         { text: "A tool that amplifies your physical capabilities", 
           attributes: { power: 1 }, 
-          item: "Modified Crowbar (d8 damage, advantage on forcing things open)" },
+          item: "Modified Crowbar (d8)" },
         { text: "A device that behaves in ways that defy explanation", 
           attributes: { oddity: 1 }, 
           item: "Anomalous Calculator (sometimes reveals hidden information about the environment)" },
@@ -55,10 +55,10 @@ const characterCreationData = {
           item: "N-CO Technical Manual (reference for understanding game entities)" },
         { text: "Equipment that helps you survive in harsh conditions", 
           attributes: { endurance: 1 }, 
-          item: "Survival Pack (advantage on endurance checks in corrupted zones)" },
+          item: "Survival Pack" },
         { text: "Something that enhances your speed or reaction time", 
           attributes: { reflex: 1 }, 
-          item: "Reflex Enhancer (advantage on initiative rolls)" }
+          item: "Reflex Enhancer (grants +1 reflex when powered" }
       ]
     },
     {
@@ -129,20 +129,20 @@ const characterCreationData = {
     {
       text: "What personal item from before the collapse do you still keep with you?",
       options: [
-        { text: "A well-worn multi-tool that seems immune to digital corruption", 
-          item: "Reliable Multi-tool (advantage on physical repair attempts)" 
+        { text: "A well-worn multi-tool, useful for repair", 
+          item: "Reliable Multi-tool" 
         },
-        { text: "A mixtape that plays different songs than what was recorded", 
-          item: "Glitched Mixtape (can sometimes influence digital entities behavior)" 
+        { text: "A mixtape that never plays the same song", 
+          item: "Glitched Mixtape)" 
         },
-        { text: "A journal where you mapped the first glitch patterns", 
-          item: "Anomaly Journal (+1 to identifying glitch patterns)" 
+        { text: "A journal where you categorise anomalies", 
+          item: "Anomaly Journal" 
         },
-        { text: "A family photo that occasionally shows different poses", 
-          item: "Shifting Photo (stabilizes your mental state during digital storms)" 
+        { text: "A family photo that occasionally changes", 
+          item: "Shifting Photo" 
         },
-        { text: "A keychain with reflexes that occasionally move on their own", 
-          item: "Predictive Keychain (gives warning vibrations near hidden dangers)" 
+        { text: "A keychain, no keys", 
+          item: "Keychain" 
         }
       ]
     },
@@ -159,11 +159,11 @@ const characterCreationData = {
   ],
   
   startingGear: {
-    power: ["Impact Wrench (d8 damage, effective against physical barriers)", "Reinforced Workgloves (+1 to breaking objects)"],
-    oddity: ["Glitched Calculator (sometimes displays useful information about digital anomalies)", "Signal Disruptor (creates temporary interference in digital fields)"],
-    wisdom: ["N-CO Technical Manual (reference for understanding game entities)", "UV Flashlight (reveals hidden digital trace elements)"],
-    endurance: ["Emergency Medkit (restore 1d4 BLOOD, 3 uses)", "Purification Tablets (make corrupted water drinkable)"],
-    reflex: ["Concussion Grenade (stuns entities in small area)", "Grappling Hook (quick vertical movement)"]
+    power: ["Impact Wrench (d8 damage, effective against physical barriers)", "Reinforced Workgloves (d6 to breaking objects)"],
+    oddity: ["Glitched Calculator (d8 to solving math problems)", "Signal Disruptor (creates temporary interference in digital fields)"],
+    wisdom: ["N-CO Technical Manual (reference for understanding game entities)", "UV Flashlight (reveals things you wish you hadn't)"],
+    endurance: ["Emergency Medkit (restore 1d6 BLOOD, 3 uses)", "Purification Tablets (makes nasty water drinkable)"],
+    reflex: ["Flashbang (blinds enemies in a 15ft area for 3 turns)", "Grappling Hook (quick vertical movement)"]
   }
 };
 
