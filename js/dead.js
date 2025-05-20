@@ -162,14 +162,14 @@ function handleOutOfBlood() {
   matrixContainer.style.zIndex = '0'; // Behind other elements
   deathScreen.appendChild(matrixContainer);
   
-  // Initialize matrix rain
+
   createMatrixRain(matrixContainer);
   
-  // Create animated death message (initially hidden)
+  // Create animated death message
   const deathMessage = document.createElement('div');
-  deathMessage.textContent = 'Insert Soul to Continue';
+  deathMessage.textContent = 'You Died.';
   deathMessage.style.color = '#e0f8cf'; // Lightest green from the palette
-  deathMessage.style.fontFamily = 'PixelCastle, monospace';
+  deathMessage.style.fontFamily = 'RuneScape, monospace';
   deathMessage.style.fontSize = '64px';
   deathMessage.style.textShadow = '0 0 10px rgba(134, 192, 108, 0.8)'; // Green glow
   deathMessage.style.marginBottom = '40px';

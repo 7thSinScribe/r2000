@@ -1,7 +1,8 @@
-const catalogEntities = [
+// js/catalogue.js
+const catalogueEntities = [
     {
-      id: '1',
-      name: 'TORIEL, THE UNVANQUISHED',
+      id: '001',
+      name: 'TORIEL, THE UNVANQUISHED (RED DRAGON)',
       origin: 'Tutorial_Boss_001.arc',
       state: 'HYBRID',
       powerLevel: 9100,
@@ -14,13 +15,7 @@ const catalogEntities = [
       blood: { current: 62, max: 62 },
       sweat: { current: 50, max: 50 },
       tears: { current: 52, max: 52 },
-      threats: [
-        'Draconic entity serving as gateway guardian to new areas',
-        'Controls both PHYSICAL and DIGITAL space within 30m radius',
-        'Special ability: "Maternal Reset" - restores 50% BLOOD when low',
-        'Special ability: "Bitmap Breath" - converts physical objects to corrupted digital pixels',
-        'WEAKNESS: Exploits in tutorial code patterns'
-      ],
+      threat: 'Draconic entity serving as gateway guardian to new areas. Controls both PHYSICAL and DIGITAL space within 30m radius. Special ability: "Maternal Reset" restores 50% BLOOD when low.',
       history: 'Originally designed as tutorial guide, corrupted during game/reality merger, now tests survivors through combat trials. First encountered in Sector N-3 by Survivor Group "Deadbeef".',
       notes: [
         'She\'s trying to help, in her way. Doesn\'t make her less deadly.',
@@ -29,7 +24,7 @@ const catalogEntities = [
       ]
     },
     {
-      id: '42',
+      id: '042',
       name: 'BITMAP SHADE',
       origin: 'Enemy_Shadow_001.arc',
       state: 'DIGITAL',
@@ -43,13 +38,7 @@ const catalogEntities = [
       blood: { current: 32, max: 32 },
       sweat: { current: 40, max: 40 },
       tears: { current: 43, max: 43 },
-      threats: [
-        'Intangible digital entity capable of possessing electronic devices',
-        'Can travel through power lines and electrical connections',
-        'Special ability: "Glitch Step" - teleports short distances through digital space',
-        'Special ability: "Pixel Drain" - absorbs digital imagery to heal',
-        'WEAKNESS: Electromagnetic pulses disrupt its cohesion'
-      ],
+      threat: 'Intangible digital entity capable of possessing electronic devices. Can travel through power lines and electrical connections. Special ability: "Glitch Step" enables teleportation through digital space.',
       history: 'Appears to be fragmented shadow data from the original game\'s stealth enemies. Gained sentience during the merge. Often found near abandoned N-CO facilities.',
       notes: [
         'They don\'t see you if you don\'t look at screens. - Log #23',
@@ -60,30 +49,15 @@ const catalogEntities = [
   ];
   
   function renderEntityCard(entityData) {
-    const cardWidth = 68;
-    
-    const topBorder = `╔${'═'.repeat(cardWidth - 2)}╗`;
-    const headerDivider = `╠${'═'.repeat(cardWidth - 2)}╣`;
-    const bottomBorder = `╚${'═'.repeat(cardWidth - 2)}╝`;
-    
-    const title = ` SURVIVOROS ENTITY CATALOG - ENTRY #${entityData.id.padStart(3, '0')} `;
-    const headerRow = `║${title.padEnd(cardWidth - 2)}║`;
-    
-    const sections = [];
-    
-    // Entity info section
-    sections.push(generateSection([
+    const output = [
+      `SURVIVOROS ENTITY CATALOGUE - ENTRY #${entityData.id}`,
       '',
       `ENTITY: ${entityData.name}`,
       `ORIGIN: ${entityData.origin}`,
       `STATE: ${entityData.state}`,
       `POWER LEVEL: ${entityData.powerLevel.toLocaleString()}`,
       `CONFIRMED KILLS: ${entityData.kills.toLocaleString()}`,
-      ''
-    ], cardWidth));
-    
-    // POWER attributes section
-    sections.push(generateSection([
+      '',
       'P.O.W.E.R ATTRIBUTES:',
       '',
       `POWER:     ${entityData.power.value} | ${entityData.power.dice}`,
@@ -93,131 +67,57 @@ const catalogEntities = [
       `REFLEX:    ${entityData.reflex.value} | ${entityData.reflex.dice}`,
       '',
       `BLOOD: ${entityData.blood.current}/${entityData.blood.max} | SWEAT: ${entityData.sweat.current}/${entityData.sweat.max} | TEARS: ${entityData.tears.current}/${entityData.tears.max}`,
+      '',
+      'THREAT ASSESSMENT:',
+      '',
+      `> ${entityData.threat}`,
+      '',
+      'HISTORY:',
+      '',
+      entityData.history,
+      '',
+      'SURVIVOR NOTES:',
       ''
-    ], cardWidth));
+    ];
     
-    // Threat assessment section
-    const threatLines = ['THREAT ASSESSMENT:', ''];
-    entityData.threats.forEach(threat => {
-      const wrappedLines = wrapText(threat, cardWidth - 6);
-      wrappedLines.forEach((line, index) => {
-        if (index === 0) {
-          threatLines.push(`> ${line}`);
-        } else {
-          threatLines.push(`  ${line}`);
-        }
-      });
-    });
-    threatLines.push('');
-    sections.push(generateSection(threatLines, cardWidth));
-    
-    // History section
-    const historyLines = ['HISTORY:', ''];
-    const wrappedHistory = wrapText(entityData.history, cardWidth - 4);
-    historyLines.push(...wrappedHistory);
-    historyLines.push('');
-    sections.push(generateSection(historyLines, cardWidth));
-    
-    // Notes section
-    const notesLines = ['SURVIVOR NOTES:', ''];
     entityData.notes.forEach(note => {
-      const wrappedLines = wrapText(note, cardWidth - 6);
-      wrappedLines.forEach((line, index) => {
-        if (index === 0) {
-          notesLines.push(`> ${line}`);
-        } else {
-          notesLines.push(`  ${line}`);
-        }
-      });
-    });
-    notesLines.push('');
-    sections.push(generateSection(notesLines, cardWidth));
-    
-    // Assemble the complete card
-    let result = topBorder + '\n' + headerRow + '\n' + headerDivider + '\n';
-    
-    for (let i = 0; i < sections.length; i++) {
-      result += sections[i].join('\n') + '\n';
-      if (i < sections.length - 1) {
-        result += headerDivider + '\n';
-      }
-    }
-    
-    result += bottomBorder;
-    return result;
-  }
-  
-  function generateSection(lines, width) {
-    return lines.map(line => `║ ${line.padEnd(width - 4)} ║`);
-  }
-  
-  function wrapText(text, maxWidth) {
-    const words = text.split(' ');
-    const lines = [];
-    let currentLine = '';
-    
-    words.forEach(word => {
-      if (currentLine.length + word.length + 1 <= maxWidth) {
-        currentLine += (currentLine.length === 0 ? '' : ' ') + word;
-      } else {
-        lines.push(currentLine);
-        currentLine = word;
-      }
+      output.push(`> ${note}`);
     });
     
-    if (currentLine.length > 0) {
-      lines.push(currentLine);
-    }
-    
-    return lines;
+    return output.join('\n');
   }
   
-  function listCatalogEntities(searchTerm = '') {
-    const cardWidth = 68;
-    const topBorder = `╔${'═'.repeat(cardWidth - 2)}╗`;
-    const headerDivider = `╠${'═'.repeat(cardWidth - 2)}╣`;
-    const bottomBorder = `╚${'═'.repeat(cardWidth - 2)}╝`;
+  function listCatalogueEntities(searchTerm = '') {
+    const output = [
+      'SURVIVOROS ENTITY CATALOGUE',
+      ''
+    ];
     
-    const title = ' SURVIVOROS ENTITY CATALOG ';
-    const headerRow = `║${title.padEnd(cardWidth - 2)}║`;
-    
-    let filteredEntities = catalogEntities;
+    let filteredEntities = catalogueEntities;
     if (searchTerm) {
       searchTerm = searchTerm.toLowerCase();
-      filteredEntities = catalogEntities.filter(entity => 
+      filteredEntities = catalogueEntities.filter(entity => 
         entity.name.toLowerCase().includes(searchTerm) ||
         entity.origin.toLowerCase().includes(searchTerm) ||
         entity.state.toLowerCase().includes(searchTerm)
       );
     }
     
-    const listLines = [
-      '',
-      `DISCOVERED ENTITIES (SHOWING ${filteredEntities.length} OF ${catalogEntities.length}):`,
-      '────────────────────────────────────────────────────────────────',
-      ''
-    ];
+    output.push(`DISCOVERED ENTITIES (SHOWING ${filteredEntities.length} OF ${catalogueEntities.length}):`);
+    output.push('────────────────────────────────────────────────────────────────');
+    output.push('');
     
     filteredEntities.forEach(entity => {
-      listLines.push(`#${entity.id.padStart(3, '0')} - ${entity.name} [${entity.state}] - ${entity.origin}`);
+      output.push(`#${entity.id} - ${entity.name} [${entity.state}] - ${entity.origin}`);
     });
     
     if (filteredEntities.length === 0) {
-      listLines.push('No matching entities found.');
+      output.push('No matching entities found.');
     }
     
-    listLines.push('');
-    listLines.push('Enter "catalog view [ID]" to view entity details.');
-    listLines.push('Enter "catalog search [term]" to search for specific entities.');
-    listLines.push('');
+    output.push('');
+    output.push('Enter "catalogue view [ID]" to view entity details.');
+    output.push('Enter "catalogue search [term]" to search for specific entities.');
     
-    const result = [
-      topBorder,
-      headerRow,
-      headerDivider,
-      ...generateSection(listLines, cardWidth),
-      bottomBorder
-    ].join('\n');
-    
-    return result;
+    return output.join('\n');
   }

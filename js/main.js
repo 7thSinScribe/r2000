@@ -353,12 +353,10 @@ const SurvivorOSTerminal = () => {
         text: 'CRITICAL ERROR: BLOOD LEVEL ZERO\nVITAL FUNCTIONS COMPROMISED\nSYSTEM SHUTDOWN IMMINENT...'
       });
       
-      // Create a blood loss vignette effect
       const vignette = document.createElement('div');
       vignette.className = 'blood-loss-vignette';
       document.body.appendChild(vignette);
       
-      // Create some glitch artifacts during system "failure"
       for (let i = 0; i < 3; i++) {
         setTimeout(() => {
           const artifact = document.createElement('div');
@@ -382,7 +380,6 @@ const SurvivorOSTerminal = () => {
         }, 800 + i * 300);
       }
       
-      // Trigger glitch artifacts as system "fails"
       for (let i = 0; i < 5; i++) {
         setTimeout(() => {
           const terminalContainer = document.querySelector('.crt-screen');
@@ -395,17 +392,15 @@ const SurvivorOSTerminal = () => {
         }, 500 + i * 300);
       }
       
-      // Delay before showing death screen
       setTimeout(() => {
-        // Call the death screen function from dead.js
         window.handleOutOfBlood();
       }, 2000);
       
       return;
     }
     
-    // CATALOG COMMAND HANDLING
-    if (command === 'catalog' || command === 'catalog list') {
+    // CATALOGUE COMMAND HANDLING
+    if (command === 'catalogue' || command === 'catalogue list') {
       addToTerminalHistory({ type: 'input', text: `> ${cmd}` });
       addToTerminalHistory({ 
         type: 'output', 
@@ -415,15 +410,15 @@ const SurvivorOSTerminal = () => {
       setTimeout(() => {
         addToTerminalHistory({ 
           type: 'output', 
-          text: listCatalogEntities()
+          text: listCatalogueEntities()
         });
       }, 500);
       return;
     }
     
-    if (command.startsWith('catalog view ')) {
+    if (command.startsWith('catalogue view ')) {
       addToTerminalHistory({ type: 'input', text: `> ${cmd}` });
-      const entityId = command.split('catalog view ')[1].trim();
+      const entityId = command.split('catalogue view ')[1].trim();
       
       addToTerminalHistory({ 
         type: 'output', 
@@ -431,7 +426,8 @@ const SurvivorOSTerminal = () => {
       });
       
       setTimeout(() => {
-        const entity = catalogEntities.find(e => e.id === entityId);
+        // Look for exact ID match (with leading zeros)
+        const entity = catalogueEntities.find(e => e.id === entityId);
         if (entity) {
           addToTerminalHistory({ 
             type: 'output', 
@@ -447,9 +443,9 @@ const SurvivorOSTerminal = () => {
       return;
     }
     
-    if (command.startsWith('catalog search ')) {
+    if (command.startsWith('catalogue search ')) {
       addToTerminalHistory({ type: 'input', text: `> ${cmd}` });
-      const searchTerm = command.split('catalog search ')[1].trim();
+      const searchTerm = command.split('catalogue search ')[1].trim();
       
       addToTerminalHistory({ 
         type: 'output', 
@@ -459,7 +455,7 @@ const SurvivorOSTerminal = () => {
       setTimeout(() => {
         addToTerminalHistory({ 
           type: 'output', 
-          text: listCatalogEntities(searchTerm)
+          text: listCatalogueEntities(searchTerm)
         });
       }, 500);
       return;
@@ -480,7 +476,7 @@ const SurvivorOSTerminal = () => {
   quickstart: Display Rogue 2000 game information
   whoami:     Run survivor identity questionnaire
   ascii:      Display SurvivorOS ASCII art logo
-  catalog:    Access entity database
+  catalogue:  Access entity database
   logs:       List available survivor logs
   log [#]:    Display specific log entry
   outofblood: Simulate critical blood loss
@@ -560,22 +556,6 @@ const SurvivorOSTerminal = () => {
     }
     
     setTerminalInput('');
-  };
-
-  const handleTerminalInput = (e) => {
-    setTerminalInput(e.target.value);
-  };
-
-  const handleTerminalKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      if (characterCreation.active) {
-        processCharacterCreationAnswer(terminalInput);
-        setTerminalInput('');
-        return;
-      }
-      
-      processCommand(terminalInput);
-    }
   };
 
   return (
