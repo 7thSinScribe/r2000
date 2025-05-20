@@ -22,6 +22,12 @@ const SurvivorOSTerminal = () => {
   const [quickStartContent, setQuickStartContent] = useState("");
   const [logsCache, setLogsCache] = useState({});
   const availableLogs = [76, 55];
+  
+  const [rabbitHoleState, setRabbitHoleState] = useState({
+    accessed: false,
+    entries: [],
+    cache: {}
+  });
 
   useEffect(() => {
     async function loadQuickstart() {
@@ -210,12 +216,10 @@ const SurvivorOSTerminal = () => {
           text: `Name registered: ${name}`
         });
         
-        // Verify total points is exactly 15 (5 base + 10 distributed)
         const totalPoints = Object.values(characterCreation.attributes).reduce((sum, val) => sum + val, 0);
         
         if (totalPoints !== 15) {
           console.error(`Point total ${totalPoints} !== 15. Character creation error.`);
-          // This shouldn't happen with the cascading system, but log it if it does
         }
         
         const characterSheet = generateCharacterSheet(
@@ -276,15 +280,12 @@ const SurvivorOSTerminal = () => {
     let updatedItems = [...characterCreation.items];
     let updatedBackground = characterCreation.background;
     
-    // Handle different attribute distribution scenarios
     if (selectedOption.primaryAttributes) {
-      // Multi-attribute option (like backgrounds)
       updatedAttributes = distributeMultipleAttributes(
         updatedAttributes,
         selectedOption.primaryAttributes
       );
     } else if (selectedOption.primaryAttribute) {
-      // Single attribute option with possible fallbacks
       const pointsToAdd = selectedOption.multiplePoints || 1;
       updatedAttributes = distributeAttributePoints(
         updatedAttributes,
@@ -294,12 +295,10 @@ const SurvivorOSTerminal = () => {
       );
     }
     
-    // Add item if present
     if (selectedOption.item && !updatedItems.includes(selectedOption.item)) {
       updatedItems.push(selectedOption.item);
     }
     
-    // Set background if present
     if (selectedOption.background) {
       updatedBackground = {
         title: selectedOption.background,
@@ -307,7 +306,6 @@ const SurvivorOSTerminal = () => {
       };
     }
     
-    // Calculate total points used
     const totalPoints = Object.values(updatedAttributes).reduce((sum, val) => sum + val, 0);
     
     setCharacterCreation({
@@ -346,6 +344,24 @@ const SurvivorOSTerminal = () => {
       return;
     }
     
+    if (command === 'whiterabbit') {
+      window.rabbitModule.processWhiterabbitCommand(
+        addToTerminalHistory, 
+        setTerminalInput,
+        setRabbitHoleState
+      );
+      return;
+    }
+    
+    if (command.startsWith('rabbit ')) {
+      const rabbitQuery = command.split('rabbit ')[1];
+      window.rabbitModule.processRabbitCommand(
+        rabbitQuery, 
+        addToTerminalHistory
+      );
+      return;
+    }
+    
     if (command === 'outofblood') {
       addToTerminalHistory({ type: 'input', text: `> ${cmd}` });
       addToTerminalHistory({ 
@@ -353,12 +369,10 @@ const SurvivorOSTerminal = () => {
         text: 'CRITICAL ERROR: BLOOD LEVEL ZERO\nVITAL FUNCTIONS COMPROMISED\nSYSTEM SHUTDOWN IMMINENT...'
       });
       
-      // Create a blood loss vignette effect
       const vignette = document.createElement('div');
       vignette.className = 'blood-loss-vignette';
       document.body.appendChild(vignette);
       
-      // Create some glitch artifacts during system "failure"
       for (let i = 0; i < 3; i++) {
         setTimeout(() => {
           const artifact = document.createElement('div');
@@ -382,7 +396,6 @@ const SurvivorOSTerminal = () => {
         }, 800 + i * 300);
       }
       
-      // Trigger glitch artifacts as system "fails"
       for (let i = 0; i < 5; i++) {
         setTimeout(() => {
           const terminalContainer = document.querySelector('.crt-screen');
@@ -395,9 +408,7 @@ const SurvivorOSTerminal = () => {
         }, 500 + i * 300);
       }
       
-      // Delay before showing death screen
       setTimeout(() => {
-        // Call the death screen function from dead.js
         window.handleOutOfBlood();
       }, 2000);
       
@@ -555,7 +566,7 @@ Type 'help' for available commands.`;
                     style={{color: '#e0f8cf'}}
                     autoFocus
                   />
-                  <span className={blinkCursor ? 'opacity-100' : 'opacity-0'}>_</span>
+                  <span className={`cursor-element ${blinkCursor ? 'opacity-100' : 'opacity-0'}`}>_</span>
                 </div>
               )}
               

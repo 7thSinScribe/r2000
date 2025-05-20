@@ -207,6 +207,17 @@ function renderOutput(item, isBooting) {
     } else {
       return <pre className={`terminal-${item.contentType}`}>{item.text}</pre>;
     }
+  } else if (item.contentType === 'rabbit') {
+    if (typeof marked !== 'undefined' && item.text) {
+      return (
+        <div 
+          className="terminal-rabbit markdown-content"
+          dangerouslySetInnerHTML={{ __html: marked.parse(item.text) }}
+        />
+      );
+    } else {
+      return <pre className="terminal-rabbit">{item.text}</pre>;
+    }
   } else if (item.isCharacterSheet) {
     return (
       <pre className="terminal-output">
