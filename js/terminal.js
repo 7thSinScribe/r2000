@@ -12,7 +12,7 @@ const survivorAsciiLogo = [
 if (typeof marked !== 'undefined') {
   marked.setOptions({
     gfm: true,
-    breaks: true,
+    breaks: true,  // This enables GitHub-style line breaks
     pedantic: false,
     headerIds: true,
     mangle: false,
@@ -181,6 +181,15 @@ function startLogoGlitchSequence() {
   currentGlitchState.glitchTimer = rapidGlitchInterval;
 }
 
+// Prepare markdown content for proper line break display
+function prepareMarkdownContent(text) {
+  // This ensures single line breaks are preserved while maintaining Markdown formatting
+  if (!text) return text;
+  
+  // Add two spaces at the end of each line to force Markdown line breaks
+  return text.replace(/([^\n])\n([^\n])/g, '$1  \n$2');
+}
+
 function renderOutput(item, isBooting) {
   // Check for special catalogue content
   if (item.text && item.text.includes('SURVIVOROS ENTITY CATALOGUE')) {
@@ -202,14 +211,13 @@ function renderOutput(item, isBooting) {
       </div>
     );
   } else if (item.contentType === 'quickstart' || item.contentType === 'log') {
-    if (item.contentType === 'log') {
-      // For logs specifically, use pre to maintain formatting exactly as in the file
-      return <pre className="terminal-log">{item.text}</pre>;
-    } else if (typeof marked !== 'undefined' && item.text) {
+    if (typeof marked !== 'undefined' && item.text) {
+      // Process the text to ensure line breaks work
+      const processedText = prepareMarkdownContent(item.text);
       return (
         <div 
           className={`terminal-${item.contentType} markdown-content`}
-          dangerouslySetInnerHTML={{ __html: marked.parse(item.text) }}
+          dangerouslySetInnerHTML={{ __html: marked.parse(processedText) }}
         />
       );
     } else {
@@ -238,10 +246,11 @@ function renderOutput(item, isBooting) {
           item.text.includes('```') ||
           item.text.includes('> ')
         )) {
+      const processedText = prepareMarkdownContent(item.text);
       return (
         <div 
           className="terminal-output markdown-content"
-          dangerouslySetInnerHTML={{ __html: marked.parse(item.text) }}
+          dangerouslySetInnerHTML={{ __html: marked.parse(processedText) }}
         />
       );
     }
