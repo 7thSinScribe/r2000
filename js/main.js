@@ -183,12 +183,10 @@ const SurvivorOSTerminal = () => {
     let questionText = `QUESTION ${questionIndex + 1}/${characterCreationData.questions.length}: ${question.text}\n\n`;
     
     question.options.forEach((option, index) => {
-      questionText += `${index + 1}. ${option.text}\n`;
+      questionText += `${index + 1} ${option.text}\n`;
     });
     
-    if (characterCreation.pointsRemaining > 0) {
-      questionText += `\nRemaining attribute points: ${characterCreation.pointsRemaining}`;
-    }
+    // Removed the "remaining attribute points" display
     
     addToTerminalHistory({ 
       type: 'output', 
