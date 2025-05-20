@@ -336,6 +336,64 @@ const SurvivorOSTerminal = () => {
       return;
     }
     
+    if (command === 'outofblood') {
+      addToTerminalHistory({ type: 'input', text: `> ${cmd}` });
+      addToTerminalHistory({ 
+        type: 'output', 
+        text: 'CRITICAL ERROR: BLOOD LEVEL ZERO\nVITAL FUNCTIONS COMPROMISED\nSYSTEM SHUTDOWN IMMINENT...'
+      });
+      
+      // Create a blood loss vignette effect
+      const vignette = document.createElement('div');
+      vignette.className = 'blood-loss-vignette';
+      document.body.appendChild(vignette);
+      
+      // Create some glitch artifacts during system "failure"
+      for (let i = 0; i < 3; i++) {
+        setTimeout(() => {
+          const artifact = document.createElement('div');
+          artifact.className = 'artifact h-line';
+          artifact.style.position = 'fixed';
+          artifact.style.height = '2px';
+          artifact.style.width = '100%';
+          artifact.style.left = '0';
+          artifact.style.top = `${Math.random() * 100}%`;
+          artifact.style.backgroundColor = '#86c06c';
+          artifact.style.opacity = '0.7';
+          artifact.style.zIndex = '9998';
+          
+          document.body.appendChild(artifact);
+          
+          setTimeout(() => {
+            if (artifact.parentNode) {
+              artifact.parentNode.removeChild(artifact);
+            }
+          }, 300);
+        }, 800 + i * 300);
+      }
+      
+      // Trigger glitch artifacts as system "fails"
+      for (let i = 0; i < 5; i++) {
+        setTimeout(() => {
+          const terminalContainer = document.querySelector('.crt-screen');
+          if (terminalContainer) {
+            terminalContainer.classList.add('screen-glitch');
+            setTimeout(() => {
+              terminalContainer.classList.remove('screen-glitch');
+            }, 150);
+          }
+        }, 500 + i * 300);
+      }
+      
+      // Delay before showing death screen
+      setTimeout(() => {
+        // Call the death screen function from dead.js
+        window.handleOutOfBlood();
+      }, 2000);
+      
+      return;
+    }
+    
     addToTerminalHistory({ type: 'input', text: `> ${cmd}` });
     
     let response = '';
@@ -345,14 +403,15 @@ const SurvivorOSTerminal = () => {
 SURVIVOROS TERMINAL COMMANDS:
 ----------------------------
 
-help:     Display this help message
-clear:    Clear terminal
-about:    About SurvivorOS
+help:       Display this help message
+clear:      Clear terminal
+about:      About SurvivorOS
 quickstart: Display Rogue 2000 game information
-whoami:   Run survivor identity questionnaire
-ascii:    Display SurvivorOS ASCII art logo
-logs:     List available survivor logs
-log [#]:  Display specific log entry
+whoami:     Run survivor identity questionnaire
+ascii:      Display SurvivorOS ASCII art logo
+logs:       List available survivor logs
+log [#]:    Display specific log entry
+outofblood: Simulate critical blood loss
 
 For survivors in the zones: Type what you learn out there.
 Stay safe. Share knowledge. Survive.`;
