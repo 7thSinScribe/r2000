@@ -497,7 +497,6 @@ ascii:      Display SurvivorOS ASCII art logo
 catalogue:  Access entity database
 logs:       List available survivor logs
 log [#]:    Display specific log entry
-outofblood: Simulate critical blood loss
 
 For survivors in the zones: Type what you learn out there.
 Stay safe. Share knowledge. Survive.`;

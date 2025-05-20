@@ -17,7 +17,6 @@ Then it "attacked" me. No physical damage, but it sent this electrical pulse tha
 
 Finally figured out I could affect it by using other powered devices. Had an old taser in my pack - discharged it near the creature and it seemed to disrupt its form. Kept zapping until it dissipated entirely.
 
-
 Key findings about pure digital entities:
 - Invisible without AR glasses/goggles
 - Can't physically touch or harm you
