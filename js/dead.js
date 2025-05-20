@@ -54,7 +54,7 @@ function handleOutOfBlood() {
   // Create animated death message
   const deathMessage = document.createElement('div');
   deathMessage.textContent = 'YOU DIED';
-  deathMessage.style.color = '#8B0000'; // Momentarily using red
+  deathMessage.style.color = '#e0f8cf'; // Lightest green from the palette
   deathMessage.style.fontFamily = 'Pixelcastle, monospace';
   deathMessage.style.fontSize = '64px';
   deathMessage.style.textShadow = '0 0 10px rgba(134, 192, 108, 0.8)'; // Green glow from your palette
@@ -95,9 +95,9 @@ function handleOutOfBlood() {
     }
     
     @keyframes pulseGlow {
-      0% { text-shadow: 0 0 10px rgba(134, 192, 108, 0.5); color: #8B0000; }
-      50% { text-shadow: 0 0 20px rgba(134, 192, 108, 0.8), 0 0 40px rgba(134, 192, 108, 0.6); color: #8B0000; }
-      100% { text-shadow: 0 0 10px rgba(134, 192, 108, 0.5); color: #8B0000; }
+      0% { text-shadow: 0 0 10px rgba(134, 192, 108, 0.5); color: #e0f8cf; }
+      50% { text-shadow: 0 0 20px rgba(134, 192, 108, 0.8), 0 0 40px rgba(134, 192, 108, 0.6); color: #e0f8cf; }
+      100% { text-shadow: 0 0 10px rgba(134, 192, 108, 0.5); color: #e0f8cf; }
     }
     
     @keyframes quoteAppear {
