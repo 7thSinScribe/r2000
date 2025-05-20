@@ -302,7 +302,7 @@ const SurvivorOSTerminal = () => {
     // Set background if present
     if (selectedOption.background) {
       updatedBackground = {s
-        title: selectedOption.background,
+        ,title: selectedOption.background,
         description: selectedOption.backgroundDesc
       };
     }
