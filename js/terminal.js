@@ -202,7 +202,10 @@ function renderOutput(item, isBooting) {
       </div>
     );
   } else if (item.contentType === 'quickstart' || item.contentType === 'log') {
-    if (typeof marked !== 'undefined' && item.text) {
+    if (item.contentType === 'log') {
+      // For logs specifically, use pre to maintain formatting exactly as in the file
+      return <pre className="terminal-log">{item.text}</pre>;
+    } else if (typeof marked !== 'undefined' && item.text) {
       return (
         <div 
           className={`terminal-${item.contentType} markdown-content`}

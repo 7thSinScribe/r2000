@@ -741,3 +741,24 @@ pre.ascii-logo {
   100% { opacity: 0.4; }
 }
 
+.terminal-log {
+  white-space: pre-wrap;
+  font-family: monospace;
+  line-height: 1.5;
+  color: #e0f8cf;
+  margin: 0;
+  padding: 0;
+}
+
+/* Ensure that lists in logs display properly */
+.terminal-log ul,
+.terminal-log ol {
+  padding-left: 2em;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.terminal-log ul li,
+.terminal-log ol li {
+  margin-bottom: 0.5em;
+}
