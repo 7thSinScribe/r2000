@@ -360,20 +360,6 @@ Stay safe. Share knowledge. Survive.`;
     else if (command === 'about') {
       response = `SurvivorOS v0.5b [BUILD: SRV-2957f5a]
 A community-developed operating system for Rogueboy 2000 devices
-Designed to help survivors navigate the merged reality
-Current cycle: Saturday, January 1, 2000 #12,957
-Status: UNSTABLE - N-CO RESTRICTIONS BYPASSED
-
-SurvivorOS allows for user-driven modifications to Rogueboy hardware
-without N-CO oversight or control. This OS lets you document findings,
-identify glitch patterns, and share survival knowledge with others.
-
-The original Rogueboy 2000 AR system was designed to overlay game 
-content onto reality. After the collapse, these distinctions blurred. 
-SurvivorOS helps you deal with this merged state of existence.
-
-"We build tools to survive together. The Gamemaster wants us isolated. 
-Don't let it win." - Anonymous contributor, dead zone relay #37
 `;
     }
     else if (command === 'clear') {
