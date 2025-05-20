@@ -52,7 +52,7 @@ const characterCreationData = {
           item: "Anomalous Calculator (sometimes reveals hidden information about the environment)" },
         { text: "A repository of technical information you've collected", 
           attributes: { wisdom: 1 }, 
-          item: "N-CO Technical Manual (advantage on checks to understand digital entities)" },
+          item: "N-CO Technical Manual (reference for understanding game entities)" },
         { text: "Equipment that helps you survive in harsh conditions", 
           attributes: { endurance: 1 }, 
           item: "Survival Pack (advantage on endurance checks in corrupted zones)" },
@@ -117,33 +117,43 @@ const characterCreationData = {
       ]
     },
     {
-      text: "When the environment glitches around you, your response is:",
+      text: "Your final two attribute points - where do they matter most?",
       options: [
-        { text: "Stand your ground, physically resisting the changes", attributes: { power: 1 } },
-        { text: "Embrace the strangeness, let intuition guide you", attributes: { oddity: 1 } },
-        { text: "Observe patterns to predict what comes next", attributes: { wisdom: 1 } },
-        { text: "Brace yourself, focusing on maintaining stability", attributes: { endurance: 1 } },
-        { text: "React immediately to each change as it happens", attributes: { reflex: 1 } }
+        { text: "Physical strength and impact", attributes: { power: 2 } },
+        { text: "Unusual perception and thinking", attributes: { oddity: 2 } },
+        { text: "Knowledge and problem-solving", attributes: { wisdom: 2 } },
+        { text: "Stamina and resilience", attributes: { endurance: 2 } },
+        { text: "Speed and reaction time", attributes: { reflex: 2 } }
+      ]
+    },
+    {
+      text: "What personal item from before the collapse do you still keep with you?",
+      options: [
+        { text: "A well-worn multi-tool that seems immune to digital corruption", 
+          item: "Reliable Multi-tool (advantage on physical repair attempts)" 
+        },
+        { text: "A mixtape that plays different songs than what was recorded", 
+          item: "Glitched Mixtape (can sometimes influence digital entities behavior)" 
+        },
+        { text: "A journal where you mapped the first glitch patterns", 
+          item: "Anomaly Journal (+1 to identifying glitch patterns)" 
+        },
+        { text: "A family photo that occasionally shows different poses", 
+          item: "Shifting Photo (stabilizes your mental state during digital storms)" 
+        },
+        { text: "A keychain with reflexes that occasionally move on their own", 
+          item: "Predictive Keychain (gives warning vibrations near hidden dangers)" 
+        }
       ]
     },
     {
       text: "Digital entities seem to perceive you as:",
       options: [
-        { text: "A threat to be avoided or confronted", attributes: { power: 1 } },
-        { text: "An anomaly they can't categorize", attributes: { oddity: 1 } },
-        { text: "A complex pattern worth analyzing", attributes: { wisdom: 1 } },
-        { text: "A persistent variable in their calculations", attributes: { endurance: 1 } },
-        { text: "An unpredictable element in their system", attributes: { reflex: 1 } }
-      ]
-    },
-    {
-      text: "Your survival strategy in the merged reality involves:",
-      options: [
-        { text: "Creating safe zones through physical control", attributes: { power: 1 } },
-        { text: "Exploring glitched areas others avoid", attributes: { oddity: 1 } },
-        { text: "Developing systematic understanding of new rules", attributes: { wisdom: 1 } },
-        { text: "Establishing sustainable routines and stockpiles", attributes: { endurance: 1 } },
-        { text: "Staying constantly mobile and adaptive", attributes: { reflex: 1 } }
+        { text: "A threat to be avoided or confronted" },
+        { text: "An anomaly they can't categorize" },
+        { text: "A complex pattern worth analyzing" },
+        { text: "A persistent variable in their calculations" },
+        { text: "An unpredictable element in their system" }
       ]
     }
   ],
@@ -237,50 +247,4 @@ function generateDicePoolText(attributeValue) {
   }
   
   return diceText;
-}
-
-function redistributePoints(attributes) {
-  const attributeRelationships = {
-    power: ['endurance', 'reflex', 'oddity', 'wisdom'],
-    oddity: ['wisdom', 'reflex', 'power', 'endurance'],
-    wisdom: ['oddity', 'endurance', 'reflex', 'power'],
-    endurance: ['power', 'wisdom', 'reflex', 'oddity'],
-    reflex: ['power', 'oddity', 'endurance', 'wisdom']
-  };
-  
-  let changed = true;
-  while (changed) {
-    changed = false;
-    
-    for (const [attr, value] of Object.entries(attributes)) {
-      if (value > 5) {
-        const excess = value - 5;
-        attributes[attr] = 5;
-        
-        const relatedAttrs = attributeRelationships[attr];
-        let redistributed = false;
-        
-        for (const relatedAttr of relatedAttrs) {
-          if (attributes[relatedAttr] < 5) {
-            attributes[relatedAttr]++;
-            redistributed = true;
-            changed = true;
-            break;
-          }
-        }
-        
-        if (!redistributed) {
-          for (const anyAttr of Object.keys(attributes)) {
-            if (attributes[anyAttr] < 5) {
-              attributes[anyAttr]++;
-              changed = true;
-              break;
-            }
-          }
-        }
-      }
-    }
-  }
-  
-  return attributes;
 }

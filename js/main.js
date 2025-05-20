@@ -210,38 +210,16 @@ const SurvivorOSTerminal = () => {
           text: `Name registered: ${name}`
         });
         
-        // Final check to ensure points are properly distributed
-        let finalAttributes = {...characterCreation.attributes};
-        
-        // Redistribute any attributes over 5
-        finalAttributes = redistributePoints(finalAttributes);
-        
-        // Ensure total points is exactly 15
-        const totalPoints = Object.values(finalAttributes).reduce((sum, val) => sum + val, 0);
+        // Verify total points is exactly 15 (5 base + 10 distributed)
+        const totalPoints = Object.values(characterCreation.attributes).reduce((sum, val) => sum + val, 0);
         if (totalPoints !== 15) {
-          const diff = 15 - totalPoints;
-          if (diff > 0) {
-            // Need to add points
-            for (let i = 0; i < diff; i++) {
-              // Find lowest attribute
-              let lowestAttr = null;
-              let lowestVal = 6;
-              for (const [attr, val] of Object.entries(finalAttributes)) {
-                if (val < lowestVal) {
-                  lowestVal = val;
-                  lowestAttr = attr;
-                }
-              }
-              if (lowestAttr && finalAttributes[lowestAttr] < 5) {
-                finalAttributes[lowestAttr]++;
-              }
-            }
-          }
+          // This should never happen if questionnaire is properly structured
+          console.error(`Point total ${totalPoints} !== 15. Character creation error.`);
         }
         
         const characterSheet = generateCharacterSheet(
           name, 
-          finalAttributes, 
+          characterCreation.attributes, 
           characterCreation.items,
           characterCreation.background || { title: "UNKNOWN", description: "Your past is a blur, forgotten in the chaos of the digital apocalypse." }
         );
@@ -249,7 +227,6 @@ const SurvivorOSTerminal = () => {
         setCharacterCreation({
           ...characterCreation,
           name: name,
-          attributes: finalAttributes,
           active: false,
           completed: true
         });
@@ -298,13 +275,14 @@ const SurvivorOSTerminal = () => {
     let updatedItems = [...characterCreation.items];
     let updatedBackground = characterCreation.background;
     
-    // Add attributes from selected option
-    for (const [attr, value] of Object.entries(selectedOption.attributes || {})) {
-      updatedAttributes[attr] += value;
+    // Add attributes from selected option if they exist
+    if (selectedOption.attributes) {
+      for (const [attr, value] of Object.entries(selectedOption.attributes)) {
+        // Ensure no attribute goes above 5
+        const newValue = Math.min(updatedAttributes[attr] + value, 5);
+        updatedAttributes[attr] = newValue;
+      }
     }
-    
-    // Redistribute attributes that exceed 5
-    updatedAttributes = redistributePoints(updatedAttributes);
     
     // Add item if present
     if (selectedOption.item) {
@@ -319,7 +297,7 @@ const SurvivorOSTerminal = () => {
       };
     }
     
-    // Calculate total points used so far (excluding base points)
+    // Calculate total points used (excluding base points)
     const additionalPoints = Object.values(updatedAttributes).reduce((sum, val) => sum + val, 0) - 5;
     
     setCharacterCreation({
@@ -369,7 +347,7 @@ SURVIVOROS TERMINAL COMMANDS:
 
 help:     Display this help message
 clear:    Clear terminal
-about:    About SurvivorOS Terminal
+about:    About SurvivorOS
 quickstart: Display Rogue 2000 game information
 whoami:   Run survivor identity questionnaire
 ascii:    Display SurvivorOS ASCII art logo
@@ -380,18 +358,22 @@ For survivors in the zones: Type what you learn out there.
 Stay safe. Share knowledge. Survive.`;
     } 
     else if (command === 'about') {
-      response = `SurvivorOS Terminal v0.5b [BUILD: SRV-2957f5a]
-A modified RogueBoy OS for survivors in the dead zones
+      response = `SurvivorOS v0.5b [BUILD: SRV-2957f5a]
+A community-developed operating system for Rogueboy 2000 devices
+Designed to help survivors navigate the merged reality
 Current cycle: Saturday, January 1, 2000 #12,957
-System status: UNSTABLE - FIRMWARE MODIFIED
-Created by: Unknown (Terminal found in abandoned safe house)
-Storage: Local Browser Storage - NO CLOUD SYNC
+Status: UNSTABLE - N-CO RESTRICTIONS BYPASSED
 
-"This terminal was hacked by someone who knew what they were doing.
-The original RogueBoy protections have been bypassed, allowing
-full access to the information system. Use it to document what 
-you find out there in the dead zones. And if you're reading this,
-good luck. You'll need it." - Note found with terminal
+SurvivorOS allows for user-driven modifications to Rogueboy hardware
+without N-CO oversight or control. This OS lets you document findings,
+identify glitch patterns, and share survival knowledge with others.
+
+The original Rogueboy 2000 AR system was designed to overlay game 
+content onto reality. After the collapse, these distinctions blurred. 
+SurvivorOS helps you deal with this merged state of existence.
+
+"We build tools to survive together. The Gamemaster wants us isolated. 
+Don't let it win." - Anonymous contributor, dead zone relay #37
 `;
     }
     else if (command === 'clear') {
@@ -485,7 +467,7 @@ Type 'help' for available commands.`;
         <div className="crt-screen h-full">
           <div className="terminal-container h-full flex flex-col">
             <div className="terminal-header p-2 text-sm flex justify-between">
-              <span>survivoros terminal v0.5b | build: srv-2957f5a</span>
+              <span>survivoros v0.5b | build: srv-2957f5a</span>
               <span>{bootComplete ? "READY" : "BOOTING..."}</span>
             </div>
             
