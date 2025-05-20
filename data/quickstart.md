@@ -77,7 +77,6 @@ Like many RPGs of the time, Rogue 2000 used derived stats, calculated & updated 
 
 
 ### **BLOOD**
-
 > The last analogue interface.
 
 Run out of this stuff and you don't need to question what happens, type outofblood into the terminal if you're curious. 
@@ -90,9 +89,7 @@ Blood regenerates very slowly, ticking up by 1 per flip. (day)
 
 
 ### SWEAT
-
 > It's almost a prerequisite to life's greatest pleasures. Like, being alive.
-
 
 Calculated based off of your **ENDURANCE & REFLEX**, plus a base number of 2 for humans.
 
@@ -107,9 +104,7 @@ Just be prepared to actually sweat,
 
 
 ### TEARS
-
 > Don't waste too much salt. 
-
 
 Calculated based off of your **WISDOM & ODDITY**, plus a base number of 1 for humans.
 
