@@ -327,9 +327,10 @@ pre.ascii-logo {
   pointer-events: none;
 }
 
+/* Compact blockquote styling */
 .markdown-content blockquote {
   border-left: 3px solid #86c06c;
-  padding: 0.8em 1em;
+  padding: 0.3em 1em;
   margin: 1em 0;
   background-color: rgba(24, 52, 40, 0.5);
   border-radius: 0 5px 5px 0;
@@ -337,6 +338,17 @@ pre.ascii-logo {
   font-style: italic;
   color: #c3e6b4;
   box-shadow: 0 0 0 1px rgba(134, 192, 108, 0.3);
+  line-height: 1.4;
+}
+
+/* Blockquote containing only a single line with no breaks should be compact */
+.markdown-content blockquote > p:only-child {
+  margin: 0.1em 0;
+}
+
+/* But make sure multi-paragraph blockquotes still have proper spacing */
+.markdown-content blockquote > p:not(:only-child) {
+  margin: 0.7em 0;
 }
 
 .markdown-content table {
