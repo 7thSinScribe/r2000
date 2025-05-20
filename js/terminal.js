@@ -214,12 +214,10 @@ function renderOutput(item, isBooting) {
       </pre>
     );
   } else {
-    // Special case: If the text starts with "QUESTION", force use of pre tag to avoid markdown rendering
     if (item.text && item.text.includes("QUESTION")) {
       return <pre className="terminal-output">{item.text}</pre>;
     }
     
-    // For other cases, continue with the existing logic
     if (typeof marked !== 'undefined' && item.text && (
       item.text.includes('#') || 
       item.text.includes('*') || 

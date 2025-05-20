@@ -182,9 +182,7 @@ const SurvivorOSTerminal = () => {
     const question = characterCreationData.questions[questionIndex];
     let questionText = `QUESTION ${questionIndex + 1}/${characterCreationData.questions.length}: ${question.text}\n\n`;
     
-    // Make sure the formatting is consistent for all options
     question.options.forEach((option, index) => {
-      // Use a consistent format without any special characters
       questionText += `${index + 1} ${option.text}\n`;
     });
     
@@ -192,7 +190,7 @@ const SurvivorOSTerminal = () => {
       type: 'output', 
       text: questionText
     });
-  };;
+  };
   
   const processCharacterCreationAnswer = (answer) => {
     if (answer.toLowerCase() === 'cancel') {
@@ -212,9 +210,38 @@ const SurvivorOSTerminal = () => {
           text: `Name registered: ${name}`
         });
         
+        // Final check to ensure points are properly distributed
+        let finalAttributes = {...characterCreation.attributes};
+        
+        // Redistribute any attributes over 5
+        finalAttributes = redistributePoints(finalAttributes);
+        
+        // Ensure total points is exactly 15
+        const totalPoints = Object.values(finalAttributes).reduce((sum, val) => sum + val, 0);
+        if (totalPoints !== 15) {
+          const diff = 15 - totalPoints;
+          if (diff > 0) {
+            // Need to add points
+            for (let i = 0; i < diff; i++) {
+              // Find lowest attribute
+              let lowestAttr = null;
+              let lowestVal = 6;
+              for (const [attr, val] of Object.entries(finalAttributes)) {
+                if (val < lowestVal) {
+                  lowestVal = val;
+                  lowestAttr = attr;
+                }
+              }
+              if (lowestAttr && finalAttributes[lowestAttr] < 5) {
+                finalAttributes[lowestAttr]++;
+              }
+            }
+          }
+        }
+        
         const characterSheet = generateCharacterSheet(
           name, 
-          characterCreation.attributes, 
+          finalAttributes, 
           characterCreation.items,
           characterCreation.background || { title: "UNKNOWN", description: "Your past is a blur, forgotten in the chaos of the digital apocalypse." }
         );
@@ -222,6 +249,7 @@ const SurvivorOSTerminal = () => {
         setCharacterCreation({
           ...characterCreation,
           name: name,
+          attributes: finalAttributes,
           active: false,
           completed: true
         });
@@ -269,17 +297,21 @@ const SurvivorOSTerminal = () => {
     let updatedAttributes = {...characterCreation.attributes};
     let updatedItems = [...characterCreation.items];
     let updatedBackground = characterCreation.background;
-    let pointsUsedInThisQuestion = 0;
     
+    // Add attributes from selected option
     for (const [attr, value] of Object.entries(selectedOption.attributes || {})) {
       updatedAttributes[attr] += value;
-      pointsUsedInThisQuestion += value;
     }
     
+    // Redistribute attributes that exceed 5
+    updatedAttributes = redistributePoints(updatedAttributes);
+    
+    // Add item if present
     if (selectedOption.item) {
       updatedItems.push(selectedOption.item);
     }
     
+    // Set background if present
     if (selectedOption.background) {
       updatedBackground = {
         title: selectedOption.background,
@@ -287,28 +319,20 @@ const SurvivorOSTerminal = () => {
       };
     }
     
-    const newPointsRemaining = characterCreation.pointsRemaining - pointsUsedInThisQuestion;
-    const nextQuestionIndex = questionIndex + 1;
+    // Calculate total points used so far (excluding base points)
+    const additionalPoints = Object.values(updatedAttributes).reduce((sum, val) => sum + val, 0) - 5;
     
     setCharacterCreation({
       ...characterCreation,
-      currentQuestion: nextQuestionIndex,
+      currentQuestion: questionIndex + 1,
       attributes: updatedAttributes,
       items: updatedItems,
       background: updatedBackground,
-      pointsAllocated: characterCreation.pointsAllocated + pointsUsedInThisQuestion,
-      pointsRemaining: newPointsRemaining
+      pointsAllocated: additionalPoints + 5,
+      pointsRemaining: 10 - additionalPoints
     });
     
-    for (const [attr, value] of Object.entries(updatedAttributes)) {
-      if (value > 5) {
-        const excess = value - 5;
-        updatedAttributes[attr] = 5;
-        distributeExcessPoints(updatedAttributes, attr, excess);
-      }
-    }
-    
-    setTimeout(() => displayCurrentQuestion(nextQuestionIndex), 500);
+    setTimeout(() => displayCurrentQuestion(questionIndex + 1), 500);
   };
 
   const processCommand = (cmd) => {
@@ -351,23 +375,16 @@ whoami:   Run survivor identity questionnaire
 ascii:    Display SurvivorOS ASCII art logo
 logs:     List available survivor logs
 log [#]:  Display specific log entry
+`;
 
-For survivors in the zones: Type what you learn out there.
-Stay safe. Share knowledge. Survive.`;
     } 
     else if (command === 'about') {
-      response = `SurvivorOS Terminal v0.5b [BUILD: SRV-2957f5a]
-A modified RogueBoy OS for survivors in the dead zones
+      response = `SurvivorOS v0.5b [BUILD: SRV-2957f5a]
+A modified RogueBoy OS for survivors
 Current cycle: Saturday, January 1, 2000 #12,957
 System status: UNSTABLE - FIRMWARE MODIFIED
-Created by: Unknown (Terminal found in abandoned safe house)
-Storage: Local Browser Storage - NO CLOUD SYNC
-
-"This terminal was hacked by someone who knew what they were doing.
-The original RogueBoy protections have been bypassed, allowing
-full access to the information system. Use it to document what 
-you find out there in the dead zones. And if you're reading this,
-good luck. You'll need it." - Note found with terminal
+Creator: RED
+Storage: Local Storage - NO CLOUD SYNC
 `;
     }
     else if (command === 'clear') {
