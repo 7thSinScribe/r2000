@@ -21,13 +21,9 @@ const SurvivorOSTerminal = () => {
   
   const [quickStartContent, setQuickStartContent] = useState("");
   const [logsCache, setLogsCache] = useState({});
+  const [rabbitCache, setRabbitCache] = useState({});
   const availableLogs = [76, 55];
-  
-  const [rabbitHoleState, setRabbitHoleState] = useState({
-    accessed: false,
-    entries: [],
-    cache: {}
-  });
+  const [rabbitHoleAccessed, setRabbitHoleAccessed] = useState(false);
 
   useEffect(() => {
     async function loadQuickstart() {
@@ -321,6 +317,123 @@ const SurvivorOSTerminal = () => {
     setTimeout(() => displayCurrentQuestion(questionIndex + 1), 500);
   };
 
+  const processWhiterabbitCommand = () => {
+    addToTerminalHistory({ type: 'output', text: 'COMMAND NOT FOUND\nTERMINAL SECURITY BREACH DETECTED\nEMERGENCY OVERRIDE IN PROGRESS...' });
+    
+    setTimeout(() => {
+      addToTerminalHistory({ type: 'output', text: '█▒▒▒▒▒▒▒▒▒▒ 10%' });
+    }, 500);
+    
+    setTimeout(() => {
+      addToTerminalHistory({ type: 'output', text: '████▒▒▒▒▒▒▒ 40%' });
+    }, 1000);
+    
+    setTimeout(() => {
+      addToTerminalHistory({ type: 'output', text: '██████████▒ 98%' });
+    }, 1500);
+    
+    setTimeout(() => {
+      addToTerminalHistory({ type: 'output', text: 'OVERRIDE SUCCESSFUL' });
+    }, 2000);
+    
+    setTimeout(() => {
+      addToTerminalHistory({ type: 'output', text: 'IDENTITY CONFIRMATION\n--------------------\nWhat is your name?' });
+      
+      setTimeout(() => {
+        const aliceTypingInterval = setInterval(() => {
+          let currentText = terminalInput;
+          const nextChar = "Alice".charAt(currentText.length);
+          
+          if (currentText.length < 5) {
+            setTerminalInput(currentText + nextChar);
+          } else {
+            clearInterval(aliceTypingInterval);
+            
+            setTimeout(() => {
+              addToTerminalHistory({ type: 'input', text: '> Alice' });
+              setTerminalInput('');
+              
+              setTimeout(() => {
+                addToTerminalHistory({ type: 'output', text: 'ACCESS GRANTED TO PERSONAL ARCHIVES' });
+                
+                setTimeout(() => {
+                  addToTerminalHistory({ 
+                    type: 'output', 
+                    text: 'JOURNAL ENTRIES AVAILABLE:\n------------------------\n\nType \'rabbit [title]\' or \'rabbit [number]\' to access journal entry.'
+                  });
+                  
+                  setRabbitHoleAccessed(true);
+                }, 800);
+              }, 600);
+            }, 300);
+          }
+        }, 250);
+      }, 1000);
+    }, 2500);
+  };
+  
+  const processRabbitCommand = (input) => {
+    if (!rabbitHoleAccessed) {
+      addToTerminalHistory({ type: 'output', text: 'Command not recognized: rabbit' });
+      return;
+    }
+    
+    const query = input.trim();
+    let rabbitNumber;
+    
+    if (/^\d+$/.test(query)) {
+      rabbitNumber = parseInt(query);
+    } else {
+      const titleWords = ["first", "contact", "protocols", "moon", "landing", 
+                          "discrepancies", "quantum", "computing", "badge", 
+                          "government", "contracts", "tokyo"];
+      
+      for (let i = 1; i <= 6; i++) {
+        const title = titleWords.some(word => query.toLowerCase().includes(word));
+        if (title) {
+          rabbitNumber = i;
+          break;
+        }
+      }
+    }
+    
+    if (!rabbitNumber) {
+      addToTerminalHistory({ type: 'output', text: `No matching entry found for: ${input}` });
+      return;
+    }
+    
+    addToTerminalHistory({ type: 'output', text: `Accessing archive...` });
+    
+    const filename = `rabbit${rabbitNumber.toString().padStart(2, '0')}`;
+    
+    if (rabbitCache[filename]) {
+      addToTerminalHistory({ type: 'output', text: rabbitCache[filename], contentType: 'rabbit' });
+      return;
+    }
+    
+    const loadRabbit = async () => {
+      try {
+        const rabbitResponse = await fetch(`data/${filename}.md`);
+        if (!rabbitResponse.ok) {
+          throw new Error(`Entry ${filename} not found.`);
+        }
+        const rabbitContent = await rabbitResponse.text();
+        
+        setRabbitCache(prev => ({
+          ...prev,
+          [filename]: rabbitContent
+        }));
+        
+        addToTerminalHistory({ type: 'output', text: rabbitContent, contentType: 'rabbit' });
+      } catch (error) {
+        console.error(`Error loading rabbit entry ${filename}:`, error);
+        addToTerminalHistory({ type: 'output', text: `ERROR: Entry #${rabbitNumber} not found or could not be loaded.` });
+      }
+    };
+    
+    loadRabbit();
+  };
+
   const processCommand = (cmd) => {
     const command = cmd.toLowerCase().trim();
     
@@ -345,20 +458,15 @@ const SurvivorOSTerminal = () => {
     }
     
     if (command === 'whiterabbit') {
-      window.rabbitModule.processWhiterabbitCommand(
-        addToTerminalHistory, 
-        setTerminalInput,
-        setRabbitHoleState
-      );
+      addToTerminalHistory({ type: 'input', text: `> whiterabbit` });
+      processWhiterabbitCommand();
       return;
     }
     
     if (command.startsWith('rabbit ')) {
+      addToTerminalHistory({ type: 'input', text: `> ${command}` });
       const rabbitQuery = command.split('rabbit ')[1];
-      window.rabbitModule.processRabbitCommand(
-        rabbitQuery, 
-        addToTerminalHistory
-      );
+      processRabbitCommand(rabbitQuery);
       return;
     }
     
