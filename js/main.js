@@ -375,16 +375,23 @@ whoami:   Run survivor identity questionnaire
 ascii:    Display SurvivorOS ASCII art logo
 logs:     List available survivor logs
 log [#]:  Display specific log entry
-`;
 
+For survivors in the zones: Type what you learn out there.
+Stay safe. Share knowledge. Survive.`;
     } 
     else if (command === 'about') {
-      response = `SurvivorOS v0.5b [BUILD: SRV-2957f5a]
-A modified RogueBoy OS for survivors
+      response = `SurvivorOS Terminal v0.5b [BUILD: SRV-2957f5a]
+A modified RogueBoy OS for survivors in the dead zones
 Current cycle: Saturday, January 1, 2000 #12,957
 System status: UNSTABLE - FIRMWARE MODIFIED
-Creator: RED
-Storage: Local Storage - NO CLOUD SYNC
+Created by: Unknown (Terminal found in abandoned safe house)
+Storage: Local Browser Storage - NO CLOUD SYNC
+
+"This terminal was hacked by someone who knew what they were doing.
+The original RogueBoy protections have been bypassed, allowing
+full access to the information system. Use it to document what 
+you find out there in the dead zones. And if you're reading this,
+good luck. You'll need it." - Note found with terminal
 `;
     }
     else if (command === 'clear') {
