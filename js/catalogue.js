@@ -15,12 +15,12 @@ const catalogueEntities = [
       blood: { current: 62, max: 62 },
       sweat: { current: 50, max: 50 },
       tears: { current: 52, max: 52 },
-      threat: 'Toriel should not be approached or reasoned with, her mind is as sharp as her talons.',
+      threat: 'Toriel should not be approached or reasoned with, her tongue is perhaps more dangerous than her fire.',
       history: 'Originally designed as tutorial guide, corrupted during game/reality merger, now tests survivors through combat trials. First encountered by Survivor Group "Deadmeat", an apt name, as they were the first victims.',
       notes: [
         'She\'s trying to help, in her way. Doesn\'t make her less deadly.',
         'The fire breath isn\'t 100%  real. The pain is.',
-        'Color flickers before breath attack. DODGE LATERAL.'
+        'Color flickers before breath attack. DON\'T DODGE IT.'
       ]
     },
     {
