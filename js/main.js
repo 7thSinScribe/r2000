@@ -114,13 +114,16 @@ const SurvivorOSTerminal = () => {
 
   const handleTerminalKeyPress = (e) => {
     if (e.key === 'Enter') {
+      const inputValue = terminalInput;
+      // Clear input immediately after Enter is pressed
+      setTerminalInput('');
+      
       if (characterCreation.active) {
-        processCharacterCreationAnswer(terminalInput);
-        setTerminalInput('');
+        processCharacterCreationAnswer(inputValue);
         return;
       }
       
-      processCommand(terminalInput);
+      processCommand(inputValue);
     }
   };
 
@@ -139,8 +142,6 @@ const SurvivorOSTerminal = () => {
         contentType: 'quickstart'
       });
     }, 500);
-    
-    setTerminalInput('');
   };
 
   const showAsciiLogo = () => {
@@ -158,8 +159,6 @@ const SurvivorOSTerminal = () => {
         isLogo: true
       });
     });
-    
-    setTerminalInput('');
   };
 
   const startCharacterCreation = () => {
@@ -183,8 +182,6 @@ const SurvivorOSTerminal = () => {
     });
     
     displayCurrentQuestion(0);
-    
-    setTerminalInput('');
   };
   
   const displayCurrentQuestion = (questionIndex) => {
@@ -348,6 +345,10 @@ const SurvivorOSTerminal = () => {
       return;
     }
     
+    // Add command to terminal history before processing
+    addToTerminalHistory({ type: 'input', text: `> ${command}` });
+    
+    // Process different commands
     if (command === 'quickstart') {
       showQuickstartContent();
       return;
@@ -364,7 +365,6 @@ const SurvivorOSTerminal = () => {
     }
     
     if (command === 'outofblood') {
-      addToTerminalHistory({ type: 'input', text: `> ${cmd}` });
       addToTerminalHistory({ 
         type: 'output', 
         text: 'CRITICAL ERROR: BLOOD LEVEL ZERO\nVITAL FUNCTIONS COMPROMISED\nSYSTEM SHUTDOWN IMMINENT...'
@@ -418,7 +418,6 @@ const SurvivorOSTerminal = () => {
     
     // CATALOGUE COMMAND HANDLING
     if (command === 'catalogue' || command === 'catalogue list') {
-      addToTerminalHistory({ type: 'input', text: `> ${cmd}` });
       addToTerminalHistory({ 
         type: 'output', 
         text: 'LOADING ENTITY DATABASE...'
@@ -434,7 +433,6 @@ const SurvivorOSTerminal = () => {
     }
     
     if (command.startsWith('catalogue view ')) {
-      addToTerminalHistory({ type: 'input', text: `> ${cmd}` });
       const entityId = command.split('catalogue view ')[1].trim();
       
       addToTerminalHistory({ 
@@ -461,7 +459,6 @@ const SurvivorOSTerminal = () => {
     }
     
     if (command.startsWith('catalogue search ')) {
-      addToTerminalHistory({ type: 'input', text: `> ${cmd}` });
       const searchTerm = command.split('catalogue search ')[1].trim();
       
       addToTerminalHistory({ 
@@ -478,8 +475,12 @@ const SurvivorOSTerminal = () => {
       return;
     }
     
-    addToTerminalHistory({ type: 'input', text: `> ${cmd}` });
+    if (command === 'clear') {
+      clearTerminal();
+      return;
+    }
     
+    // Standard command responses
     let response = '';
     
     if (command === 'help') {
@@ -505,10 +506,6 @@ Stay safe. Share knowledge. Survive.`;
       response = `SurvivorOS v0.5b [BUILD: SRV-2957f5a]
 A community-developed operating system for Rogueboy 2000 devices
 `;
-    }
-    else if (command === 'clear') {
-      clearTerminal();
-      return;
     }
     else if (command === 'logs') {
       response = `AVAILABLE LOGS:\n\n${availableLogs.map(logNum => `- Log #${logNum}`).join('\n')}\n\nType 'log [number]' to view a specific log.`;
@@ -571,8 +568,6 @@ Type 'help' for available commands.`;
     if (response) {
       addToTerminalHistory({ type: 'output', text: response });
     }
-    
-    setTerminalInput('');
   };
 
   return (

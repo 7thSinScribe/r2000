@@ -167,7 +167,7 @@ function handleOutOfBlood() {
   
   // Create animated death message
   const deathMessage = document.createElement('div');
-  deathMessage.textContent = 'You Died.';
+  deathMessage.textContent = 'YOU DIED.';
   deathMessage.style.color = '#e0f8cf'; // Lightest green from the palette
   deathMessage.style.fontFamily = 'RuneScape, monospace';
   deathMessage.style.fontSize = '64px';
