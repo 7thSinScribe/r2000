@@ -161,8 +161,8 @@ const SurvivorOSTerminal = () => {
       background: null,
       name: "",
       completed: false,
-      pointsAllocated: 5,
-      pointsRemaining: 10
+      pointsAllocated: 5, 
+      pointsRemaining: 10  
     });
     
     displayCurrentQuestion(0);
@@ -212,9 +212,10 @@ const SurvivorOSTerminal = () => {
         
         // Verify total points is exactly 15 (5 base + 10 distributed)
         const totalPoints = Object.values(characterCreation.attributes).reduce((sum, val) => sum + val, 0);
+        
         if (totalPoints !== 15) {
-          // This should never happen if questionnaire is properly structured
           console.error(`Point total ${totalPoints} !== 15. Character creation error.`);
+          // This shouldn't happen with the cascading system, but log it if it does
         }
         
         const characterSheet = generateCharacterSheet(
@@ -275,17 +276,26 @@ const SurvivorOSTerminal = () => {
     let updatedItems = [...characterCreation.items];
     let updatedBackground = characterCreation.background;
     
-    // Add attributes from selected option if they exist
-    if (selectedOption.attributes) {
-      for (const [attr, value] of Object.entries(selectedOption.attributes)) {
-        // Ensure no attribute goes above 5
-        const newValue = Math.min(updatedAttributes[attr] + value, 5);
-        updatedAttributes[attr] = newValue;
-      }
+    // Handle different attribute distribution scenarios
+    if (selectedOption.primaryAttributes) {
+      // Multi-attribute option (like backgrounds)
+      updatedAttributes = distributeMultipleAttributes(
+        updatedAttributes,
+        selectedOption.primaryAttributes
+      );
+    } else if (selectedOption.primaryAttribute) {
+      // Single attribute option with possible fallbacks
+      const pointsToAdd = selectedOption.multiplePoints || 1;
+      updatedAttributes = distributeAttributePoints(
+        updatedAttributes,
+        selectedOption.primaryAttribute,
+        selectedOption.fallbackOrder,
+        pointsToAdd
+      );
     }
     
     // Add item if present
-    if (selectedOption.item) {
+    if (selectedOption.item && !updatedItems.includes(selectedOption.item)) {
       updatedItems.push(selectedOption.item);
     }
     
@@ -297,8 +307,8 @@ const SurvivorOSTerminal = () => {
       };
     }
     
-    // Calculate total points used (excluding base points)
-    const additionalPoints = Object.values(updatedAttributes).reduce((sum, val) => sum + val, 0) - 5;
+    // Calculate total points used
+    const totalPoints = Object.values(updatedAttributes).reduce((sum, val) => sum + val, 0);
     
     setCharacterCreation({
       ...characterCreation,
@@ -306,8 +316,8 @@ const SurvivorOSTerminal = () => {
       attributes: updatedAttributes,
       items: updatedItems,
       background: updatedBackground,
-      pointsAllocated: additionalPoints + 5,
-      pointsRemaining: 10 - additionalPoints
+      pointsAllocated: totalPoints,
+      pointsRemaining: 15 - totalPoints
     });
     
     setTimeout(() => displayCurrentQuestion(questionIndex + 1), 500);

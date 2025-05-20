@@ -1,84 +1,194 @@
-// Character creation questionnaire data
+// Character creation questionnaire data with cascading attribute priority
 const characterCreationData = {
   questions: [
     {
       text: "When presented with a glitched environment, your first instinct is to:",
       options: [
-        { text: "Force your way through physical obstacles", attributes: { power: 1 } },
-        { text: "Look for unusual patterns or non-obvious solutions", attributes: { oddity: 1 } },
-        { text: "Analyze the environment for predictable behaviors", attributes: { wisdom: 1 } },
-        { text: "Prepare for the long haul and conserve your energy", attributes: { endurance: 1 } },
-        { text: "Move quickly and stay one step ahead of danger", attributes: { reflex: 1 } }
+        { 
+          text: "Force your way through physical obstacles", 
+          primaryAttribute: "power",
+          fallbackOrder: ["endurance", "reflex", "oddity", "wisdom"]
+        },
+        { 
+          text: "Look for unusual patterns or non-obvious solutions", 
+          primaryAttribute: "oddity",
+          fallbackOrder: ["wisdom", "reflex", "power", "endurance"]
+        },
+        { 
+          text: "Analyze the environment for predictable behaviors", 
+          primaryAttribute: "wisdom",
+          fallbackOrder: ["oddity", "reflex", "endurance", "power"]
+        },
+        { 
+          text: "Prepare for the long haul and conserve your energy", 
+          primaryAttribute: "endurance",
+          fallbackOrder: ["power", "wisdom", "oddity", "reflex"]
+        },
+        { 
+          text: "Move quickly and stay one step ahead of danger", 
+          primaryAttribute: "reflex",
+          fallbackOrder: ["oddity", "endurance", "power", "wisdom"]
+        }
       ]
     },
     {
       text: "Your recurring dream in the endless January involves:",
       options: [
-        { text: "Pushing against an immovable barrier until it breaks", attributes: { power: 1 } },
-        { text: "Conversation with digital entities that answer in code", attributes: { oddity: 1 } },
-        { text: "Seeing patterns in chaos that others miss", attributes: { wisdom: 1 } },
-        { text: "Walking endlessly without tiring through corrupted zones", attributes: { endurance: 1 } },
-        { text: "Moving through frozen time while everything else stands still", attributes: { reflex: 1 } }
+        { 
+          text: "Pushing against an immovable barrier until it breaks", 
+          primaryAttribute: "power",
+          fallbackOrder: ["endurance", "reflex", "oddity", "wisdom"]
+        },
+        { 
+          text: "Conversation with digital entities that answer in code", 
+          primaryAttribute: "oddity",
+          fallbackOrder: ["wisdom", "reflex", "endurance", "power"]
+        },
+        { 
+          text: "Seeing patterns in chaos that others miss", 
+          primaryAttribute: "wisdom",
+          fallbackOrder: ["oddity", "reflex", "endurance", "power"]
+        },
+        { 
+          text: "Walking endlessly without tiring through corrupted zones", 
+          primaryAttribute: "endurance",
+          fallbackOrder: ["power", "wisdom", "oddity", "reflex"]
+        },
+        { 
+          text: "Moving through frozen time while everything else stands still", 
+          primaryAttribute: "reflex",
+          fallbackOrder: ["oddity", "power", "wisdom", "endurance"] 
+        }
       ]
     },
     {
       text: "The other survivors often come to you when they need someone to:",
       options: [
-        { text: "Break through a physical barrier or threat", attributes: { power: 1 } },
-        { text: "Handle bizarre situations that defy normal logic", attributes: { oddity: 1 } },
-        { text: "Solve complex problems or repair technology", attributes: { wisdom: 1 } },
-        { text: "Endure harsh conditions or long treks", attributes: { endurance: 1 } },
-        { text: "Move quickly or react to sudden dangers", attributes: { reflex: 1 } }
+        { 
+          text: "Break through a physical barrier or threat", 
+          primaryAttribute: "power",
+          fallbackOrder: ["endurance", "reflex", "oddity", "wisdom"]
+        },
+        { 
+          text: "Handle bizarre situations that defy normal logic", 
+          primaryAttribute: "oddity",
+          fallbackOrder: ["wisdom", "reflex", "power", "endurance"]
+        },
+        { 
+          text: "Solve complex problems or repair technology", 
+          primaryAttribute: "wisdom",
+          fallbackOrder: ["oddity", "reflex", "endurance", "power"]
+        },
+        { 
+          text: "Endure harsh conditions or long treks", 
+          primaryAttribute: "endurance",
+          fallbackOrder: ["power", "wisdom", "oddity", "reflex"]
+        },
+        { 
+          text: "Move quickly or react to sudden dangers", 
+          primaryAttribute: "reflex",
+          fallbackOrder: ["power", "oddity", "endurance", "wisdom"]
+        }
       ]
     },
     {
       text: "Which Gamemaster challenge would you most likely overcome?",
       options: [
-        { text: "Trial of Strength: force-based obstacles", attributes: { power: 1 } },
-        { text: "Trial of Chaos: reality-bending puzzles", attributes: { oddity: 1 } },
-        { text: "Trial of Knowledge: complex pattern recognition", attributes: { wisdom: 1 } },
-        { text: "Trial of Persistence: prolonged environmental hazards", attributes: { endurance: 1 } },
-        { text: "Trial of Speed: reaction-based challenges", attributes: { reflex: 1 } }
+        { 
+          text: "Trial of Strength: force-based obstacles", 
+          primaryAttribute: "power",
+          fallbackOrder: ["endurance", "reflex", "oddity", "wisdom"]
+        },
+        { 
+          text: "Trial of Chaos: reality-bending puzzles", 
+          primaryAttribute: "oddity",
+          fallbackOrder: ["wisdom", "reflex", "power", "endurance"]
+        },
+        { 
+          text: "Trial of Knowledge: complex pattern recognition", 
+          primaryAttribute: "wisdom",
+          fallbackOrder: ["oddity", "reflex", "endurance", "power"]
+        },
+        { 
+          text: "Trial of Persistence: prolonged environmental hazards", 
+          primaryAttribute: "endurance",
+          fallbackOrder: ["power", "wisdom", "reflex", "oddity"]
+        },
+        { 
+          text: "Trial of Speed: reaction-based challenges", 
+          primaryAttribute: "reflex",
+          fallbackOrder: ["power", "endurance", "oddity", "wisdom"]
+        }
       ]
     },
     {
       text: "Your most valued possession in the glitched world is:",
       options: [
-        { text: "A tool that amplifies your physical capabilities", 
-          attributes: { power: 1 }, 
-          item: "Modified Crowbar (d8)" },
-        { text: "A device that behaves in ways that defy explanation", 
-          attributes: { oddity: 1 }, 
-          item: "Anomalous Calculator (sometimes reveals hidden information about the environment)" },
-        { text: "A repository of technical information you've collected", 
-          attributes: { wisdom: 1 }, 
-          item: "N-CO Technical Manual (reference for understanding game entities)" },
-        { text: "Equipment that helps you survive in harsh conditions", 
-          attributes: { endurance: 1 }, 
-          item: "Survival Pack" },
-        { text: "Something that enhances your speed or reaction time", 
-          attributes: { reflex: 1 }, 
-          item: "Reflex Enhancer (grants +1 reflex when powered" }
+        { 
+          text: "A tool that amplifies your physical capabilities", 
+          primaryAttribute: "power",
+          fallbackOrder: ["endurance", "reflex", "oddity", "wisdom"],
+          item: "Modified Crowbar (d8)"
+        },
+        { 
+          text: "A device that behaves in ways that defy explanation", 
+          primaryAttribute: "oddity",
+          fallbackOrder: ["wisdom", "reflex", "power", "endurance"],
+          item: "Anomalous Calculator (sometimes reveals hidden information about the environment)"
+        },
+        { 
+          text: "A repository of technical information you've collected", 
+          primaryAttribute: "wisdom",
+          fallbackOrder: ["oddity", "power", "endurance", "reflex"],
+          item: "N-CO Technical Manual (reference for understanding game entities)"
+        },
+        { 
+          text: "Equipment that helps you survive in harsh conditions", 
+          primaryAttribute: "endurance",
+          fallbackOrder: ["power", "wisdom", "oddity", "reflex"],
+          item: "Survival Pack"
+        },
+        { 
+          text: "Something that enhances your speed or reaction time", 
+          primaryAttribute: "reflex",
+          fallbackOrder: ["power", "oddity", "endurance", "wisdom"],
+          item: "Reflex Enhancer (grants +1 reflex when powered"
+        }
       ]
     },
     {
       text: "Your specialized approach to digital anomalies involves:",
       options: [
-        { text: "Physical disruption - sometimes you need to break things", 
-          attributes: { power: 1 }, 
-          item: "Signal Disruptor (temporarily disable digital entities)" },
-        { text: "Unconventional interaction - communicating in strange ways", 
-          attributes: { oddity: 1 }, 
-          item: "Pattern Translator (interpret bizarre digital communications)" },
-        { text: "Systematic analysis - understanding the underlying code", 
-          attributes: { wisdom: 1 }, 
-          item: "Code Analyzer (reveal weaknesses in digital entities)" },
-        { text: "Weathering the effects - building resistance over time", 
-          attributes: { endurance: 1 }, 
-          item: "Digital Buffer (reduce damage from digital attacks)" },
-        { text: "Rapid adaptation - changing tactics faster than they can", 
-          attributes: { reflex: 1 }, 
-          item: "Adaptive Interface (quicker reactions to digital threats)" }
+        { 
+          text: "Physical disruption - sometimes you need to break things", 
+          primaryAttribute: "power",
+          fallbackOrder: ["endurance", "reflex", "oddity", "wisdom"],
+          item: "Signal Disruptor (temporarily disable digital entities)"
+        },
+        { 
+          text: "Unconventional interaction - communicating in strange ways", 
+          primaryAttribute: "oddity",
+          fallbackOrder: ["wisdom", "reflex", "power", "endurance"],
+          item: "Pattern Translator (interpret bizarre digital communications)"
+        },
+        { 
+          text: "Systematic analysis - understanding the underlying code", 
+          primaryAttribute: "wisdom",
+          fallbackOrder: ["oddity", "reflex", "endurance", "power"],
+          item: "Code Analyzer (reveal weaknesses in digital entities)"
+        },
+        { 
+          text: "Weathering the effects - building resistance over time", 
+          primaryAttribute: "endurance",
+          fallbackOrder: ["power", "wisdom", "oddity", "reflex"],
+          item: "Digital Buffer (reduce damage from digital attacks)"
+        },
+        { 
+          text: "Rapid adaptation - changing tactics faster than they can", 
+          primaryAttribute: "reflex",
+          fallbackOrder: ["oddity", "power", "endurance", "wisdom"],
+          item: "Adaptive Interface (quicker reactions to digital threats)"
+        }
       ]
     },
     {
@@ -86,31 +196,46 @@ const characterCreationData = {
       options: [
         { 
           text: "Willingness to confront obstacles head-on", 
-          attributes: { power: 1, endurance: 1 },
+          primaryAttributes: [
+            { attr: "power", fallbackOrder: ["endurance", "reflex", "oddity", "wisdom"] },
+            { attr: "endurance", fallbackOrder: ["power", "reflex", "oddity", "wisdom"] }
+          ],
           background: "ENFORCER",
           backgroundDesc: "You've always believed in facing problems directly, using strength and determination to overcome what stands in your way. In the digital apocalypse, this approach has kept you alive when others hesitated. Digital entities seem to recognize your fortitude, sometimes avoiding direct confrontation with you."
         },
         { 
           text: "Curiosity about things others find disturbing", 
-          attributes: { oddity: 1, wisdom: 1 },
+          primaryAttributes: [
+            { attr: "oddity", fallbackOrder: ["wisdom", "reflex", "power", "endurance"] },
+            { attr: "wisdom", fallbackOrder: ["oddity", "reflex", "power", "endurance"] }
+          ],
           background: "INVESTIGATOR",
           backgroundDesc: "You've always been drawn to the strange and unexplained, willing to look where others won't. This curiosity now serves you well in a world where reality itself has become malleable. You sometimes experience déjà vu moments that provide insight into digital anomalies."
         },
         { 
           text: "Ability to stay calm and think clearly in chaos", 
-          attributes: { wisdom: 1, endurance: 1 },
+          primaryAttributes: [
+            { attr: "wisdom", fallbackOrder: ["oddity", "endurance", "reflex", "power"] },
+            { attr: "endurance", fallbackOrder: ["wisdom", "power", "oddity", "reflex"] }
+          ],
           background: "ANALYST",
           backgroundDesc: "Your analytical mind has always been your greatest asset, allowing you to see patterns and solutions where others see only confusion. In the merged reality, this clarity helps you navigate the seemingly random glitches. Sometimes digital systems briefly stabilize in your presence."
         },
         { 
           text: "Stubborn refusal to give up despite hardship", 
-          attributes: { endurance: 1, power: 1 },
+          primaryAttributes: [
+            { attr: "endurance", fallbackOrder: ["power", "wisdom", "oddity", "reflex"] },
+            { attr: "power", fallbackOrder: ["endurance", "wisdom", "oddity", "reflex"] }
+          ],
           background: "SURVIVOR",
           backgroundDesc: "Long before the collapse, you were known for perseverance through difficulties that would break others. This tenacity has only grown stronger in the face of the digital apocalypse. You require less rest than most and recover more quickly from injuries."
         },
         { 
           text: "Instinct for danger and ability to act instantly", 
-          attributes: { reflex: 1, oddity: 1 },
+          primaryAttributes: [
+            { attr: "reflex", fallbackOrder: ["oddity", "power", "wisdom", "endurance"] },
+            { attr: "oddity", fallbackOrder: ["reflex", "power", "wisdom", "endurance"] }
+          ],
           background: "SCOUT",
           backgroundDesc: "Your quick reactions and sixth sense for trouble kept you alive in the chaos of the collapse when others froze or panicked. You continue to rely on these instincts in the glitched world. You occasionally experience brief premonitions of digital anomalies before they manifest."
         }
@@ -119,11 +244,36 @@ const characterCreationData = {
     {
       text: "Your final two attribute points - where do they matter most?",
       options: [
-        { text: "Physical strength and impact", attributes: { power: 2 } },
-        { text: "Unusual perception and thinking", attributes: { oddity: 2 } },
-        { text: "Knowledge and problem-solving", attributes: { wisdom: 2 } },
-        { text: "Stamina and resilience", attributes: { endurance: 2 } },
-        { text: "Speed and reaction time", attributes: { reflex: 2 } }
+        { 
+          text: "Physical strength and impact", 
+          multiplePoints: 2,
+          primaryAttribute: "power",
+          fallbackOrder: ["endurance", "reflex", "oddity", "wisdom"]
+        },
+        { 
+          text: "Unusual perception and thinking", 
+          multiplePoints: 2,
+          primaryAttribute: "oddity",
+          fallbackOrder: ["wisdom", "reflex", "power", "endurance"]
+        },
+        { 
+          text: "Knowledge and problem-solving", 
+          multiplePoints: 2,
+          primaryAttribute: "wisdom",
+          fallbackOrder: ["oddity", "reflex", "endurance", "power"]
+        },
+        { 
+          text: "Stamina and resilience", 
+          multiplePoints: 2,
+          primaryAttribute: "endurance",
+          fallbackOrder: ["power", "wisdom", "oddity", "reflex"]
+        },
+        { 
+          text: "Speed and reaction time", 
+          multiplePoints: 2,
+          primaryAttribute: "reflex",
+          fallbackOrder: ["power", "oddity", "endurance", "wisdom"]
+        }
       ]
     },
     {
@@ -133,7 +283,7 @@ const characterCreationData = {
           item: "Reliable Multi-tool" 
         },
         { text: "A mixtape that never plays the same song", 
-          item: "Glitched Mixtape)" 
+          item: "Glitched Mixtape" 
         },
         { text: "A journal where you categorise anomalies", 
           item: "Anomaly Journal" 
@@ -166,6 +316,45 @@ const characterCreationData = {
     reflex: ["Flashbang (blinds enemies in a 15ft area for 3 turns)", "Grappling Hook (quick vertical movement)"]
   }
 };
+
+// Function to distribute attribute points with fallback
+function distributeAttributePoints(attributes, primaryAttribute, fallbackOrder, points = 1) {
+  let remaining = points;
+  let currentAttr = primaryAttribute;
+  let fallbackIndex = 0;
+  
+  // First try to add to the primary attribute
+  while (remaining > 0) {
+    if (attributes[currentAttr] < 5) {
+      attributes[currentAttr] += 1;
+      remaining--;
+    } else {
+      // Primary attribute is maxed, move to fallback
+      if (fallbackIndex < fallbackOrder.length) {
+        currentAttr = fallbackOrder[fallbackIndex];
+        fallbackIndex++;
+      } else {
+        // We've exhausted all options (shouldn't happen in normal play)
+        console.warn("Warning: Unable to allocate all attribute points. All attributes may be at maximum.");
+        break;
+      }
+    }
+  }
+  
+  return attributes;
+}
+
+// Function to handle multiple attributes with fallbacks (for background choice)
+function distributeMultipleAttributes(attributes, primaryAttributesConfig) {
+  for (const config of primaryAttributesConfig) {
+    attributes = distributeAttributePoints(
+      attributes, 
+      config.attr, 
+      config.fallbackOrder
+    );
+  }
+  return attributes;
+}
 
 function generateCharacterSheet(name, attributes, items, background) {
   const blood = 3 + attributes.power + attributes.endurance;
