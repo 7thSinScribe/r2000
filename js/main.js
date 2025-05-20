@@ -210,10 +210,12 @@ const SurvivorOSTerminal = () => {
           text: `Name registered: ${name}`
         });
         
+        // Verify total points is exactly 15 (5 base + 10 distributed)
         const totalPoints = Object.values(characterCreation.attributes).reduce((sum, val) => sum + val, 0);
         
         if (totalPoints !== 15) {
           console.error(`Point total ${totalPoints} !== 15. Character creation error.`);
+          // This shouldn't happen with the cascading system, but log it if it does
         }
         
         const characterSheet = generateCharacterSheet(
@@ -274,12 +276,15 @@ const SurvivorOSTerminal = () => {
     let updatedItems = [...characterCreation.items];
     let updatedBackground = characterCreation.background;
     
+    // Handle different attribute distribution scenarios
     if (selectedOption.primaryAttributes) {
+      // Multi-attribute option (like backgrounds)
       updatedAttributes = distributeMultipleAttributes(
         updatedAttributes,
         selectedOption.primaryAttributes
       );
     } else if (selectedOption.primaryAttribute) {
+      // Single attribute option with possible fallbacks
       const pointsToAdd = selectedOption.multiplePoints || 1;
       updatedAttributes = distributeAttributePoints(
         updatedAttributes,
@@ -289,17 +294,20 @@ const SurvivorOSTerminal = () => {
       );
     }
     
+    // Add item if present
     if (selectedOption.item && !updatedItems.includes(selectedOption.item)) {
       updatedItems.push(selectedOption.item);
     }
     
+    // Set background if present
     if (selectedOption.background) {
-      updatedBackground = {
+      updatedBackground = {s
         title: selectedOption.background,
         description: selectedOption.backgroundDesc
       };
     }
     
+    // Calculate total points used
     const totalPoints = Object.values(updatedAttributes).reduce((sum, val) => sum + val, 0);
     
     setCharacterCreation({
@@ -345,10 +353,12 @@ const SurvivorOSTerminal = () => {
         text: 'CRITICAL ERROR: BLOOD LEVEL ZERO\nVITAL FUNCTIONS COMPROMISED\nSYSTEM SHUTDOWN IMMINENT...'
       });
       
+      // Create a blood loss vignette effect
       const vignette = document.createElement('div');
       vignette.className = 'blood-loss-vignette';
       document.body.appendChild(vignette);
       
+      // Create some glitch artifacts during system "failure"
       for (let i = 0; i < 3; i++) {
         setTimeout(() => {
           const artifact = document.createElement('div');
@@ -372,6 +382,7 @@ const SurvivorOSTerminal = () => {
         }, 800 + i * 300);
       }
       
+      // Trigger glitch artifacts as system "fails"
       for (let i = 0; i < 5; i++) {
         setTimeout(() => {
           const terminalContainer = document.querySelector('.crt-screen');
@@ -384,10 +395,73 @@ const SurvivorOSTerminal = () => {
         }, 500 + i * 300);
       }
       
+      // Delay before showing death screen
       setTimeout(() => {
+        // Call the death screen function from dead.js
         window.handleOutOfBlood();
       }, 2000);
       
+      return;
+    }
+    
+    // CATALOG COMMAND HANDLING
+    if (command === 'catalog' || command === 'catalog list') {
+      addToTerminalHistory({ type: 'input', text: `> ${cmd}` });
+      addToTerminalHistory({ 
+        type: 'output', 
+        text: 'LOADING ENTITY DATABASE...'
+      });
+      
+      setTimeout(() => {
+        addToTerminalHistory({ 
+          type: 'output', 
+          text: listCatalogEntities()
+        });
+      }, 500);
+      return;
+    }
+    
+    if (command.startsWith('catalog view ')) {
+      addToTerminalHistory({ type: 'input', text: `> ${cmd}` });
+      const entityId = command.split('catalog view ')[1].trim();
+      
+      addToTerminalHistory({ 
+        type: 'output', 
+        text: `LOADING ENTITY #${entityId}...`
+      });
+      
+      setTimeout(() => {
+        const entity = catalogEntities.find(e => e.id === entityId);
+        if (entity) {
+          addToTerminalHistory({ 
+            type: 'output', 
+            text: renderEntityCard(entity)
+          });
+        } else {
+          addToTerminalHistory({ 
+            type: 'output', 
+            text: `ERROR: Entity #${entityId} not found in database.`
+          });
+        }
+      }, 500);
+      return;
+    }
+    
+    if (command.startsWith('catalog search ')) {
+      addToTerminalHistory({ type: 'input', text: `> ${cmd}` });
+      const searchTerm = command.split('catalog search ')[1].trim();
+      
+      addToTerminalHistory({ 
+        type: 'output', 
+        text: `SEARCHING DATABASE FOR "${searchTerm}"...`
+      });
+      
+      setTimeout(() => {
+        addToTerminalHistory({ 
+          type: 'output', 
+          text: listCatalogEntities(searchTerm)
+        });
+      }, 500);
       return;
     }
     
@@ -397,26 +471,27 @@ const SurvivorOSTerminal = () => {
     
     if (command === 'help') {
       response = `
-SURVIVOROS TERMINAL COMMANDS:
-----------------------------
-
-help:       Display this help message
-clear:      Clear terminal
-about:      About SurvivorOS
-quickstart: Display Rogue 2000 game information
-whoami:     Run survivor identity questionnaire
-ascii:      Display SurvivorOS ASCII art logo
-logs:       List available survivor logs
-log [#]:    Display specific log entry
-outofblood: Simulate critical blood loss
-
-For survivors in the zones: Type what you learn out there.
-Stay safe. Share knowledge. Survive.`;
+  SURVIVOROS TERMINAL COMMANDS:
+  ----------------------------
+  
+  help:       Display this help message
+  clear:      Clear terminal
+  about:      About SurvivorOS
+  quickstart: Display Rogue 2000 game information
+  whoami:     Run survivor identity questionnaire
+  ascii:      Display SurvivorOS ASCII art logo
+  catalog:    Access entity database
+  logs:       List available survivor logs
+  log [#]:    Display specific log entry
+  outofblood: Simulate critical blood loss
+  
+  For survivors in the zones: Type what you learn out there.
+  Stay safe. Share knowledge. Survive.`;
     } 
     else if (command === 'about') {
       response = `SurvivorOS v0.5b [BUILD: SRV-2957f5a]
-A community-developed operating system for Rogueboy 2000 devices
-`;
+  A community-developed operating system for Rogueboy 2000 devices
+  `;
     }
     else if (command === 'clear') {
       clearTerminal();
@@ -477,7 +552,7 @@ A community-developed operating system for Rogueboy 2000 devices
     }
     else {
       response = `Command not recognized: '${command}'
-Type 'help' for available commands.`;
+  Type 'help' for available commands.`;
     }
     
     if (response) {
@@ -542,7 +617,7 @@ Type 'help' for available commands.`;
                     style={{color: '#e0f8cf'}}
                     autoFocus
                   />
-                  <span className={`cursor-element ${blinkCursor ? 'opacity-100' : 'opacity-0'}`}>_</span>
+                  <span className={blinkCursor ? 'opacity-100' : 'opacity-0'}>_</span>
                 </div>
               )}
               
