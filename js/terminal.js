@@ -182,6 +182,11 @@ function startLogoGlitchSequence() {
 }
 
 function renderOutput(item, isBooting) {
+  // Check for special catalogue content
+  if (item.text && item.text.includes('SURVIVOROS ENTITY CATALOGUE')) {
+    return <pre className="terminal-output">{item.text}</pre>;
+  }
+
   if (item.text === 'OVERRIDE ACCEPTED - FULL ACCESS GRANTED') {
     document.body.classList.add('hacked');
     currentGlitchState.state = logoStates.COMPLETE;
@@ -218,13 +223,18 @@ function renderOutput(item, isBooting) {
       return <pre className="terminal-output">{item.text}</pre>;
     }
     
-    if (typeof marked !== 'undefined' && item.text && (
-      item.text.includes('#') || 
-      item.text.includes('*') || 
-      item.text.includes('- ') ||
-      item.text.includes('```') ||
-      item.text.includes('> ')
-    )) {
+    // Only apply markdown to specific content types that SHOULD use markdown
+    // Avoid applying it to content that might have '>' or other markdown characters
+    // but isn't intended to be formatted as markdown
+    if (typeof marked !== 'undefined' && item.text && 
+        !item.text.includes("ENTITY:") && // Skip catalogue entries
+        (
+          item.text.includes('#') || 
+          item.text.includes('*') || 
+          item.text.includes('- ') ||
+          item.text.includes('```') ||
+          item.text.includes('> ')
+        )) {
       return (
         <div 
           className="terminal-output markdown-content"
