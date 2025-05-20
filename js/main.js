@@ -1,3 +1,4 @@
+// main.js
 const { useState, useEffect, useRef } = React;
 
 const SurvivorOSTerminal = () => {
@@ -106,6 +107,22 @@ const SurvivorOSTerminal = () => {
       terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
     }
   }, [terminalHistory]);
+
+  const handleTerminalInput = (e) => {
+    setTerminalInput(e.target.value);
+  };
+
+  const handleTerminalKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      if (characterCreation.active) {
+        processCharacterCreationAnswer(terminalInput);
+        setTerminalInput('');
+        return;
+      }
+      
+      processCommand(terminalInput);
+    }
+  };
 
   const showQuickstartContent = () => {
     addToTerminalHistory({ type: 'input', text: `> quickstart` });
@@ -301,8 +318,8 @@ const SurvivorOSTerminal = () => {
     
     // Set background if present
     if (selectedOption.background) {
-      updatedBackground = {s
-        ,title: selectedOption.background,
+      updatedBackground = {
+        title: selectedOption.background,
         description: selectedOption.backgroundDesc
       };
     }
@@ -467,27 +484,27 @@ const SurvivorOSTerminal = () => {
     
     if (command === 'help') {
       response = `
-  SURVIVOROS TERMINAL COMMANDS:
-  ----------------------------
-  
-  help:       Display this help message
-  clear:      Clear terminal
-  about:      About SurvivorOS
-  quickstart: Display Rogue 2000 game information
-  whoami:     Run survivor identity questionnaire
-  ascii:      Display SurvivorOS ASCII art logo
-  catalogue:  Access entity database
-  logs:       List available survivor logs
-  log [#]:    Display specific log entry
-  outofblood: Simulate critical blood loss
-  
-  For survivors in the zones: Type what you learn out there.
-  Stay safe. Share knowledge. Survive.`;
+SURVIVOROS TERMINAL COMMANDS:
+----------------------------
+
+help:       Display this help message
+clear:      Clear terminal
+about:      About SurvivorOS
+quickstart: Display Rogue 2000 game information
+whoami:     Run survivor identity questionnaire
+ascii:      Display SurvivorOS ASCII art logo
+catalogue:  Access entity database
+logs:       List available survivor logs
+log [#]:    Display specific log entry
+outofblood: Simulate critical blood loss
+
+For survivors in the zones: Type what you learn out there.
+Stay safe. Share knowledge. Survive.`;
     } 
     else if (command === 'about') {
       response = `SurvivorOS v0.5b [BUILD: SRV-2957f5a]
-  A community-developed operating system for Rogueboy 2000 devices
-  `;
+A community-developed operating system for Rogueboy 2000 devices
+`;
     }
     else if (command === 'clear') {
       clearTerminal();
@@ -548,7 +565,7 @@ const SurvivorOSTerminal = () => {
     }
     else {
       response = `Command not recognized: '${command}'
-  Type 'help' for available commands.`;
+Type 'help' for available commands.`;
     }
     
     if (response) {
