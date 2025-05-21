@@ -1,4 +1,4 @@
-// Character creation questionnaire data with cascading attribute priority
+
 const characterCreationData = {
   questions: [
     {
@@ -317,7 +317,7 @@ const characterCreationData = {
   }
 };
 
-// Function to distribute attribute points with fallback
+
 function distributeAttributePoints(attributes, primaryAttribute, fallbackOrder, points = 1) {
   let remaining = points;
   let currentAttr = primaryAttribute;
@@ -329,12 +329,12 @@ function distributeAttributePoints(attributes, primaryAttribute, fallbackOrder, 
       attributes[currentAttr] += 1;
       remaining--;
     } else {
-      // Primary attribute is maxed, move to fallback
+  
       if (fallbackIndex < fallbackOrder.length) {
         currentAttr = fallbackOrder[fallbackIndex];
         fallbackIndex++;
       } else {
-        // We've exhausted all options (shouldn't happen in normal play)
+        // (shouldn't happen)
         console.warn("Warning: Unable to allocate all attribute points. All attributes may be at maximum.");
         break;
       }
@@ -344,7 +344,7 @@ function distributeAttributePoints(attributes, primaryAttribute, fallbackOrder, 
   return attributes;
 }
 
-// Function to handle multiple attributes with fallbacks (for background choice)
+
 function distributeMultipleAttributes(attributes, primaryAttributesConfig) {
   for (const config of primaryAttributesConfig) {
     attributes = distributeAttributePoints(

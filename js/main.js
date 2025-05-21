@@ -364,6 +364,33 @@ const SurvivorOSTerminal = () => {
       return;
     }
     
+    if (command === 'wyrm') {
+      addToTerminalHistory({ 
+        type: 'output', 
+        text: 'LAUNCHING WYRM v1.0\n\nUse arrow keys to control the wyrm.\nCollect food to grow.\nAvoid walls and yourself.\nPress ESC to quit.\n\nLoading game...'
+      });
+      
+      const gameOutputItem = { 
+        type: 'output', 
+        text: '', 
+        isWyrmGame: true 
+      };
+      
+      addToTerminalHistory(gameOutputItem);
+      
+      setTimeout(() => {
+        const outputElements = terminalRef.current.querySelectorAll('.terminal-output');
+        const gameElement = Array.from(outputElements).find(el => el.textContent === '');
+        
+        if (gameElement && window.startWyrmGame) {
+          window.startWyrmGame(gameElement);
+          gameElement.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 500);
+      
+      return;
+    }
+    
     if (command === 'outofblood') {
       addToTerminalHistory({ 
         type: 'output', 

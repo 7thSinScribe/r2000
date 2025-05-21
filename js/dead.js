@@ -149,7 +149,7 @@ function handleOutOfBlood() {
   deathScreen.style.alignItems = 'center';
   document.body.appendChild(deathScreen);
 
-  // Create matrix rain container
+ 
   const matrixContainer = document.createElement('div');
   matrixContainer.className = 'matrix-container';
   matrixContainer.style.position = 'absolute';
@@ -158,14 +158,14 @@ function handleOutOfBlood() {
   matrixContainer.style.width = '100%';
   matrixContainer.style.height = '100%';
   matrixContainer.style.overflow = 'hidden';
-  matrixContainer.style.opacity = '0.2'; // Start subtle
-  matrixContainer.style.zIndex = '0'; // Behind other elements
+  matrixContainer.style.opacity = '0.2'; 
+  matrixContainer.style.zIndex = '0'; 
   deathScreen.appendChild(matrixContainer);
   
 
   createMatrixRain(matrixContainer);
   
-  // Create animated death message
+ 
   const deathMessage = document.createElement('div');
   deathMessage.textContent = 'YOU DIED.';
   deathMessage.style.color = '#e0f8cf'; // Lightest green from the palette
@@ -177,34 +177,34 @@ function handleOutOfBlood() {
   deathMessage.style.transition = 'opacity 3s ease-in';
   deathMessage.style.zIndex = '2';
   
-  // Select a random quote
+
   const randomQuote = existentialistQuotes[Math.floor(Math.random() * existentialistQuotes.length)];
   
-  // Create quote container (initially hidden)
+  
   const quoteContainer = document.createElement('div');
   quoteContainer.style.maxWidth = '600px';
   quoteContainer.style.textAlign = 'center';
-  quoteContainer.style.color = '#86c06c'; // Medium green from palette
+  quoteContainer.style.color = '#86c06c'; 
   quoteContainer.style.fontFamily = 'RuneScape, monospace';
   quoteContainer.style.fontSize = '18px';
-  quoteContainer.style.opacity = '0'; // Start hidden
+  quoteContainer.style.opacity = '0'; 
   quoteContainer.style.transform = 'translateY(20px)';
   quoteContainer.style.transition = 'opacity 2s, transform 2s';
   quoteContainer.style.padding = '0 20px';
   quoteContainer.textContent = randomQuote;
   quoteContainer.style.zIndex = '2';
   
-  // Create glitchy effects container
+
   const glitchEffects = document.createElement('div');
   glitchEffects.className = 'death-glitch-effects';
   glitchEffects.style.zIndex = '1';
   
-  // Add elements to DOM in correct order
+
   deathScreen.appendChild(glitchEffects);
   deathScreen.appendChild(deathMessage);
   deathScreen.appendChild(quoteContainer);
   
-  // Add keyframe animations
+
   const styleSheet = document.createElement('style');
   styleSheet.textContent = `
     @keyframes pulseGlow {
@@ -220,63 +220,63 @@ function handleOutOfBlood() {
   `;
   document.head.appendChild(styleSheet);
   
-  // Add glitch artifacts (subtle at first)
+
   createGlitchArtifacts(glitchEffects, true);
   
-  // Sequence the animations
+
   
-  // 1. Let the screen sit dark for a moment
+
   setTimeout(() => {
-    // 2. Fade in the matrix effect
+
     matrixContainer.style.transition = 'opacity 2s';
     matrixContainer.style.opacity = '0.6';
     
-    // 3. Then add more intense glitches
+
     createGlitchArtifacts(glitchEffects, false);
     
-    // 4. Then fade in the YOU DIED message
+
     setTimeout(() => {
       deathMessage.style.opacity = '1';
       deathMessage.style.animation = 'pulseGlow 2s infinite';
       
-      // 5. Then fade in the quote
+
       setTimeout(() => {
         quoteContainer.style.opacity = '1';
         quoteContainer.style.transform = 'translateY(0)';
         
-        // Continue to add glitches during the display
+
         createGlitchArtifacts(glitchEffects, false);
       }, 3000);
     }, 2000);
   }, 1500);
   
-  // Refresh page after a longer delay (12 seconds total)
+
   setTimeout(() => {
     window.location.reload();
   }, 12000);
 }
 
 function createMatrixRain(container) {
-  // Set up the matrix character columns
+
   const width = window.innerWidth;
   const fontSize = 20;
   const columns = Math.floor(width / fontSize);
   
-  // Matrix characters - using ASCII characters between code 33 and 126
+  
   const getRandomChar = () => {
     return String.fromCharCode(33 + Math.floor(Math.random() * 94));
   };
   
-  // Create color array from palette
+
   const colors = ['#e0f8cf', '#86c06c', '#306850'];
   
-  // Create drops starting position for each column
+
   const drops = [];
   for (let i = 0; i < columns; i++) {
     drops[i] = Math.random() * -20;
   }
   
-  // Create canvas for matrix
+
   const canvas = document.createElement('canvas');
   canvas.width = width;
   canvas.height = window.innerHeight;
@@ -288,40 +288,39 @@ function createMatrixRain(container) {
   const ctx = canvas.getContext('2d');
   ctx.font = fontSize + 'px monospace';
   
-  // Draw the matrix animation
+
   const drawMatrix = () => {
-    // Add semi-transparent black to create fade effect
+
     ctx.fillStyle = 'rgba(7, 24, 33, 0.05)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
     for (let i = 0; i < drops.length; i++) {
-      // Randomly choose a character and color
+
       const text = getRandomChar();
       
-      // Determine color - small chance for the brightest color to create "highlights"
+
       const colorIndex = Math.random() < 0.1 ? 0 : (Math.random() < 0.5 ? 1 : 2);
       ctx.fillStyle = colors[colorIndex];
       
-      // Draw the character
+
       ctx.fillText(text, i * fontSize, drops[i] * fontSize);
       
-      // Move drop down
+
       drops[i]++;
       
-      // Send drop back to top randomly after it crosses the screen
-      // Also randomize the reset position to create varied flow
+
       if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
         drops[i] = Math.random() * -20;
       }
     }
   };
   
-  // Start animation loop
-  const matrixInterval = setInterval(drawMatrix, 33); // Approx 30 fps
+
+  const matrixInterval = setInterval(drawMatrix, 33); 
   
-  // Clean up function to stop animation when needed
+
   return () => clearInterval(matrixInterval);
 }
 
-// Export the handler function
+
 window.handleOutOfBlood = handleOutOfBlood;

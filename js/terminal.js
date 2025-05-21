@@ -12,7 +12,7 @@ const survivorAsciiLogo = [
 if (typeof marked !== 'undefined') {
   marked.setOptions({
     gfm: true,
-    breaks: true,  // This enables GitHub-style line breaks
+    breaks: true,  
     pedantic: false,
     headerIds: true,
     mangle: false,
@@ -181,8 +181,13 @@ function startLogoGlitchSequence() {
   currentGlitchState.glitchTimer = rapidGlitchInterval;
 }
 
+function prepareMarkdownContent(text) {
+  if (!text) return text;
+  
+  return text.replace(/([^\n])\n([^\n])/g, '$1  \n$2');
+}
+
 function renderOutput(item, isBooting) {
-  // Check for special catalogue content
   if (item.text && item.text.includes('SURVIVOROS ENTITY CATALOGUE')) {
     return <pre className="terminal-output">{item.text}</pre>;
   }
@@ -203,10 +208,11 @@ function renderOutput(item, isBooting) {
     );
   } else if (item.contentType === 'quickstart' || item.contentType === 'log') {
     if (typeof marked !== 'undefined' && item.text) {
+      const processedText = prepareMarkdownContent(item.text);
       return (
         <div 
           className={`terminal-${item.contentType} markdown-content`}
-          dangerouslySetInnerHTML={{ __html: marked.parse(item.text) }}
+          dangerouslySetInnerHTML={{ __html: marked.parse(processedText) }}
         />
       );
     } else {
@@ -218,16 +224,15 @@ function renderOutput(item, isBooting) {
         {item.text}
       </pre>
     );
+  } else if (item.isWyrmGame) {
+    return <pre className="terminal-output"></pre>;
   } else {
     if (item.text && item.text.includes("QUESTION")) {
       return <pre className="terminal-output">{item.text}</pre>;
     }
     
-    // Only apply markdown to specific content types that SHOULD use markdown
-    // Avoid applying it to content that might have '>' or other markdown characters
-    // but isn't intended to be formatted as markdown
     if (typeof marked !== 'undefined' && item.text && 
-        !item.text.includes("ENTITY:") && // Skip catalogue entries
+        !item.text.includes("ENTITY:") && 
         (
           item.text.includes('#') || 
           item.text.includes('*') || 
@@ -235,10 +240,11 @@ function renderOutput(item, isBooting) {
           item.text.includes('```') ||
           item.text.includes('> ')
         )) {
+      const processedText = prepareMarkdownContent(item.text);
       return (
         <div 
           className="terminal-output markdown-content"
-          dangerouslySetInnerHTML={{ __html: marked.parse(item.text) }}
+          dangerouslySetInnerHTML={{ __html: marked.parse(processedText) }}
         />
       );
     }
