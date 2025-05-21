@@ -10,6 +10,7 @@ const INITIAL_GAME_SPEED = 150; // Milliseconds between game updates
 const MAX_ENEMIES = 4;  // Maximum number of enemy wyrms
 const MUTATION_CHANCE = 0.2; // Chance of mutation spawning when eating food
 const FOOD_MOVE_CHANCE = 0.3; // Chance that food will move each turn
+const SIZE_REQUIREMENTS = [10, 20, 30]; // Minimum wyrm length to advance levels
 
 // Visual settings
 const COLORS = {
@@ -28,10 +29,13 @@ const COLORS = {
     regular: '#e0f8cf',
     speed: '#ffb347',   // Orange - increases speed
     slow: '#9370db',    // Purple - decreases speed
-    steal: '#ff6b6b',   // Red - steals segments
+    hunter: '#ff6b6b',  // Red - enables hunter mode
     bonus: '#4dabff'    // Blue - bonus points
   },
-  wall: '#285840',
+  wall: {
+    deadly: '#285840',  // Dark green - deadly walls
+    safe: '#429867'     // Light green - passable walls
+  },
   mutation: '#f0f055', // Yellow for mutations
   text: '#e0f8cf',
   gameOver: '#e0f8cf'
@@ -39,11 +43,11 @@ const COLORS = {
 
 // Food types and their effects
 const FOOD_TYPES = {
-  REGULAR: { name: 'regular', points: 10, color: COLORS.food.regular, moveChance: 0, stealChance: 0, speedEffect: 0 },
-  SPEED: { name: 'speed', points: 15, color: COLORS.food.speed, moveChance: 0.1, stealChance: 0, speedEffect: -20 }, // Faster
-  SLOW: { name: 'slow', points: 5, color: COLORS.food.slow, moveChance: 0.05, stealChance: 0, speedEffect: 20 },    // Slower
-  STEAL: { name: 'steal', points: 20, color: COLORS.food.steal, moveChance: 0.4, stealChance: 0.6, speedEffect: 0 },
-  BONUS: { name: 'bonus', points: 30, color: COLORS.food.bonus, moveChance: 0.2, stealChance: 0, speedEffect: 0 }
+  REGULAR: { name: 'regular', points: 10, color: COLORS.food.regular, moveChance: 0, speedEffect: 0 },
+  SPEED: { name: 'speed', points: 15, color: COLORS.food.speed, moveChance: 0.1, speedEffect: -20 }, // Faster
+  SLOW: { name: 'slow', points: 5, color: COLORS.food.slow, moveChance: 0.05, speedEffect: 20 },     // Slower
+  HUNTER: { name: 'hunter', points: 20, color: COLORS.food.hunter, moveChance: 0.2, speedEffect: 0 }, // Hunter mode
+  BONUS: { name: 'bonus', points: 30, color: COLORS.food.bonus, moveChance: 0.2, speedEffect: 0 }
 };
 
 // Mutation types
@@ -52,7 +56,7 @@ const MUTATIONS = {
   GHOST: { name: 'GHOST MODE', effect: () => {}, duration: 50 }, // Implemented in collision logic
   MAGNETIC: { name: 'FOOD MAGNET', effect: () => {}, duration: 40 }, // Implemented in update logic
   ARMORED: { name: 'ARMORED', effect: () => {}, duration: 70 }, // Prevents segment loss
-  HUNTER: { name: 'HUNTER', effect: () => {}, duration: 60 }  // Enemies flee from player
+  HUNTER: { name: 'HUNTER', effect: () => {}, duration: 60 }  // Enables attacking other wyrms
 };
 
 // Game state variables
@@ -73,6 +77,7 @@ let gameState = {
   enemies: [],
   food: [],
   walls: [],
+  deadSegments: [], // Stores segments from sliced wyrms
   score: 0,
   gameOver: false,
   victory: false,
@@ -110,6 +115,7 @@ function initWyrmGame() {
     enemies: [],
     food: [],
     walls: [],
+    deadSegments: [],
     score: 0,
     gameOver: false,
     victory: false,
@@ -191,73 +197,97 @@ function generateWalls() {
   // Level design based on current level
   const level = gameState.level;
   
-  if (level === 1) {
-    // Simple walls at the borders with some gaps
-    for (let x = 0; x < GAME_WIDTH; x++) {
-      for (let y = 0; y < GAME_HEIGHT; y++) {
-        // Top and bottom borders with gaps
-        if ((y === 0 || y === GAME_HEIGHT-1) && 
-            !(x > 10 && x < 15) && !(x > 25 && x < 30)) {
-          gameState.walls.push({x, y});
-        }
-        // Left and right borders with gaps
-        if ((x === 0 || x === GAME_WIDTH-1) && 
-            !(y > 10 && y < 15) && !(y > 20 && y < 25)) {
-          gameState.walls.push({x, y});
-        }
+  // All levels have outer boundary walls - these are safe to pass through
+  for (let x = 0; x < GAME_WIDTH; x++) {
+    for (let y = 0; y < GAME_HEIGHT; y++) {
+      // Top and bottom borders
+      if (y === 0 || y === GAME_HEIGHT-1) {
+        gameState.walls.push({x, y, safe: true});
       }
+      // Left and right borders
+      if (x === 0 || x === GAME_WIDTH-1) {
+        gameState.walls.push({x, y, safe: true});
+      }
+    }
+  }
+  
+  if (level === 1) {
+    // Simple interior walls - these are deadly
+    for (let x = 10; x < 30; x++) {
+      if (x < 15 || x > 25) {
+        gameState.walls.push({x, y: 15, safe: false});
+      }
+    }
+    
+    // Add some vertical obstacles
+    for (let y = 5; y < 10; y++) {
+      gameState.walls.push({x: 10, y, safe: false});
+      gameState.walls.push({x: 30, y, safe: false});
+    }
+    
+    for (let y = 20; y < 25; y++) {
+      gameState.walls.push({x: 10, y, safe: false});
+      gameState.walls.push({x: 30, y, safe: false});
     }
   } else if (level === 2) {
-    // More complex pattern with some internal walls
-    for (let x = 0; x < GAME_WIDTH; x++) {
-      for (let y = 0; y < GAME_HEIGHT; y++) {
-        // Borders
-        if (x === 0 || x === GAME_WIDTH-1 || y === 0 || y === GAME_HEIGHT-1) {
-          if (!(x === 0 && y === 15) && 
-              !(x === GAME_WIDTH-1 && y === 15) && 
-              !(y === 0 && x === 20) && 
-              !(y === GAME_HEIGHT-1 && x === 20)) {
-            gameState.walls.push({x, y});
-          }
-        }
-        
-        // Cross in the middle
-        if ((x === 20 || y === 15) && 
-            x >= 10 && x <= 30 && y >= 5 && y <= 25) {
-          if (!(x === 20 && y === 15)) { // Leave center open
-            gameState.walls.push({x, y});
-          }
-        }
+    // More complex pattern with deadly internal walls
+    
+    // Cross in the middle
+    for (let x = 10; x < 30; x++) {
+      if (x !== 20) {
+        gameState.walls.push({x, y: 15, safe: false});
       }
     }
+    
+    for (let y = 5; y < 25; y++) {
+      if (y !== 15) {
+        gameState.walls.push({x: 20, y, safe: false});
+      }
+    }
+    
+    // Corner obstacles
+    for (let i = 0; i < 5; i++) {
+      gameState.walls.push({x: 5 + i, y: 5 + i, safe: false});
+      gameState.walls.push({x: 35 - i, y: 5 + i, safe: false});
+      gameState.walls.push({x: 5 + i, y: 25 - i, safe: false});
+      gameState.walls.push({x: 35 - i, y: 25 - i, safe: false});
+    }
   } else {
-    // Random maze-like walls for level 3+
-    // Start with borders
-    for (let x = 0; x < GAME_WIDTH; x++) {
-      for (let y = 0; y < GAME_HEIGHT; y++) {
-        if (x === 0 || x === GAME_WIDTH-1 || y === 0 || y === GAME_HEIGHT-1) {
-          // Add some random gaps in the borders
-          if (Math.random() > 0.2) {
-            gameState.walls.push({x, y});
-          }
+    // Random maze-like walls for level 3
+    
+    // Add diagonal walls
+    for (let i = 5; i < 15; i++) {
+      gameState.walls.push({x: i, y: i, safe: false});
+      gameState.walls.push({x: GAME_WIDTH - i - 1, y: i, safe: false});
+    }
+    
+    // Add some enclosures with small openings
+    for (let x = 5; x < 15; x++) {
+      for (let y = 20; y < 25; y++) {
+        if (!(x === 10 && y === 20)) {
+          gameState.walls.push({x, y, safe: false});
         }
       }
     }
     
-    // Add some random internal walls
-    let internalWalls = 3 + level;
-    for (let i = 0; i < internalWalls; i++) {
-      let wallLength = 5 + Math.floor(Math.random() * 10);
-      let startX = 5 + Math.floor(Math.random() * (GAME_WIDTH - 10));
-      let startY = 5 + Math.floor(Math.random() * (GAME_HEIGHT - 10));
-      let horizontal = Math.random() > 0.5;
-      
-      for (let j = 0; j < wallLength; j++) {
-        let x = horizontal ? startX + j : startX;
-        let y = horizontal ? startY : startY + j;
-        
-        if (x < GAME_WIDTH-1 && y < GAME_HEIGHT-1) {
-          gameState.walls.push({x, y});
+    for (let x = 25; x < 35; x++) {
+      for (let y = 5; y < 10; y++) {
+        if (!(x === 30 && y === 9)) {
+          gameState.walls.push({x, y, safe: false});
+        }
+      }
+    }
+    
+    // Add a central circular obstacle
+    const centerX = Math.floor(GAME_WIDTH / 2);
+    const centerY = Math.floor(GAME_HEIGHT / 2);
+    const radius = 5;
+    
+    for (let x = centerX - radius; x <= centerX + radius; x++) {
+      for (let y = centerY - radius; y <= centerY + radius; y++) {
+        const distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
+        if (distance <= radius && distance > radius - 1) {
+          gameState.walls.push({x, y, safe: false});
         }
       }
     }
@@ -281,6 +311,7 @@ function spawnEnemies() {
       let awayFromPlayer = Math.abs(startX - gameState.player.segments[0].x) > 10 || 
                          Math.abs(startY - gameState.player.segments[0].y) > 10;
       
+      // Check not on any wall
       let notOnWall = !gameState.walls.some(wall => wall.x === startX && wall.y === startY);
       
       // Check not on top of other enemies
@@ -288,7 +319,12 @@ function spawnEnemies() {
         enemy.segments.some(segment => segment.x === startX && segment.y === startY)
       );
       
-      validPosition = awayFromPlayer && notOnWall && notOnEnemy;
+      // Check not on dead segments
+      let notOnDeadSegment = !gameState.deadSegments.some(segment => 
+        segment.x === startX && segment.y === startY
+      );
+      
+      validPosition = awayFromPlayer && notOnWall && notOnEnemy && notOnDeadSegment;
     }
     
     // Create enemy with 3-5 segments
@@ -311,17 +347,29 @@ function spawnEnemies() {
         case 'right': newSegment.x--; break;
       }
       
+      // Check if the new segment is valid
+      if (newSegment.x < 0 || newSegment.x >= GAME_WIDTH || 
+          newSegment.y < 0 || newSegment.y >= GAME_HEIGHT) {
+        // If out of bounds, stop adding segments
+        break;
+      }
+      
       segments.push(newSegment);
     }
     
-    // Add enemy to game state
-    gameState.enemies.push({
-      segments: segments,
-      direction: direction,
-      color: COLORS.enemies[i % COLORS.enemies.length],
-      speed: INITIAL_GAME_SPEED + Math.floor(Math.random() * 50) - 25, // Vary speed
-      moveCounter: 0
-    });
+    // Add enemy to game state with at least 3 segments
+    if (segments.length >= 3) {
+      gameState.enemies.push({
+        segments: segments,
+        direction: direction,
+        color: COLORS.enemies[i % COLORS.enemies.length],
+        speed: INITIAL_GAME_SPEED + Math.floor(Math.random() * 50) - 25, // Vary speed
+        moveCounter: 0
+      });
+    } else {
+      // Try again if we couldn't create a valid enemy
+      i--;
+    }
   }
 }
 
@@ -345,14 +393,14 @@ function spawnFood(count = 1) {
       } else if (rand < 0.85) {
         foodType = FOOD_TYPES.SLOW;
       } else if (rand < 0.95) {
-        foodType = FOOD_TYPES.STEAL;
-      } else {
         foodType = FOOD_TYPES.BONUS;
+      } else {
+        foodType = FOOD_TYPES.HUNTER; // Hunter food is rare
       }
       
       food = {
         x, y, type: foodType, 
-        moveChance: foodType.moveChance, 
+        moveChance: foodType.moveChance,
         lastMoveTime: 0
       };
       
@@ -381,6 +429,12 @@ function spawnFood(count = 1) {
       
       // Check not on other food
       if (gameState.food.some(f => f.x === x && f.y === y)) {
+        validPosition = false;
+        continue;
+      }
+      
+      // Check not on dead segments
+      if (gameState.deadSegments.some(segment => segment.x === x && segment.y === y)) {
         validPosition = false;
         continue;
       }
@@ -460,7 +514,7 @@ function updateFoodPositions() {
 
 // Update enemy movement
 function updateEnemies() {
-  gameState.enemies.forEach(enemy => {
+  gameState.enemies.forEach((enemy, enemyIndex) => {
     enemy.moveCounter++;
     
     // Only move enemy when it's time (based on its speed)
@@ -506,8 +560,17 @@ function updateEnemies() {
           }
         });
         
-        // 70% chance to go for food, 30% to chase player
-        if (closestFood && Math.random() < 0.7) {
+        // Dead segments are also attractive as food
+        gameState.deadSegments.forEach(segment => {
+          const dist = Math.abs(segment.x - head.x) + Math.abs(segment.y - head.y);
+          if (dist < minFoodDist) {
+            minFoodDist = dist;
+            closestFood = segment;
+          }
+        });
+        
+        // 70% chance to go for food, 30% to chase player if not much food
+        if (closestFood && (Math.random() < 0.7 || minFoodDist < 5)) {
           const distX = closestFood.x - head.x;
           const distY = closestFood.y - head.y;
           
@@ -536,7 +599,7 @@ function updateEnemies() {
         }
       }
       
-      // Check if target direction is valid
+      // Check if target direction would lead to a deadly wall
       const newHead = { x: head.x, y: head.y };
       switch(targetDirection) {
         case 'up': newHead.y--; break;
@@ -545,37 +608,76 @@ function updateEnemies() {
         case 'right': newHead.x++; break;
       }
       
-      // Check for collisions with walls or self
-      let willCollide = false;
-      
-      // Wall collision (they can pass through walls at edges)
-      if (gameState.walls.some(wall => wall.x === newHead.x && wall.y === newHead.y)) {
-        // Check if it's a border wall - if so, wrap around
-        if (newHead.x < 0) newHead.x = GAME_WIDTH - 1;
-        else if (newHead.x >= GAME_WIDTH) newHead.x = 0;
-        else if (newHead.y < 0) newHead.y = GAME_HEIGHT - 1;
-        else if (newHead.y >= GAME_HEIGHT) newHead.y = 0;
-        else willCollide = true; // Internal wall collision
+      // Check for wall - wrapping at edges only if it's a safe wall
+      const hitWall = gameState.walls.find(wall => wall.x === newHead.x && wall.y === newHead.y);
+      if (hitWall) {
+        if (hitWall.safe) {
+          // Edge wall - wrap around
+          if (newHead.x < 0) newHead.x = GAME_WIDTH - 1;
+          else if (newHead.x >= GAME_WIDTH) newHead.x = 0;
+          else if (newHead.y < 0) newHead.y = GAME_HEIGHT - 1;
+          else if (newHead.y >= GAME_HEIGHT) newHead.y = 0;
+        } else {
+          // Interior deadly wall - avoid!
+          // Try each alternative direction
+          let avoidedWall = false;
+          for (const dir of validDirections.filter(d => d !== targetDirection)) {
+            const testHead = { x: head.x, y: head.y };
+            switch(dir) {
+              case 'up': testHead.y--; break;
+              case 'down': testHead.y++; break;
+              case 'left': testHead.x--; break;
+              case 'right': testHead.x++; break;
+            }
+            
+            // Check if this direction is safe
+            const wallHit = gameState.walls.find(wall => wall.x === testHead.x && wall.y === testHead.y);
+            if (!wallHit || wallHit.safe) {
+              targetDirection = dir;
+              if (wallHit && wallHit.safe) {
+                // Edge wall - wrap
+                if (testHead.x < 0) testHead.x = GAME_WIDTH - 1;
+                else if (testHead.x >= GAME_WIDTH) testHead.x = 0;
+                else if (testHead.y < 0) testHead.y = GAME_HEIGHT - 1;
+                else if (testHead.y >= GAME_HEIGHT) testHead.y = 0;
+              }
+              newHead.x = testHead.x;
+              newHead.y = testHead.y;
+              avoidedWall = true;
+              break;
+            }
+          }
+          
+          if (!avoidedWall) {
+            // No safe direction to move - destroy this enemy
+            gameState.enemies.splice(enemyIndex, 1);
+            
+            // Add to dead segments
+            enemy.segments.forEach(segment => {
+              gameState.deadSegments.push({
+                x: segment.x,
+                y: segment.y,
+                color: enemy.color.body,
+                points: 5,
+                timeLeft: 300 // Will disappear after this many frames
+              });
+            });
+            
+            // Visual effect
+            createGlitchEffect(true);
+            return;
+          }
+        }
       }
       
-      // Self collision
+      // Check for self collision
       if (enemy.segments.slice(1).some(segment => 
         segment.x === newHead.x && segment.y === newHead.y
       )) {
-        willCollide = true;
-      }
-      
-      // If collision detected, try random valid direction
-      if (willCollide) {
-        // Shuffle valid directions
-        for (let i = validDirections.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [validDirections[i], validDirections[j]] = [validDirections[j], validDirections[i]];
-        }
-        
-        // Try each direction until finding a valid one
-        let foundValidDirection = false;
-        for (const dir of validDirections) {
+        // For enemy, we'll try to find another direction
+        // Try each alternative direction
+        let avoidedCollision = false;
+        for (const dir of validDirections.filter(d => d !== targetDirection)) {
           const testHead = { x: head.x, y: head.y };
           switch(dir) {
             case 'up': testHead.y--; break;
@@ -584,42 +686,176 @@ function updateEnemies() {
             case 'right': testHead.x++; break;
           }
           
-          // Wall edge wrapping
-          if (testHead.x < 0) testHead.x = GAME_WIDTH - 1;
-          else if (testHead.x >= GAME_WIDTH) testHead.x = 0;
-          else if (testHead.y < 0) testHead.y = GAME_HEIGHT - 1;
-          else if (testHead.y >= GAME_HEIGHT) testHead.y = 0;
+          // Check for wall at new position
+          const wallHit = gameState.walls.find(wall => wall.x === testHead.x && wall.y === testHead.y);
+          if (wallHit && !wallHit.safe) continue; // Skip deadly walls
           
-          // Check for collisions
-          const wallCollision = gameState.walls.some(wall => 
-            wall.x === testHead.x && wall.y === testHead.y
-          );
+          // Wrap if needed
+          if (wallHit && wallHit.safe) {
+            if (testHead.x < 0) testHead.x = GAME_WIDTH - 1;
+            else if (testHead.x >= GAME_WIDTH) testHead.x = 0;
+            else if (testHead.y < 0) testHead.y = GAME_HEIGHT - 1;
+            else if (testHead.y >= GAME_HEIGHT) testHead.y = 0;
+          }
           
+          // Check if this direction is safe
           const selfCollision = enemy.segments.slice(1).some(segment => 
             segment.x === testHead.x && segment.y === testHead.y
           );
           
-          if (!wallCollision && !selfCollision) {
-            enemy.direction = dir;
-            foundValidDirection = true;
+          if (!selfCollision) {
             targetDirection = dir;
             newHead.x = testHead.x;
             newHead.y = testHead.y;
+            avoidedCollision = true;
             break;
           }
         }
         
-        // If no valid direction, just stay in place
-        if (!foundValidDirection) {
+        if (!avoidedCollision) {
+          // No safe direction to move - destroy this enemy
+          gameState.enemies.splice(enemyIndex, 1);
+          
+          // Add to dead segments
+          enemy.segments.forEach(segment => {
+            gameState.deadSegments.push({
+              x: segment.x,
+              y: segment.y,
+              color: enemy.color.body,
+              points: 5,
+              timeLeft: 300 // Will disappear after this many frames
+            });
+          });
+          
+          // Visual effect
+          createGlitchEffect(true);
           return;
         }
-      } else {
-        enemy.direction = targetDirection;
+      }
+      
+      // Update direction
+      enemy.direction = targetDirection;
+      
+      // Check for head-on collision with other enemies
+      for (let i = 0; i < gameState.enemies.length; i++) {
+        if (i === enemyIndex) continue; // Skip self
+        
+        const otherEnemy = gameState.enemies[i];
+        const otherHead = otherEnemy.segments[0];
+        
+        if (newHead.x === otherHead.x && newHead.y === otherHead.y) {
+          // Head-on collision!
+          // The larger wyrm survives, or both die if similar size
+          if (enemy.segments.length > otherEnemy.segments.length * 1.5) {
+            // This enemy wins
+            const deadEnemy = gameState.enemies.splice(i, 1)[0];
+            
+            // Add dead enemy segments to the board
+            deadEnemy.segments.forEach(segment => {
+              gameState.deadSegments.push({
+                x: segment.x,
+                y: segment.y,
+                color: deadEnemy.color.body,
+                points: 5,
+                timeLeft: 300
+              });
+            });
+            
+            // Grow this enemy
+            enemy.segments.push({...enemy.segments[enemy.segments.length - 1]});
+            
+            // Visual effect
+            createGlitchEffect(true);
+            
+            if (i < enemyIndex) enemyIndex--; // Adjust index if needed
+            
+          } else if (otherEnemy.segments.length > enemy.segments.length * 1.5) {
+            // Other enemy wins
+            gameState.enemies.splice(enemyIndex, 1);
+            
+            // Add segments to the board
+            enemy.segments.forEach(segment => {
+              gameState.deadSegments.push({
+                x: segment.x,
+                y: segment.y,
+                color: enemy.color.body,
+                points: 5,
+                timeLeft: 300
+              });
+            });
+            
+            // Grow the other enemy
+            otherEnemy.segments.push({...otherEnemy.segments[otherEnemy.segments.length - 1]});
+            
+            // Visual effect
+            createGlitchEffect(true);
+            return;
+          } else {
+            // Both die in the collision
+            gameState.enemies.splice(Math.max(i, enemyIndex), 1);
+            gameState.enemies.splice(Math.min(i, enemyIndex), 1);
+            
+            // Add both sets of segments to the board
+            enemy.segments.forEach(segment => {
+              gameState.deadSegments.push({
+                x: segment.x,
+                y: segment.y,
+                color: enemy.color.body,
+                points: 5,
+                timeLeft: 300
+              });
+            });
+            
+            otherEnemy.segments.forEach(segment => {
+              gameState.deadSegments.push({
+                x: segment.x,
+                y: segment.y,
+                color: otherEnemy.color.body,
+                points: 5,
+                timeLeft: 300
+              });
+            });
+            
+            // Visual effect
+            createGlitchEffect(true);
+            return;
+          }
+        }
       }
       
       // Move enemy
       enemy.segments.unshift(newHead);
       enemy.segments.pop();
+      
+      // Check for collision with player body
+      const playerBodyCollision = gameState.player.segments.slice(1).some(segment => 
+        segment.x === newHead.x && segment.y === newHead.y
+      );
+      
+      if (playerBodyCollision && !gameState.player.isGhost) {
+        // Enemy slices through player's body
+        let sliceIndex = gameState.player.segments.findIndex((segment, index) => 
+          index > 0 && segment.x === newHead.x && segment.y === newHead.y
+        );
+        
+        if (sliceIndex !== -1) {
+          // Create dead segments from the cut pieces
+          const slicedSegments = gameState.player.segments.splice(sliceIndex);
+          
+          slicedSegments.forEach(segment => {
+            gameState.deadSegments.push({
+              x: segment.x,
+              y: segment.y,
+              color: COLORS.player.body,
+              points: 5,
+              timeLeft: 300
+            });
+          });
+          
+          // Visual effect for slicing
+          createGlitchEffect(true);
+        }
+      }
       
       // Check for food collision
       const foodIndex = gameState.food.findIndex(food => 
@@ -628,35 +864,137 @@ function updateEnemies() {
       
       if (foodIndex !== -1) {
         // Enemy eats food
-        gameState.food.splice(foodIndex, 1);
+        const food = gameState.food.splice(foodIndex, 1)[0];
         
         // Grow by 1 segment
         const tail = enemy.segments[enemy.segments.length - 1];
         enemy.segments.push({...tail});
         
+        // If it was hunter food, enemy can briefly become a threat
+        if (food.type === FOOD_TYPES.HUNTER) {
+          // Make enemy faster for a short time
+          enemy.speed = Math.max(50, enemy.speed - 30);
+          setTimeout(() => {
+            enemy.speed = INITIAL_GAME_SPEED + Math.floor(Math.random() * 50) - 25;
+          }, 3000);
+        }
+        
         // Spawn new food
         spawnFood(1);
       }
       
-      // Check for collision with player
-      if (!gameState.player.isGhost) {
-        const playerCollision = gameState.player.segments.some(segment => 
-          segment.x === newHead.x && segment.y === newHead.y
-        );
+      // Check for dead segment collision
+      const deadSegmentIndex = gameState.deadSegments.findIndex(segment => 
+        segment.x === newHead.x && segment.y === newHead.y
+      );
+      
+      if (deadSegmentIndex !== -1) {
+        // Enemy eats dead segment
+        gameState.deadSegments.splice(deadSegmentIndex, 1);
         
-        if (playerCollision) {
-          // Player loses a segment or game over
-          if (gameState.player.segments.length > 3 && !gameState.player.isArmored) {
-            // Remove last segment
-            gameState.player.segments.pop();
+        // Grow by 1 segment
+        const tail = enemy.segments[enemy.segments.length - 1];
+        enemy.segments.push({...tail});
+      }
+      
+      // Check for collision with player head
+      if (!gameState.player.isGhost) {
+        const playerHead = gameState.player.segments[0];
+        
+        if (newHead.x === playerHead.x && newHead.y === playerHead.y) {
+          // Head-on collision with player!
+          if (gameState.player.isHunter) {
+            // Player wins if in hunter mode
+            gameState.enemies.splice(enemyIndex, 1);
+            
+            // Add to dead segments
+            enemy.segments.forEach(segment => {
+              gameState.deadSegments.push({
+                x: segment.x,
+                y: segment.y,
+                color: enemy.color.body,
+                points: 5,
+                timeLeft: 300
+              });
+            });
+            
+            // Score points
+            gameState.score += 50;
+            
+            // Grow player
+            const playerTail = gameState.player.segments[gameState.player.segments.length - 1];
+            gameState.player.segments.push({...playerTail});
+            
+            // Visual effect
             createGlitchEffect(true);
-          } else if (!gameState.player.isArmored) {
-            endGame(false);
+            return;
+          } else if (gameState.player.segments.length > enemy.segments.length * 1.5) {
+            // Player wins by size advantage
+            gameState.enemies.splice(enemyIndex, 1);
+            
+            // Add to dead segments
+            enemy.segments.forEach(segment => {
+              gameState.deadSegments.push({
+                x: segment.x,
+                y: segment.y,
+                color: enemy.color.body,
+                points: 5,
+                timeLeft: 300
+              });
+            });
+            
+            // Grow player
+            gameState.player.segmentsToAdd += 2;
+            
+            // Score points
+            gameState.score += 30;
+            
+            // Visual effect
+            createGlitchEffect(true);
+            return;
+          } else if (enemy.segments.length > gameState.player.segments.length * 1.5) {
+            // Enemy wins by size advantage
+            if (!gameState.player.isArmored) {
+              endGame(false);
+              return;
+            }
+          } else {
+            // Both die in the collision
+            if (!gameState.player.isArmored) {
+              endGame(false);
+              return;
+            } else {
+              // Player survives due to armor
+              gameState.enemies.splice(enemyIndex, 1);
+              
+              // Add to dead segments
+              enemy.segments.forEach(segment => {
+                gameState.deadSegments.push({
+                  x: segment.x,
+                  y: segment.y,
+                  color: enemy.color.body,
+                  points: 5,
+                  timeLeft: 300
+                });
+              });
+              
+              // Visual effect
+              createGlitchEffect(true);
+              return;
+            }
           }
         }
       }
     }
   });
+  
+  // Update dead segments timers
+  for (let i = gameState.deadSegments.length - 1; i >= 0; i--) {
+    gameState.deadSegments[i].timeLeft--;
+    if (gameState.deadSegments[i].timeLeft <= 0) {
+      gameState.deadSegments.splice(i, 1);
+    }
+  }
 }
 
 // Draw the game state
@@ -665,9 +1003,31 @@ function drawGame() {
   gameCtx.fillStyle = COLORS.background;
   gameCtx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
   
+  // Draw dead segments
+  gameState.deadSegments.forEach(segment => {
+    gameCtx.fillStyle = segment.color;
+    gameCtx.fillRect(
+      segment.x * CELL_SIZE + 1, 
+      segment.y * CELL_SIZE + 1, 
+      CELL_SIZE - 2, 
+      CELL_SIZE - 2
+    );
+    
+    // Add slight fade effect as they decay
+    if (segment.timeLeft < 100) {
+      gameCtx.fillStyle = `rgba(48, 104, 80, ${0.7 * (1 - segment.timeLeft/100)})`;
+      gameCtx.fillRect(
+        segment.x * CELL_SIZE + 1, 
+        segment.y * CELL_SIZE + 1, 
+        CELL_SIZE - 2, 
+        CELL_SIZE - 2
+      );
+    }
+  });
+  
   // Draw walls
   gameState.walls.forEach(wall => {
-    gameCtx.fillStyle = COLORS.wall;
+    gameCtx.fillStyle = wall.safe ? COLORS.wall.safe : COLORS.wall.deadly;
     gameCtx.fillRect(
       wall.x * CELL_SIZE, 
       wall.y * CELL_SIZE, 
@@ -718,9 +1078,9 @@ function drawGame() {
     } else if (gameState.player.isHunter) {
       // Hunter effect - reddish tint
       if (index === 0) {
-        color = mixColors(COLORS.player.head, COLORS.food.steal, 0.3);
+        color = mixColors(COLORS.player.head, COLORS.food.hunter, 0.3);
       } else {
-        color = mixColors(COLORS.player.body, COLORS.food.steal, 0.3);
+        color = mixColors(COLORS.player.body, COLORS.food.hunter, 0.3);
       }
     } else if (gameState.player.isMagnetic) {
       // Magnetic effect - bluish tint
@@ -883,8 +1243,8 @@ function drawGame() {
         CELL_SIZE - 6, 
         CELL_SIZE - 6
       );
-    } else if (food.type === FOOD_TYPES.STEAL) {
-      // Star (steal food)
+    } else if (food.type === FOOD_TYPES.HUNTER) {
+      // Star (hunter food)
       const centerX = food.x * CELL_SIZE + CELL_SIZE/2;
       const centerY = food.y * CELL_SIZE + CELL_SIZE/2;
       const outerRadius = (CELL_SIZE/2 - 2) * pulseAmount;
@@ -936,11 +1296,18 @@ function drawGame() {
     });
   }
   
-  // Draw level indicator
+  // Draw level indicator and size requirement
   gameCtx.font = '10px monospace';
   gameCtx.fillStyle = COLORS.text;
   gameCtx.textAlign = 'right';
-  gameCtx.fillText(`LEVEL ${gameState.level}`, gameCanvas.width - 10, 20);
+  
+  const sizeRequired = SIZE_REQUIREMENTS[gameState.level - 1];
+  const currentSize = gameState.player.segments.length;
+  gameCtx.fillText(
+    `LEVEL ${gameState.level} - SIZE: ${currentSize}/${sizeRequired}`, 
+    gameCanvas.width - 10, 
+    20
+  );
   
   // Draw game over or victory message if needed
   if (gameState.gameOver) {
@@ -976,7 +1343,7 @@ function drawGame() {
 function updateStatusDisplay() {
   const statusDisplay = document.getElementById('wyrm-status-display');
   if (statusDisplay) {
-    let statusText = `SCORE: ${gameState.score} | LENGTH: ${gameState.player.segments.length}`;
+    let statusText = `SCORE: ${gameState.score} | LENGTH: ${gameState.player.segments.length}/${SIZE_REQUIREMENTS[gameState.level - 1]}`;
     
     // Add active mutations
     if (gameState.player.mutations.length > 0) {
@@ -989,17 +1356,32 @@ function updateStatusDisplay() {
       });
     }
     
-    // Add level info
+    // Add level and enemy info
     statusText += ` | ENEMIES: ${gameState.enemies.length}`;
     
-    statusDisplay.textContent = statusText;
+    statusDisplay.innerHTML = statusText;
     
     // Add a "one Wyrm" indicator when close to victory
-    if (gameState.enemies.length === 1 && gameState.enemies[0].segments.length < gameState.player.segments.length) {
+    if (gameState.enemies.length === 0 && 
+        gameState.player.segments.length < SIZE_REQUIREMENTS[gameState.level - 1]) {
+      const oneWyrmIndicator = document.createElement('div');
+      oneWyrmIndicator.textContent = `NEED ${SIZE_REQUIREMENTS[gameState.level - 1] - gameState.player.segments.length} MORE SEGMENTS TO ADVANCE...`;
+      oneWyrmIndicator.style.color = COLORS.mutation;
+      statusDisplay.appendChild(oneWyrmIndicator);
+    } else if (gameState.enemies.length === 1 && 
+               gameState.player.segments.length > gameState.enemies[0].segments.length) {
       const oneWyrmIndicator = document.createElement('div');
       oneWyrmIndicator.textContent = "BECOMING THE ONE WYRM...";
       oneWyrmIndicator.style.color = COLORS.mutation;
       statusDisplay.appendChild(oneWyrmIndicator);
+    }
+    
+    // Add hunter mode status
+    if (gameState.player.isHunter) {
+      const hunterIndicator = document.createElement('div');
+      hunterIndicator.textContent = "HUNTER MODE ACTIVE!";
+      hunterIndicator.style.color = COLORS.food.hunter;
+      statusDisplay.appendChild(hunterIndicator);
     }
   }
 }
@@ -1032,26 +1414,24 @@ function updateGame() {
       break;
   }
   
-  // Handle wall wrapping (passage through borders)
-  if (head.x < 0) head.x = GAME_WIDTH - 1;
-  else if (head.x >= GAME_WIDTH) head.x = 0;
-  else if (head.y < 0) head.y = GAME_HEIGHT - 1;
-  else if (head.y >= GAME_HEIGHT) head.y = 0;
-  
-  // Check collisions
-  // 1. Wall collision (only internal walls, not borders)
-  const wallCollision = gameState.walls.some(wall => 
-    wall.x === head.x && wall.y === head.y &&
-    !(wall.x === 0 || wall.x === GAME_WIDTH-1 || wall.y === 0 || wall.y === GAME_HEIGHT-1)
-  );
-  
-  if (wallCollision && !gameState.player.isGhost) {
-    // Non-ghost players bounce off internal walls
-    createGlitchEffect(true);
-    return; // Skip the rest of the update
+  // Handle wall collision
+  const hitWall = gameState.walls.find(wall => wall.x === head.x && wall.y === head.y);
+  if (hitWall) {
+    if (hitWall.safe) {
+      // Safe wall (edge) - wrap around
+      if (head.x < 0) head.x = GAME_WIDTH - 1;
+      else if (head.x >= GAME_WIDTH) head.x = 0;
+      else if (head.y < 0) head.y = GAME_HEIGHT - 1;
+      else if (head.y >= GAME_HEIGHT) head.y = 0;
+    } else if (!gameState.player.isGhost) {
+      // Deadly wall hit when not in ghost mode
+      endGame(false);
+      return;
+    }
+    // If ghost mode, pass through the wall
   }
   
-  // 2. Self collision
+  // Check for self collision
   const selfCollision = gameState.player.segments.some(segment => 
     segment.x === head.x && segment.y === head.y
   );
@@ -1064,30 +1444,48 @@ function updateGame() {
   // Add new head
   gameState.player.segments.unshift(head);
   
-  // 3. Enemy collision
+  // Check for enemy body collision
   if (!gameState.player.isGhost) {
     for (let i = 0; i < gameState.enemies.length; i++) {
       const enemy = gameState.enemies[i];
-      const enemyCollision = enemy.segments.some(segment => 
-        segment.x === head.x && segment.y === head.y
+      
+      // Check collision with enemy body (not head)
+      const bodyCollisionIndex = enemy.segments.findIndex((segment, index) => 
+        index > 0 && segment.x === head.x && segment.y === head.y
       );
       
-      if (enemyCollision) {
+      if (bodyCollisionIndex !== -1) {
         if (gameState.player.isHunter) {
-          // In hunter mode, eat the enemy
-          gameState.enemies.splice(i, 1);
-          gameState.score += 50;
+          // In hunter mode, slice the enemy in half
+          const slicedSegments = enemy.segments.splice(bodyCollisionIndex);
+          
+          // Add sliced segments to dead segments
+          slicedSegments.forEach(segment => {
+            gameState.deadSegments.push({
+              x: segment.x,
+              y: segment.y,
+              color: enemy.color.body,
+              points: 5,
+              timeLeft: 300
+            });
+          });
+          
+          // Score points
+          gameState.score += slicedSegments.length * 5;
+          
+          // Visual effect
           createGlitchEffect(true);
           
-          // Add segments equal to half the enemy's length
-          const segmentsToAdd = Math.floor(enemy.segments.length / 2);
-          for (let j = 0; j < segmentsToAdd; j++) {
-            const tail = gameState.player.segments[gameState.player.segments.length - 1];
-            gameState.player.segments.push({...tail});
+          // Check if enemy is gone
+          if (enemy.segments.length < 3) {
+            // Remove the enemy entirely
+            gameState.enemies.splice(i, 1);
+            i--;
           }
           
           // Check for victory
-          if (gameState.enemies.length === 0) {
+          if (gameState.enemies.length === 0 && 
+              gameState.player.segments.length >= SIZE_REQUIREMENTS[gameState.level - 1]) {
             if (gameState.level < 3) {
               // Advance to next level
               advanceLevel();
@@ -1096,32 +1494,104 @@ function updateGame() {
               endGame(true);
             }
           }
-          
-          break;
-        } else if (gameState.player.isArmored) {
-          // Armored players push enemies away
-          createGlitchEffect(true);
-          break;
         } else {
-          // Normal collision - lose segments or game over
-          if (gameState.player.segments.length > 5) {
-            // Remove last 3 segments
-            for (let j = 0; j < 3; j++) {
-              if (gameState.player.segments.length > 3) {
-                gameState.player.segments.pop();
-              }
-            }
-            createGlitchEffect(true);
-          } else {
+          // Not in hunter mode - die
+          endGame(false);
+          return;
+        }
+      }
+      
+      // Check for head-on collision
+      const enemyHead = enemy.segments[0];
+      if (head.x === enemyHead.x && head.y === enemyHead.y) {
+        // Head-on collision!
+        if (gameState.player.isHunter) {
+          // Player wins in hunter mode
+          gameState.enemies.splice(i, 1);
+          
+          // Add to dead segments
+          enemy.segments.forEach(segment => {
+            gameState.deadSegments.push({
+              x: segment.x,
+              y: segment.y,
+              color: enemy.color.body,
+              points: 5,
+              timeLeft: 300
+            });
+          });
+          
+          // Score points
+          gameState.score += 50;
+          
+          // Grow player
+          gameState.player.segmentsToAdd += 3;
+          
+          // Visual effect
+          createGlitchEffect(true);
+          
+          i--;
+        } else if (gameState.player.segments.length > enemy.segments.length * 1.5) {
+          // Player wins by size advantage
+          gameState.enemies.splice(i, 1);
+          
+          // Add to dead segments
+          enemy.segments.forEach(segment => {
+            gameState.deadSegments.push({
+              x: segment.x,
+              y: segment.y,
+              color: enemy.color.body,
+              points: 5,
+              timeLeft: 300
+            });
+          });
+          
+          // Grow player
+          gameState.player.segmentsToAdd += 2;
+          
+          // Score points
+          gameState.score += 30;
+          
+          // Visual effect
+          createGlitchEffect(true);
+          
+          i--;
+        } else if (enemy.segments.length > gameState.player.segments.length * 1.5) {
+          // Enemy wins by size advantage
+          if (!gameState.player.isArmored) {
             endGame(false);
             return;
+          }
+        } else {
+          // Both die in the collision
+          if (!gameState.player.isArmored) {
+            endGame(false);
+            return;
+          } else {
+            // Player survives due to armor
+            gameState.enemies.splice(i, 1);
+            
+            // Add to dead segments
+            enemy.segments.forEach(segment => {
+              gameState.deadSegments.push({
+                x: segment.x,
+                y: segment.y,
+                color: enemy.color.body,
+                points: 5,
+                timeLeft: 300
+              });
+            });
+            
+            // Visual effect
+            createGlitchEffect(true);
+            
+            i--;
           }
         }
       }
     }
   }
   
-  // 4. Food collision
+  // Check for food collision
   const foodIndex = gameState.food.findIndex(food => 
     food.x === head.x && food.y === head.y
   );
@@ -1141,22 +1611,17 @@ function updateGame() {
       gameState.gameSpeed = Math.max(50, Math.min(250, gameState.gameSpeed + food.type.speedEffect));
     }
     
-    // Handle steal food
-    if (food.type === FOOD_TYPES.STEAL && Math.random() < food.type.stealChance) {
-      // Find an enemy to steal from
-      if (gameState.enemies.length > 0) {
-        const targetEnemyIndex = Math.floor(Math.random() * gameState.enemies.length);
-        const targetEnemy = gameState.enemies[targetEnemyIndex];
-        
-        if (targetEnemy.segments.length > 3) {
-          // Steal a segment
-          targetEnemy.segments.pop();
-          gameState.player.segmentsToAdd += 1;
-          
-          // Visual feedback
-          createGlitchEffect(true);
-        }
-      }
+    // Handle hunter food
+    if (food.type === FOOD_TYPES.HUNTER) {
+      // Spawn hunter mutation
+      const mutation = {
+        name: MUTATIONS.HUNTER.name,
+        effect: MUTATIONS.HUNTER.effect,
+        duration: MUTATIONS.HUNTER.duration
+      };
+      
+      // Add to pending mutations
+      gameState.pendingMutations.push(mutation);
     }
     
     // Remove consumed food
@@ -1174,6 +1639,24 @@ function updateGame() {
     createGlitchEffect();
   }
   
+  // Check for dead segment collision
+  const deadSegmentIndex = gameState.deadSegments.findIndex(segment => 
+    segment.x === head.x && segment.y === head.y
+  );
+  
+  if (deadSegmentIndex !== -1) {
+    // Player eats dead segment
+    const segment = gameState.deadSegments[deadSegmentIndex];
+    gameState.score += segment.points;
+    gameState.deadSegments.splice(deadSegmentIndex, 1);
+    
+    // Grow by 1 segment
+    gameState.player.segmentsToAdd += 1;
+    
+    // Visual effect
+    createGlitchEffect(false);
+  }
+  
   // Update enemy wyrms
   updateEnemies();
   
@@ -1188,7 +1671,9 @@ function updateGame() {
   updateMutations();
   
   // Check for victory condition
-  if (gameState.enemies.length === 0 && !gameState.gameOver) {
+  if (gameState.enemies.length === 0 && 
+      gameState.player.segments.length >= SIZE_REQUIREMENTS[gameState.level - 1] && 
+      !gameState.gameOver) {
     if (gameState.level < 3) {
       // Advance to next level
       advanceLevel();
@@ -1331,11 +1816,12 @@ function advanceLevel() {
   gameState.player.isArmored = false;
   gameState.player.isHunter = false;
   
+  // Clear food and dead segments
+  gameState.food = [];
+  gameState.deadSegments = [];
+  
   // Generate new walls for the next level
   generateWalls();
-  
-  // Clear food
-  gameState.food = [];
   
   // Clear enemies
   gameState.enemies = [];
@@ -1371,14 +1857,61 @@ function endGame(victory) {
 
 // Reset the game
 function resetGame() {
+  // Clear game interval
+  clearInterval(gameInterval);
+  
   // Initialize a fresh game state
-  initWyrmGame();
+  gameState = {
+    player: {
+      segments: [
+        {x: 10, y: 10},
+        {x: 9, y: 10},
+        {x: 8, y: 10}
+      ],
+      direction: 'right',
+      nextDirection: 'right',
+      color: COLORS.player,
+      mutations: [],
+      segmentsToAdd: 0,
+      speed: INITIAL_GAME_SPEED,
+      isGhost: false,
+      isMagnetic: false,
+      isArmored: false,
+      isHunter: false
+    },
+    enemies: [],
+    food: [],
+    walls: [],
+    deadSegments: [],
+    score: 0,
+    gameOver: false,
+    victory: false,
+    level: 1,
+    gameSpeed: INITIAL_GAME_SPEED,
+    timeSinceLastFoodMove: 0,
+    pendingMutations: []
+  };
+  
+  // Generate walls
+  generateWalls();
+  
+  // Spawn initial enemies
+  spawnEnemies();
+  
+  // Spawn initial food
+  spawnFood(3);
   
   // Indicate in status that game is reset
   const statusDisplay = document.getElementById('wyrm-status-display');
   if (statusDisplay) {
     statusDisplay.innerHTML = '<div style="color: #e0f8cf">GAME RESET - ENTER THE PIT</div>';
   }
+  
+  // Restart game loop
+  gameInterval = setInterval(() => {
+    updateGame();
+    drawGame();
+  }, gameState.gameSpeed);
 }
 
 // Create a glitch effect
@@ -1491,7 +2024,7 @@ function startWyrmGame(terminal) {
         // Stop the game and remove it
         clearInterval(gameInterval);
         document.removeEventListener('keydown', keydownHandler);
-        if (gameContainer.parentNode) {
+        if (gameContainer && gameContainer.parentNode) {
           gameContainer.parentNode.removeChild(gameContainer);
         }
         break;
@@ -1513,7 +2046,7 @@ function startWyrmGame(terminal) {
     stop: () => {
       clearInterval(gameInterval);
       document.removeEventListener('keydown', keydownHandler);
-      if (gameContainer.parentNode) {
+      if (gameContainer && gameContainer.parentNode) {
         gameContainer.parentNode.removeChild(gameContainer);
       }
     }
