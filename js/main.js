@@ -7,6 +7,14 @@ const SurvivorOSTerminal = () => {
   const [blinkCursor, setBlinkCursor] = useState(true);
   const terminalRef = useRef(null);
   
+  const [inMerchNet, setInMerchNet] = useState(false);
+  const [merchNetItemsList, setMerchNetItemsList] = useState([]);
+  const [selectedMerchNetIndex, setSelectedMerchNetIndex] = useState(0);
+  const [merchNetCart, setMerchNetCart] = useState([]);
+  const [merchNetWatts, setMerchNetWatts] = useState(1000);
+  const [awaitingPayment, setAwaitingPayment] = useState(false);
+  const [paymentAmount, setPaymentAmount] = useState(0);
+  
   const [characterCreation, setCharacterCreation] = useState({
     active: false,
     currentQuestion: 0,
@@ -107,6 +115,29 @@ const SurvivorOSTerminal = () => {
     }
   }, [terminalHistory]);
 
+  useEffect(() => {
+    if (!inMerchNet) return;
+    
+    const handleKeyDown = (e) => {
+      if (e.key === 'ArrowUp' && selectedMerchNetIndex > 0) {
+        setSelectedMerchNetIndex(prev => prev - 1);
+        e.preventDefault();
+      } else if (e.key === 'ArrowDown' && selectedMerchNetIndex < merchNetItemsList.length - 1) {
+        setSelectedMerchNetIndex(prev => prev + 1);
+        e.preventDefault();
+      } else if (e.key === 'Enter' && merchNetItemsList.length > 0) {
+        const selectedItem = merchNetItemsList[selectedMerchNetIndex];
+        const lookupCommand = `lookup "${selectedItem.name}"`;
+        setTerminalInput(lookupCommand);
+        processMerchNetCommand(lookupCommand);
+        e.preventDefault();
+      }
+    };
+    
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [inMerchNet, selectedMerchNetIndex, merchNetItemsList]);
+
   const handleTerminalInput = (e) => {
     setTerminalInput(e.target.value);
   };
@@ -121,7 +152,91 @@ const SurvivorOSTerminal = () => {
         return;
       }
       
+      if (inMerchNet) {
+        processMerchNetCommand(inputValue);
+        return;
+      }
+      
       processCommand(inputValue);
+    }
+  };
+
+  const processMerchNetCommand = (command) => {
+    addToTerminalHistory({ type: 'input', text: `MERCHNET> ${command}` });
+    
+    if (command.toLowerCase() === 'exit') {
+      addToTerminalHistory({ 
+        type: 'output', 
+        text: 'Exiting MerchNet terminal. Thank you for your patronage.'
+      });
+      setInMerchNet(false);
+      setMerchNetItemsList([]);
+      return;
+    }
+    
+    if (awaitingPayment && command.toLowerCase().startsWith('pay ')) {
+      const amount = parseInt(command.substring(4), 10);
+      
+      if (isNaN(amount)) {
+        addToTerminalHistory({ 
+          type: 'output', 
+          text: 'Please enter a valid amount.'
+        });
+        return;
+      }
+      
+      if (amount < paymentAmount) {
+        addToTerminalHistory({ 
+          type: 'output', 
+          text: `Payment of ${amount} W is insufficient. Order total is ${paymentAmount} W.`
+        });
+        return;
+      }
+      
+      if (merchNetWatts < amount) {
+        addToTerminalHistory({ 
+          type: 'output', 
+          text: "You don't have enough watts to make the exchange."
+        });
+        return;
+      }
+      
+      setMerchNetWatts(prev => prev - paymentAmount);
+      setMerchNetCart([]);
+      setAwaitingPayment(false);
+      
+      addToTerminalHistory({ 
+        type: 'output', 
+        text: `Thanks for using MerchNet. Your remaining balance is ${merchNetWatts - paymentAmount} W.\n\nYour items have been prepared for pickup at the nearest Haven trading post.`
+      });
+      return;
+    }
+    
+    if (window.processMerchnetCommand) {
+      const result = window.processMerchnetCommand(command);
+      
+      if (result.type === 'items') {
+        if (result.items && Array.isArray(result.items)) {
+          setMerchNetItemsList(result.items);
+          setSelectedMerchNetIndex(0);
+        }
+      } else if (result.type === 'order') {
+        setAwaitingPayment(true);
+        setPaymentAmount(result.total || 0);
+      } else if (result.type === 'success' && result.orderItems) {
+        setMerchNetCart([]);
+        setAwaitingPayment(false);
+      }
+      
+      addToTerminalHistory({ 
+        type: 'output', 
+        text: result.message || "Command processed."
+      });
+    } else {
+      addToTerminalHistory({ 
+        type: 'output', 
+        text: 'ERROR: MerchNet module not found. Please update SurvivorOS.'
+      });
     }
   };
 
@@ -337,8 +452,7 @@ const SurvivorOSTerminal = () => {
     
     addToTerminalHistory({ type: 'input', text: `> ${command}` });
     
-    // MerchNet commands
-    if (command === 'merchnet' || command.startsWith('merchnet ') || command.startsWith('lookup "')) {
+    if (command === 'merchnet') {
       addToTerminalHistory({ 
         type: 'output', 
         text: 'CONNECTING TO MERCHNET...'
@@ -346,11 +460,12 @@ const SurvivorOSTerminal = () => {
       
       setTimeout(() => {
         if (window.processMerchnetCommand) {
-          const response = window.processMerchnetCommand(command);
+          setInMerchNet(true);
+          const result = window.processMerchnetCommand('help');
           
           addToTerminalHistory({ 
             type: 'output', 
-            text: response
+            text: 'MERCHNET TERMINAL v4.0\n--------------------\n\nWelcome to MerchNet, your source for survivor supplies.\nType "help" for available commands or "exit" to return to SurvivorOS.\n\nYour balance: 1000 Watts\n'
           });
         } else {
           addToTerminalHistory({ 
@@ -537,7 +652,6 @@ logs:       List available survivor logs
 log [#]:    Display specific log entry
 wyrm:       Play Wyrm snake game
 merchnet:   Access survivor marketplace
-lookup "x": Search for specific items
 
 For survivors in the zones: Type what you learn out there.
 Stay safe. Share knowledge. Survive.`;
@@ -617,7 +731,7 @@ Type 'help' for available commands.`;
           <div className="terminal-container h-full flex flex-col">
             <div className="terminal-header p-2 text-sm flex justify-between">
               <span>survivoros v0.5b | build: srv-2957f5a</span>
-              <span>{bootComplete ? "READY" : "BOOTING..."}</span>
+              <span>{bootComplete ? (inMerchNet ? "MERCHNET" : "READY") : "BOOTING..."}</span>
             </div>
             
             <div 
@@ -637,9 +751,40 @@ Type 'help' for available commands.`;
                 </div>
               ))}
               
-              {bootComplete && !characterCreation.active && (
+              {inMerchNet && merchNetItemsList.length > 0 && (
+                <div className="mb-4 mt-2">
+                  {merchNetItemsList.map((item, index) => (
+                    <div 
+                      key={index} 
+                      className={`py-1 px-2 ${selectedMerchNetIndex === index ? 'bg-gray-700 text-white' : ''}`}
+                      style={{backgroundColor: selectedMerchNetIndex === index ? '#306850' : 'transparent'}}
+                    >
+                      {item.name} - {item.cost} W - {item.rarity} - {item.state}
+                    </div>
+                  ))}
+                  <div className="mt-2 text-sm">Use arrow keys to navigate, ENTER to select</div>
+                </div>
+              )}
+              
+              {bootComplete && !characterCreation.active && !inMerchNet && (
                 <div className="flex command-input">
                   <span>{'>'}</span>
+                  <input
+                    type="text"
+                    value={terminalInput}
+                    onChange={handleTerminalInput}
+                    onKeyPress={handleTerminalKeyPress}
+                    className="flex-1 bg-transparent outline-none border-none ml-1"
+                    style={{color: '#e0f8cf'}}
+                    autoFocus
+                  />
+                  <span className={blinkCursor ? 'opacity-100' : 'opacity-0'}>_</span>
+                </div>
+              )}
+              
+              {bootComplete && !characterCreation.active && inMerchNet && (
+                <div className="flex command-input">
+                  <span>{'MERCHNET>'}</span>
                   <input
                     type="text"
                     value={terminalInput}
