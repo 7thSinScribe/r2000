@@ -512,7 +512,7 @@ function updateFoodPositions() {
   });
 }
 
-// Update enemy movement
+  // Update enemy movement
 function updateEnemies() {
   gameState.enemies.forEach((enemy, enemyIndex) => {
     enemy.moveCounter++;
@@ -599,7 +599,7 @@ function updateEnemies() {
         }
       }
       
-      // Check if target direction would lead to a deadly wall
+      // Calculate new head position
       const newHead = { x: head.x, y: head.y };
       switch(targetDirection) {
         case 'up': newHead.y--; break;
@@ -608,8 +608,11 @@ function updateEnemies() {
         case 'right': newHead.x++; break;
       }
       
-      // Check for wall - wrapping at edges only if it's a safe wall
-      const hitWall = gameState.walls.find(wall => wall.x === newHead.x && wall.y === newHead.y);
+      // Handle edge wrapping for enemies too
+      if (newHead.x < 0) newHead.x = GAME_WIDTH - 1;
+      else if (newHead.x >= GAME_WIDTH) newHead.x = 0;
+      else if (newHead.y < 0) newHead.y = GAME_HEIGHT - 1;
+      else if (newHead.y >= GAME_HEIGHT) newHead.y = 0;
       if (hitWall) {
         if (hitWall.safe) {
           // Edge wall - wrap around
@@ -1414,21 +1417,21 @@ function updateGame() {
       break;
   }
   
+  // Handle edge wrapping BEFORE wall collision check
+  if (head.x < 0) head.x = GAME_WIDTH - 1;
+  else if (head.x >= GAME_WIDTH) head.x = 0;
+  else if (head.y < 0) head.y = GAME_HEIGHT - 1;
+  else if (head.y >= GAME_HEIGHT) head.y = 0;
+  
   // Handle wall collision
   const hitWall = gameState.walls.find(wall => wall.x === head.x && wall.y === head.y);
   if (hitWall) {
-    if (hitWall.safe) {
-      // Safe wall (edge) - wrap around
-      if (head.x < 0) head.x = GAME_WIDTH - 1;
-      else if (head.x >= GAME_WIDTH) head.x = 0;
-      else if (head.y < 0) head.y = GAME_HEIGHT - 1;
-      else if (head.y >= GAME_HEIGHT) head.y = 0;
-    } else if (!gameState.player.isGhost) {
+    if (!hitWall.safe && !gameState.player.isGhost) {
       // Deadly wall hit when not in ghost mode
       endGame(false);
       return;
     }
-    // If ghost mode, pass through the wall
+    // If it's a safe wall or in ghost mode, pass through
   }
   
   // Check for self collision
