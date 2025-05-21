@@ -59,34 +59,8 @@ const MUTATIONS = {
   HUNTER: { name: 'HUNTER', effect: () => {}, duration: 60 }  // Enables attacking other wyrms
 };
 
-// Game state variables
-let gameState = {
-  player: {
-    segments: [],
-    direction: 'right',
-    nextDirection: 'right',
-    color: COLORS.player,
-    mutations: [],
-    segmentsToAdd: 0,
-    speed: INITIAL_GAME_SPEED,
-    isGhost: false,
-    isMagnetic: false,
-    isArmored: false,
-    isHunter: false
-  },
-  enemies: [],
-  food: [],
-  walls: [],
-  deadSegments: [], // Stores segments from sliced wyrms
-  score: 0,
-  gameOver: false,
-  victory: false,
-  level: 1,
-  gameSpeed: INITIAL_GAME_SPEED,
-  timeSinceLastFoodMove: 0,
-  pendingMutations: [] // Mutations waiting to be activated
-};
-
+// Game variables
+let gameState = null;
 let gameInterval = null;
 let gameCanvas = null;
 let gameCtx = null;
@@ -470,41 +444,50 @@ function updateFoodPositions() {
         // Check if the new position is valid
         let validPosition = true;
         
-        // Check boundaries
-        if (newX < 0 || newX >= GAME_WIDTH || newY < 0 || newY >= GAME_HEIGHT) {
-          validPosition = false;
-          continue;
-        }
+        // Check boundaries (wrap if needed)
+        let checkX = newX;
+        let checkY = newY;
+        
+        if (checkX < 0) checkX = GAME_WIDTH - 1;
+        else if (checkX >= GAME_WIDTH) checkX = 0;
+        else if (checkY < 0) checkY = GAME_HEIGHT - 1;
+        else if (checkY >= GAME_HEIGHT) checkY = 0;
         
         // Check not on walls
-        if (gameState.walls.some(wall => wall.x === newX && wall.y === newY)) {
+        if (gameState.walls.some(wall => wall.x === checkX && wall.y === checkY && !wall.safe)) {
           validPosition = false;
           continue;
         }
         
         // Check not on player
-        if (gameState.player.segments.some(segment => segment.x === newX && segment.y === newY)) {
+        if (gameState.player.segments.some(segment => segment.x === checkX && segment.y === checkY)) {
           validPosition = false;
           continue;
         }
         
         // Check not on enemies
         if (gameState.enemies.some(enemy => 
-          enemy.segments.some(segment => segment.x === newX && segment.y === newY)
+          enemy.segments.some(segment => segment.x === checkX && segment.y === checkY)
         )) {
           validPosition = false;
           continue;
         }
         
         // Check not on other food
-        if (gameState.food.some(f => f !== food && f.x === newX && f.y === newY)) {
+        if (gameState.food.some(f => f !== food && f.x === checkX && f.y === checkY)) {
+          validPosition = false;
+          continue;
+        }
+        
+        // Check not on dead segments
+        if (gameState.deadSegments.some(segment => segment.x === checkX && segment.y === checkY)) {
           validPosition = false;
           continue;
         }
         
         if (validPosition) {
-          food.x = newX;
-          food.y = newY;
+          food.x = checkX;
+          food.y = checkY;
           break;
         }
       }
@@ -512,7 +495,7 @@ function updateFoodPositions() {
   });
 }
 
-  // Update enemy movement
+// Update enemy movement
 function updateEnemies() {
   gameState.enemies.forEach((enemy, enemyIndex) => {
     enemy.moveCounter++;
@@ -608,76 +591,38 @@ function updateEnemies() {
         case 'right': newHead.x++; break;
       }
       
-      // Handle edge wrapping for enemies too
+      // Handle edge wrapping for enemies
       if (newHead.x < 0) newHead.x = GAME_WIDTH - 1;
       else if (newHead.x >= GAME_WIDTH) newHead.x = 0;
       else if (newHead.y < 0) newHead.y = GAME_HEIGHT - 1;
       else if (newHead.y >= GAME_HEIGHT) newHead.y = 0;
-      if (hitWall) {
-        if (hitWall.safe) {
-          // Edge wall - wrap around
-          if (newHead.x < 0) newHead.x = GAME_WIDTH - 1;
-          else if (newHead.x >= GAME_WIDTH) newHead.x = 0;
-          else if (newHead.y < 0) newHead.y = GAME_HEIGHT - 1;
-          else if (newHead.y >= GAME_HEIGHT) newHead.y = 0;
-        } else {
-          // Interior deadly wall - avoid!
-          // Try each alternative direction
-          let avoidedWall = false;
-          for (const dir of validDirections.filter(d => d !== targetDirection)) {
-            const testHead = { x: head.x, y: head.y };
-            switch(dir) {
-              case 'up': testHead.y--; break;
-              case 'down': testHead.y++; break;
-              case 'left': testHead.x--; break;
-              case 'right': testHead.x++; break;
-            }
-            
-            // Check if this direction is safe
-            const wallHit = gameState.walls.find(wall => wall.x === testHead.x && wall.y === testHead.y);
-            if (!wallHit || wallHit.safe) {
-              targetDirection = dir;
-              if (wallHit && wallHit.safe) {
-                // Edge wall - wrap
-                if (testHead.x < 0) testHead.x = GAME_WIDTH - 1;
-                else if (testHead.x >= GAME_WIDTH) testHead.x = 0;
-                else if (testHead.y < 0) testHead.y = GAME_HEIGHT - 1;
-                else if (testHead.y >= GAME_HEIGHT) testHead.y = 0;
-              }
-              newHead.x = testHead.x;
-              newHead.y = testHead.y;
-              avoidedWall = true;
-              break;
-            }
-          }
-          
-          if (!avoidedWall) {
-            // No safe direction to move - destroy this enemy
-            gameState.enemies.splice(enemyIndex, 1);
-            
-            // Add to dead segments
-            enemy.segments.forEach(segment => {
-              gameState.deadSegments.push({
-                x: segment.x,
-                y: segment.y,
-                color: enemy.color.body,
-                points: 5,
-                timeLeft: 300 // Will disappear after this many frames
-              });
-            });
-            
-            // Visual effect
-            createGlitchEffect(true);
-            return;
-          }
-        }
+      
+      // Check for deadly wall collision
+      const hitWall = gameState.walls.find(wall => wall.x === newHead.x && wall.y === newHead.y);
+      if (hitWall && !hitWall.safe) {
+        // Enemy hit a deadly wall - destroy it
+        gameState.enemies.splice(enemyIndex, 1);
+        
+        // Add segments to dead segments
+        enemy.segments.forEach(segment => {
+          gameState.deadSegments.push({
+            x: segment.x,
+            y: segment.y,
+            color: enemy.color.body,
+            points: 5,
+            timeLeft: 300
+          });
+        });
+        
+        // Visual effect
+        createGlitchEffect(true);
+        return;
       }
       
       // Check for self collision
       if (enemy.segments.slice(1).some(segment => 
         segment.x === newHead.x && segment.y === newHead.y
       )) {
-        // For enemy, we'll try to find another direction
         // Try each alternative direction
         let avoidedCollision = false;
         for (const dir of validDirections.filter(d => d !== targetDirection)) {
@@ -689,19 +634,17 @@ function updateEnemies() {
             case 'right': testHead.x++; break;
           }
           
-          // Check for wall at new position
+          // Edge wrapping
+          if (testHead.x < 0) testHead.x = GAME_WIDTH - 1;
+          else if (testHead.x >= GAME_WIDTH) testHead.x = 0;
+          else if (testHead.y < 0) testHead.y = GAME_HEIGHT - 1;
+          else if (testHead.y >= GAME_HEIGHT) testHead.y = 0;
+          
+          // Check for deadly wall
           const wallHit = gameState.walls.find(wall => wall.x === testHead.x && wall.y === testHead.y);
           if (wallHit && !wallHit.safe) continue; // Skip deadly walls
           
-          // Wrap if needed
-          if (wallHit && wallHit.safe) {
-            if (testHead.x < 0) testHead.x = GAME_WIDTH - 1;
-            else if (testHead.x >= GAME_WIDTH) testHead.x = 0;
-            else if (testHead.y < 0) testHead.y = GAME_HEIGHT - 1;
-            else if (testHead.y >= GAME_HEIGHT) testHead.y = 0;
-          }
-          
-          // Check if this direction is safe
+          // Check for self collision
           const selfCollision = enemy.segments.slice(1).some(segment => 
             segment.x === testHead.x && segment.y === testHead.y
           );
@@ -716,7 +659,7 @@ function updateEnemies() {
         }
         
         if (!avoidedCollision) {
-          // No safe direction to move - destroy this enemy
+          // No safe direction - destroy the enemy
           gameState.enemies.splice(enemyIndex, 1);
           
           // Add to dead segments
@@ -726,7 +669,7 @@ function updateEnemies() {
               y: segment.y,
               color: enemy.color.body,
               points: 5,
-              timeLeft: 300 // Will disappear after this many frames
+              timeLeft: 300
             });
           });
           
@@ -998,6 +941,413 @@ function updateEnemies() {
       gameState.deadSegments.splice(i, 1);
     }
   }
+}
+
+// Update game logic
+function updateGame() {
+  if (gameState.gameOver) return;
+  
+  // Update player direction
+  gameState.player.direction = gameState.player.nextDirection;
+  
+  // Update food positions occasionally
+  updateFoodPositions();
+  
+  // Calculate new head position
+  const head = {...gameState.player.segments[0]};
+  
+  switch (gameState.player.direction) {
+    case 'up':
+      head.y -= 1;
+      break;
+    case 'down':
+      head.y += 1;
+      break;
+    case 'left':
+      head.x -= 1;
+      break;
+    case 'right':
+      head.x += 1;
+      break;
+  }
+  
+  // Handle edge wrapping (borders of the screen)
+  if (head.x < 0) head.x = GAME_WIDTH - 1;
+  else if (head.x >= GAME_WIDTH) head.x = 0;
+  else if (head.y < 0) head.y = GAME_HEIGHT - 1;
+  else if (head.y >= GAME_HEIGHT) head.y = 0;
+  
+  // Handle wall collision
+  const hitWall = gameState.walls.find(wall => wall.x === head.x && wall.y === head.y);
+  if (hitWall && !hitWall.safe && !gameState.player.isGhost) {
+    // Deadly wall hit when not in ghost mode
+    endGame(false);
+    return;
+  }
+  
+  // Check for self collision
+  const selfCollision = gameState.player.segments.some(segment => 
+    segment.x === head.x && segment.y === head.y
+  );
+  
+  if (selfCollision && !gameState.player.isGhost) {
+    endGame(false);
+    return;
+  }
+  
+  // Add new head
+  gameState.player.segments.unshift(head);
+  
+  // Check for enemy body collision
+  if (!gameState.player.isGhost) {
+    for (let i = 0; i < gameState.enemies.length; i++) {
+      const enemy = gameState.enemies[i];
+      
+      // Check collision with enemy body (not head)
+      const bodyCollisionIndex = enemy.segments.findIndex((segment, index) => 
+        index > 0 && segment.x === head.x && segment.y === head.y
+      );
+      
+      if (bodyCollisionIndex !== -1) {
+        if (gameState.player.isHunter) {
+          // In hunter mode, slice the enemy in half
+          const slicedSegments = enemy.segments.splice(bodyCollisionIndex);
+          
+          // Add sliced segments to dead segments
+          slicedSegments.forEach(segment => {
+            gameState.deadSegments.push({
+              x: segment.x,
+              y: segment.y,
+              color: enemy.color.body,
+              points: 5,
+              timeLeft: 300
+            });
+          });
+          
+          // Score points
+          gameState.score += slicedSegments.length * 5;
+          
+          // Visual effect
+          createGlitchEffect(true);
+          
+          // Check if enemy is gone
+          if (enemy.segments.length < 3) {
+            // Remove the enemy entirely
+            gameState.enemies.splice(i, 1);
+            i--;
+          }
+          
+          // Check for victory
+          if (gameState.enemies.length === 0 && 
+              gameState.player.segments.length >= SIZE_REQUIREMENTS[gameState.level - 1]) {
+            if (gameState.level < 3) {
+              // Advance to next level
+              advanceLevel();
+            } else {
+              // Final victory
+              endGame(true);
+            }
+          }
+        } else {
+          // Not in hunter mode - die
+          endGame(false);
+          return;
+        }
+      }
+      
+      // Check for head-on collision
+      const enemyHead = enemy.segments[0];
+      if (head.x === enemyHead.x && head.y === enemyHead.y) {
+        // Head-on collision!
+        if (gameState.player.isHunter) {
+          // Player wins in hunter mode
+          gameState.enemies.splice(i, 1);
+          
+          // Add to dead segments
+          enemy.segments.forEach(segment => {
+            gameState.deadSegments.push({
+              x: segment.x,
+              y: segment.y,
+              color: enemy.color.body,
+              points: 5,
+              timeLeft: 300
+            });
+          });
+          
+          // Score points
+          gameState.score += 50;
+          
+          // Grow player
+          gameState.player.segmentsToAdd += 3;
+          
+          // Visual effect
+          createGlitchEffect(true);
+          
+          i--;
+        } else if (gameState.player.segments.length > enemy.segments.length * 1.5) {
+          // Player wins by size advantage
+          gameState.enemies.splice(i, 1);
+          
+          // Add to dead segments
+          enemy.segments.forEach(segment => {
+            gameState.deadSegments.push({
+              x: segment.x,
+              y: segment.y,
+              color: enemy.color.body,
+              points: 5,
+              timeLeft: 300
+            });
+          });
+          
+          // Grow player
+          gameState.player.segmentsToAdd += 2;
+          
+          // Score points
+          gameState.score += 30;
+          
+          // Visual effect
+          createGlitchEffect(true);
+          
+          i--;
+        } else if (enemy.segments.length > gameState.player.segments.length * 1.5) {
+          // Enemy wins by size advantage
+          if (!gameState.player.isArmored) {
+            endGame(false);
+            return;
+          }
+        } else {
+          // Both die in the collision
+          if (!gameState.player.isArmored) {
+            endGame(false);
+            return;
+          } else {
+            // Player survives due to armor
+            gameState.enemies.splice(i, 1);
+            
+            // Add to dead segments
+            enemy.segments.forEach(segment => {
+              gameState.deadSegments.push({
+                x: segment.x,
+                y: segment.y,
+                color: enemy.color.body,
+                points: 5,
+                timeLeft: 300
+              });
+            });
+            
+            // Visual effect
+            createGlitchEffect(true);
+            
+            i--;
+          }
+        }
+      }
+    }
+  }
+  
+  // Check for food collision
+  const foodIndex = gameState.food.findIndex(food => 
+    food.x === head.x && food.y === head.y
+  );
+  
+  if (foodIndex !== -1) {
+    const food = gameState.food[foodIndex];
+    
+    // Increase score
+    gameState.score += food.type.points;
+    
+    // Snake grows, so we don't remove the tail
+    gameState.player.segmentsToAdd += 1;
+    
+    // Apply food effects
+    if (food.type.speedEffect !== 0) {
+      // Change game speed
+      gameState.gameSpeed = Math.max(50, Math.min(250, gameState.gameSpeed + food.type.speedEffect));
+    }
+    
+    // Handle hunter food
+    if (food.type === FOOD_TYPES.HUNTER) {
+      // Spawn hunter mutation
+      const mutation = {
+        name: MUTATIONS.HUNTER.name,
+        effect: MUTATIONS.HUNTER.effect,
+        duration: MUTATIONS.HUNTER.duration
+      };
+      
+      // Add to pending mutations
+      gameState.pendingMutations.push(mutation);
+    }
+    
+    // Remove consumed food
+    gameState.food.splice(foodIndex, 1);
+    
+    // Spawn new food
+    spawnFood(1);
+    
+    // Chance to spawn a mutation
+    if (Math.random() < MUTATION_CHANCE) {
+      spawnMutation();
+    }
+    
+    // Add a small glitch effect for eating
+    createGlitchEffect();
+  }
+  
+  // Check for dead segment collision
+  const deadSegmentIndex = gameState.deadSegments.findIndex(segment => 
+    segment.x === head.x && segment.y === head.y
+  );
+  
+  if (deadSegmentIndex !== -1) {
+    // Player eats dead segment
+    const segment = gameState.deadSegments[deadSegmentIndex];
+    gameState.score += segment.points;
+    gameState.deadSegments.splice(deadSegmentIndex, 1);
+    
+    // Grow by 1 segment
+    gameState.player.segmentsToAdd += 1;
+    
+    // Visual effect
+    createGlitchEffect(false);
+  }
+  
+  // Update enemy wyrms
+  updateEnemies();
+  
+  // Add segments from queue or remove tail if no food was eaten
+  if (gameState.player.segmentsToAdd > 0) {
+    gameState.player.segmentsToAdd--;
+  } else {
+    gameState.player.segments.pop();
+  }
+  
+  // Update mutations
+  updateMutations();
+  
+  // Check for victory condition
+  if (gameState.enemies.length === 0 && 
+      gameState.player.segments.length >= SIZE_REQUIREMENTS[gameState.level - 1] && 
+      !gameState.gameOver) {
+    if (gameState.level < 3) {
+      // Advance to next level
+      advanceLevel();
+    } else {
+      // Final victory
+      endGame(true);
+    }
+  }
+}
+
+// Update active mutations
+function updateMutations() {
+  // Reduce duration of active mutations
+  for (let i = gameState.player.mutations.length - 1; i >= 0; i--) {
+    gameState.player.mutations[i].duration--;
+    
+    if (gameState.player.mutations[i].duration <= 0) {
+      // Remove expired mutation
+      const removedMutation = gameState.player.mutations.splice(i, 1)[0];
+      
+      // Remove the effect
+      switch(removedMutation.name) {
+        case 'SPEED BOOST':
+          gameState.gameSpeed = INITIAL_GAME_SPEED;
+          break;
+        case 'GHOST MODE':
+          gameState.player.isGhost = false;
+          break;
+        case 'FOOD MAGNET':
+          gameState.player.isMagnetic = false;
+          break;
+        case 'ARMORED':
+          gameState.player.isArmored = false;
+          break;
+        case 'HUNTER':
+          gameState.player.isHunter = false;
+          break;
+      }
+    }
+  }
+  
+  // Apply pending mutations
+  if (gameState.pendingMutations.length > 0) {
+    const mutation = gameState.pendingMutations.shift();
+    
+    // Apply mutation effect
+    mutation.effect(gameState);
+    
+    // Set the appropriate flag
+    switch(mutation.name) {
+      case 'SPEED BOOST':
+        // Already applied in the effect function
+        break;
+      case 'GHOST MODE':
+        gameState.player.isGhost = true;
+        break;
+      case 'FOOD MAGNET':
+        gameState.player.isMagnetic = true;
+        break;
+      case 'ARMORED':
+        gameState.player.isArmored = true;
+        break;
+      case 'HUNTER':
+        gameState.player.isHunter = true;
+        break;
+    }
+    
+    // Add to active mutations
+    gameState.player.mutations.push(mutation);
+    
+    // Visual effect
+    createGlitchEffect(true);
+  }
+  
+  // Handle food magnet effect
+  if (gameState.player.isMagnetic && gameState.food.length > 0) {
+    const head = gameState.player.segments[0];
+    
+    // Find closest food
+    let closestFood = null;
+    let minDist = Infinity;
+    
+    gameState.food.forEach(food => {
+      const dist = Math.abs(food.x - head.x) + Math.abs(food.y - head.y);
+      if (dist < minDist && dist < 8) { // Only attract food within range
+        minDist = dist;
+        closestFood = food;
+      }
+    });
+    
+    // Move closest food toward player
+    if (closestFood && Math.random() < 0.3) {
+      const distX = head.x - closestFood.x;
+      const distY = head.y - closestFood.y;
+      
+      if (Math.abs(distX) > Math.abs(distY)) {
+        closestFood.x += Math.sign(distX);
+      } else {
+        closestFood.y += Math.sign(distY);
+      }
+    }
+  }
+}
+
+// Spawn a random mutation
+function spawnMutation() {
+  // Choose a random mutation
+  const mutationKeys = Object.keys(MUTATIONS);
+  const randomKey = mutationKeys[Math.floor(Math.random() * mutationKeys.length)];
+  const mutationType = MUTATIONS[randomKey];
+  
+  // Create a new mutation instance
+  const mutation = {
+    name: mutationType.name,
+    effect: mutationType.effect,
+    duration: mutationType.duration
+  };
+  
+  // Add to pending mutations
+  gameState.pendingMutations.push(mutation);
 }
 
 // Draw the game state
@@ -1389,416 +1739,6 @@ function updateStatusDisplay() {
   }
 }
 
-// Update game logic
-function updateGame() {
-  if (gameState.gameOver) return;
-  
-  // Update player direction
-  gameState.player.direction = gameState.player.nextDirection;
-  
-  // Update food positions occasionally
-  updateFoodPositions();
-  
-  // Calculate new head position
-  const head = {...gameState.player.segments[0]};
-  
-  switch (gameState.player.direction) {
-    case 'up':
-      head.y -= 1;
-      break;
-    case 'down':
-      head.y += 1;
-      break;
-    case 'left':
-      head.x -= 1;
-      break;
-    case 'right':
-      head.x += 1;
-      break;
-  }
-  
-  // Handle edge wrapping BEFORE wall collision check
-  if (head.x < 0) head.x = GAME_WIDTH - 1;
-  else if (head.x >= GAME_WIDTH) head.x = 0;
-  else if (head.y < 0) head.y = GAME_HEIGHT - 1;
-  else if (head.y >= GAME_HEIGHT) head.y = 0;
-  
-  // Handle wall collision
-  const hitWall = gameState.walls.find(wall => wall.x === head.x && wall.y === head.y);
-  if (hitWall) {
-    if (!hitWall.safe && !gameState.player.isGhost) {
-      // Deadly wall hit when not in ghost mode
-      endGame(false);
-      return;
-    }
-    // If it's a safe wall or in ghost mode, pass through
-  }
-  
-  // Check for self collision
-  const selfCollision = gameState.player.segments.some(segment => 
-    segment.x === head.x && segment.y === head.y
-  );
-  
-  if (selfCollision && !gameState.player.isGhost) {
-    endGame(false);
-    return;
-  }
-  
-  // Add new head
-  gameState.player.segments.unshift(head);
-  
-  // Check for enemy body collision
-  if (!gameState.player.isGhost) {
-    for (let i = 0; i < gameState.enemies.length; i++) {
-      const enemy = gameState.enemies[i];
-      
-      // Check collision with enemy body (not head)
-      const bodyCollisionIndex = enemy.segments.findIndex((segment, index) => 
-        index > 0 && segment.x === head.x && segment.y === head.y
-      );
-      
-      if (bodyCollisionIndex !== -1) {
-        if (gameState.player.isHunter) {
-          // In hunter mode, slice the enemy in half
-          const slicedSegments = enemy.segments.splice(bodyCollisionIndex);
-          
-          // Add sliced segments to dead segments
-          slicedSegments.forEach(segment => {
-            gameState.deadSegments.push({
-              x: segment.x,
-              y: segment.y,
-              color: enemy.color.body,
-              points: 5,
-              timeLeft: 300
-            });
-          });
-          
-          // Score points
-          gameState.score += slicedSegments.length * 5;
-          
-          // Visual effect
-          createGlitchEffect(true);
-          
-          // Check if enemy is gone
-          if (enemy.segments.length < 3) {
-            // Remove the enemy entirely
-            gameState.enemies.splice(i, 1);
-            i--;
-          }
-          
-          // Check for victory
-          if (gameState.enemies.length === 0 && 
-              gameState.player.segments.length >= SIZE_REQUIREMENTS[gameState.level - 1]) {
-            if (gameState.level < 3) {
-              // Advance to next level
-              advanceLevel();
-            } else {
-              // Final victory
-              endGame(true);
-            }
-          }
-        } else {
-          // Not in hunter mode - die
-          endGame(false);
-          return;
-        }
-      }
-      
-      // Check for head-on collision
-      const enemyHead = enemy.segments[0];
-      if (head.x === enemyHead.x && head.y === enemyHead.y) {
-        // Head-on collision!
-        if (gameState.player.isHunter) {
-          // Player wins in hunter mode
-          gameState.enemies.splice(i, 1);
-          
-          // Add to dead segments
-          enemy.segments.forEach(segment => {
-            gameState.deadSegments.push({
-              x: segment.x,
-              y: segment.y,
-              color: enemy.color.body,
-              points: 5,
-              timeLeft: 300
-            });
-          });
-          
-          // Score points
-          gameState.score += 50;
-          
-          // Grow player
-          gameState.player.segmentsToAdd += 3;
-          
-          // Visual effect
-          createGlitchEffect(true);
-          
-          i--;
-        } else if (gameState.player.segments.length > enemy.segments.length * 1.5) {
-          // Player wins by size advantage
-          gameState.enemies.splice(i, 1);
-          
-          // Add to dead segments
-          enemy.segments.forEach(segment => {
-            gameState.deadSegments.push({
-              x: segment.x,
-              y: segment.y,
-              color: enemy.color.body,
-              points: 5,
-              timeLeft: 300
-            });
-          });
-          
-          // Grow player
-          gameState.player.segmentsToAdd += 2;
-          
-          // Score points
-          gameState.score += 30;
-          
-          // Visual effect
-          createGlitchEffect(true);
-          
-          i--;
-        } else if (enemy.segments.length > gameState.player.segments.length * 1.5) {
-          // Enemy wins by size advantage
-          if (!gameState.player.isArmored) {
-            endGame(false);
-            return;
-          }
-        } else {
-          // Both die in the collision
-          if (!gameState.player.isArmored) {
-            endGame(false);
-            return;
-          } else {
-            // Player survives due to armor
-            gameState.enemies.splice(i, 1);
-            
-            // Add to dead segments
-            enemy.segments.forEach(segment => {
-              gameState.deadSegments.push({
-                x: segment.x,
-                y: segment.y,
-                color: enemy.color.body,
-                points: 5,
-                timeLeft: 300
-              });
-            });
-            
-            // Visual effect
-            createGlitchEffect(true);
-            
-            i--;
-          }
-        }
-      }
-    }
-  }
-  
-  // Check for food collision
-  const foodIndex = gameState.food.findIndex(food => 
-    food.x === head.x && food.y === head.y
-  );
-  
-  if (foodIndex !== -1) {
-    const food = gameState.food[foodIndex];
-    
-    // Increase score
-    gameState.score += food.type.points;
-    
-    // Snake grows, so we don't remove the tail
-    gameState.player.segmentsToAdd += 1;
-    
-    // Apply food effects
-    if (food.type.speedEffect !== 0) {
-      // Change game speed
-      gameState.gameSpeed = Math.max(50, Math.min(250, gameState.gameSpeed + food.type.speedEffect));
-    }
-    
-    // Handle hunter food
-    if (food.type === FOOD_TYPES.HUNTER) {
-      // Spawn hunter mutation
-      const mutation = {
-        name: MUTATIONS.HUNTER.name,
-        effect: MUTATIONS.HUNTER.effect,
-        duration: MUTATIONS.HUNTER.duration
-      };
-      
-      // Add to pending mutations
-      gameState.pendingMutations.push(mutation);
-    }
-    
-    // Remove consumed food
-    gameState.food.splice(foodIndex, 1);
-    
-    // Spawn new food
-    spawnFood(1);
-    
-    // Chance to spawn a mutation
-    if (Math.random() < MUTATION_CHANCE) {
-      spawnMutation();
-    }
-    
-    // Add a small glitch effect for eating
-    createGlitchEffect();
-  }
-  
-  // Check for dead segment collision
-  const deadSegmentIndex = gameState.deadSegments.findIndex(segment => 
-    segment.x === head.x && segment.y === head.y
-  );
-  
-  if (deadSegmentIndex !== -1) {
-    // Player eats dead segment
-    const segment = gameState.deadSegments[deadSegmentIndex];
-    gameState.score += segment.points;
-    gameState.deadSegments.splice(deadSegmentIndex, 1);
-    
-    // Grow by 1 segment
-    gameState.player.segmentsToAdd += 1;
-    
-    // Visual effect
-    createGlitchEffect(false);
-  }
-  
-  // Update enemy wyrms
-  updateEnemies();
-  
-  // Add segments from queue or remove tail if no food was eaten
-  if (gameState.player.segmentsToAdd > 0) {
-    gameState.player.segmentsToAdd--;
-  } else {
-    gameState.player.segments.pop();
-  }
-  
-  // Update mutations
-  updateMutations();
-  
-  // Check for victory condition
-  if (gameState.enemies.length === 0 && 
-      gameState.player.segments.length >= SIZE_REQUIREMENTS[gameState.level - 1] && 
-      !gameState.gameOver) {
-    if (gameState.level < 3) {
-      // Advance to next level
-      advanceLevel();
-    } else {
-      // Final victory
-      endGame(true);
-    }
-  }
-}
-
-// Update active mutations
-function updateMutations() {
-  // Reduce duration of active mutations
-  for (let i = gameState.player.mutations.length - 1; i >= 0; i--) {
-    gameState.player.mutations[i].duration--;
-    
-    if (gameState.player.mutations[i].duration <= 0) {
-      // Remove expired mutation
-      const removedMutation = gameState.player.mutations.splice(i, 1)[0];
-      
-      // Remove the effect
-      switch(removedMutation.name) {
-        case 'SPEED BOOST':
-          gameState.gameSpeed = INITIAL_GAME_SPEED;
-          break;
-        case 'GHOST MODE':
-          gameState.player.isGhost = false;
-          break;
-        case 'FOOD MAGNET':
-          gameState.player.isMagnetic = false;
-          break;
-        case 'ARMORED':
-          gameState.player.isArmored = false;
-          break;
-        case 'HUNTER':
-          gameState.player.isHunter = false;
-          break;
-      }
-    }
-  }
-  
-  // Apply pending mutations
-  if (gameState.pendingMutations.length > 0) {
-    const mutation = gameState.pendingMutations.shift();
-    
-    // Apply mutation effect
-    mutation.effect(gameState);
-    
-    // Set the appropriate flag
-    switch(mutation.name) {
-      case 'SPEED BOOST':
-        // Already applied in the effect function
-        break;
-      case 'GHOST MODE':
-        gameState.player.isGhost = true;
-        break;
-      case 'FOOD MAGNET':
-        gameState.player.isMagnetic = true;
-        break;
-      case 'ARMORED':
-        gameState.player.isArmored = true;
-        break;
-      case 'HUNTER':
-        gameState.player.isHunter = true;
-        break;
-    }
-    
-    // Add to active mutations
-    gameState.player.mutations.push(mutation);
-    
-    // Visual effect
-    createGlitchEffect(true);
-  }
-  
-  // Handle food magnet effect
-  if (gameState.player.isMagnetic && gameState.food.length > 0) {
-    const head = gameState.player.segments[0];
-    
-    // Find closest food
-    let closestFood = null;
-    let minDist = Infinity;
-    
-    gameState.food.forEach(food => {
-      const dist = Math.abs(food.x - head.x) + Math.abs(food.y - head.y);
-      if (dist < minDist && dist < 8) { // Only attract food within range
-        minDist = dist;
-        closestFood = food;
-      }
-    });
-    
-    // Move closest food toward player
-    if (closestFood && Math.random() < 0.3) {
-      const distX = head.x - closestFood.x;
-      const distY = head.y - closestFood.y;
-      
-      if (Math.abs(distX) > Math.abs(distY)) {
-        closestFood.x += Math.sign(distX);
-      } else {
-        closestFood.y += Math.sign(distY);
-      }
-    }
-  }
-}
-
-// Spawn a random mutation
-function spawnMutation() {
-  // Choose a random mutation
-  const mutationKeys = Object.keys(MUTATIONS);
-  const randomKey = mutationKeys[Math.floor(Math.random() * mutationKeys.length)];
-  const mutationType = MUTATIONS[randomKey];
-  
-  // Create a new mutation instance
-  const mutation = {
-    name: mutationType.name,
-    effect: mutationType.effect,
-    duration: mutationType.duration
-  };
-  
-  // Add to pending mutations
-  gameState.pendingMutations.push(mutation);
-}
-
 // Advance to the next level
 function advanceLevel() {
   gameState.level++;
@@ -1861,7 +1801,9 @@ function endGame(victory) {
 // Reset the game
 function resetGame() {
   // Clear game interval
-  clearInterval(gameInterval);
+  if (gameInterval) {
+    clearInterval(gameInterval);
+  }
   
   // Initialize a fresh game state
   gameState = {
@@ -1923,10 +1865,14 @@ function createGlitchEffect(major = false) {
   const numArtifacts = major ? 8 : 3;
   
   // Screen shake
-  gameCanvas.style.transform = `translate(${(Math.random() - 0.5) * intensity}px, ${(Math.random() - 0.5) * intensity}px)`;
-  setTimeout(() => {
-    gameCanvas.style.transform = 'none';
-  }, 100);
+  if (gameCanvas) {
+    gameCanvas.style.transform = `translate(${(Math.random() - 0.5) * intensity}px, ${(Math.random() - 0.5) * intensity}px)`;
+    setTimeout(() => {
+      if (gameCanvas) {
+        gameCanvas.style.transform = 'none';
+      }
+    }, 100);
+  }
   
   // Visual artifacts
   for (let i = 0; i < numArtifacts; i++) {
@@ -2025,7 +1971,10 @@ function startWyrmGame(terminal) {
         break;
       case 'Escape':
         // Stop the game and remove it
-        clearInterval(gameInterval);
+        if (gameInterval) {
+          clearInterval(gameInterval);
+          gameInterval = null;
+        }
         document.removeEventListener('keydown', keydownHandler);
         if (gameContainer && gameContainer.parentNode) {
           gameContainer.parentNode.removeChild(gameContainer);
@@ -2047,7 +1996,10 @@ function startWyrmGame(terminal) {
   
   return {
     stop: () => {
-      clearInterval(gameInterval);
+      if (gameInterval) {
+        clearInterval(gameInterval);
+        gameInterval = null;
+      }
       document.removeEventListener('keydown', keydownHandler);
       if (gameContainer && gameContainer.parentNode) {
         gameContainer.parentNode.removeChild(gameContainer);
