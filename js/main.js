@@ -16,6 +16,7 @@ const SurvivorOSTerminal = () => {
   const [paymentAmount, setPaymentAmount] = useState(0);
   const [lastSelectedItem, setLastSelectedItem] = useState("");
   const [browsingHistory, setBrowsingHistory] = useState([]);
+  const [navMode, setNavMode] = useState(false);
   
   const [characterCreation, setCharacterCreation] = useState({
     active: false,
@@ -112,13 +113,13 @@ const SurvivorOSTerminal = () => {
   }, []);
 
   useEffect(() => {
-    if (terminalRef.current && !inMerchNet) {
+    if (terminalRef.current) {
       terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
     }
   }, [terminalHistory]);
 
   useEffect(() => {
-    if (!inMerchNet) return;
+    if (!inMerchNet || !navMode) return;
     
     const handleKeyDown = (e) => {
       if (e.key === 'ArrowUp' && selectedMerchNetIndex > 0) {
@@ -129,33 +130,14 @@ const SurvivorOSTerminal = () => {
         e.preventDefault();
       } else if (e.key === 'Enter' && merchNetItemsList.length > 0) {
         const selectedItem = merchNetItemsList[selectedMerchNetIndex];
-        
-        // If we're pressing Enter on the same item twice, execute the lookup
-        if (lastSelectedItem === selectedItem.name) {
-          const lookupCommand = `lookup "${selectedItem.name}"`;
-          setTerminalInput("");
-          processMerchNetCommand(lookupCommand);
-          setLastSelectedItem("");
-        } else {
-          // First Enter press - just put the lookup command in the input
-          setTerminalInput(`lookup "${selectedItem.name}"`);
-          setLastSelectedItem(selectedItem.name);
-        }
+        const lookupCommand = `lookup "${selectedItem.name}"`;
+        processMerchNetCommand(lookupCommand);
+        setNavMode(false);
         e.preventDefault();
       } else if (e.key === 'Escape') {
-        // Cancel item selection mode
-        if (lastSelectedItem) {
-          setLastSelectedItem("");
-          setTerminalInput("");
-        } else if (browsingHistory.length > 0) {
-          // Go back to previous view
-          const prevState = browsingHistory[browsingHistory.length - 1];
-          setMerchNetItemsList(prevState.items || []);
-          setBrowsingHistory(prev => prev.slice(0, -1));
-        }
+        setNavMode(false);
         e.preventDefault();
       } else if (e.key === 'Backspace' && browsingHistory.length > 0) {
-        // Go back to previous view
         const prevState = browsingHistory[browsingHistory.length - 1];
         setMerchNetItemsList(prevState.items || []);
         setBrowsingHistory(prev => prev.slice(0, -1));
@@ -165,7 +147,7 @@ const SurvivorOSTerminal = () => {
     
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [inMerchNet, selectedMerchNetIndex, merchNetItemsList, lastSelectedItem, browsingHistory]);
+  }, [inMerchNet, navMode, selectedMerchNetIndex, merchNetItemsList, browsingHistory]);
 
   useEffect(() => {
     if (inMerchNet && inputRef.current) {
@@ -181,7 +163,6 @@ const SurvivorOSTerminal = () => {
     if (e.key === 'Enter') {
       const inputValue = terminalInput;
       setTerminalInput('');
-      setLastSelectedItem("");
       
       if (characterCreation.active) {
         processCharacterCreationAnswer(inputValue);
@@ -216,7 +197,6 @@ const SurvivorOSTerminal = () => {
       
       if (result.type === 'items') {
         if (result.items && Array.isArray(result.items)) {
-          // Save current state to history before changing
           if (merchNetItemsList.length > 0) {
             setBrowsingHistory(prev => [...prev, { 
               items: merchNetItemsList,
@@ -226,6 +206,10 @@ const SurvivorOSTerminal = () => {
           
           setMerchNetItemsList(result.items);
           setSelectedMerchNetIndex(0);
+          setNavMode(true);
+          if (inputRef.current) {
+            inputRef.current.blur();
+          }
         }
       } else if (result.type === 'order') {
         setAwaitingPayment(true);
@@ -239,7 +223,6 @@ const SurvivorOSTerminal = () => {
         text: result.message || "Command processed."
       });
 
-      // Scroll to bottom after processing a command
       if (terminalRef.current) {
         setTimeout(() => {
           terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
@@ -765,7 +748,7 @@ Type 'help' for available commands.`;
                 </div>
               ))}
               
-              {inMerchNet && merchNetItemsList.length > 0 && (
+              {inMerchNet && merchNetItemsList.length > 0 && navMode && (
                 <div className="mb-4 mt-2">
                   {merchNetItemsList.map((item, index) => (
                     <div 
@@ -777,9 +760,7 @@ Type 'help' for available commands.`;
                     </div>
                   ))}
                   <div className="mt-2 text-sm text-green-200">
-                    {lastSelectedItem ? 
-                      'Press ENTER again to view details or ESC to cancel' :
-                      'Use arrow keys to navigate, ENTER to select, BACKSPACE to go back'}
+                    Use arrow keys to navigate, ENTER to select, ESC to exit navigation, BACKSPACE to go back
                   </div>
                 </div>
               )}
@@ -813,7 +794,7 @@ Type 'help' for available commands.`;
                     onKeyPress={handleTerminalKeyPress}
                     className="flex-1 bg-transparent outline-none border-none ml-1"
                     style={{color: '#e0f8cf'}}
-                    autoFocus
+                    autoFocus={!navMode}
                     ref={inputRef}
                   />
                   <span className={blinkCursor ? 'opacity-100' : 'opacity-0'}>_</span>
@@ -841,7 +822,7 @@ Type 'help' for available commands.`;
           
           {renderRandomGlitch()}
         </div>
-
+        
         <div className="crt-scanlines"></div>
         <div className="crt-overlay"></div>
       </div>
