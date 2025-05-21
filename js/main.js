@@ -6,6 +6,7 @@ const SurvivorOSTerminal = () => {
   const [terminalHistory, setTerminalHistory] = useState([]);
   const [blinkCursor, setBlinkCursor] = useState(true);
   const terminalRef = useRef(null);
+  const activeGameRef = useRef(null);
   
   const [characterCreation, setCharacterCreation] = useState({
     active: false,
@@ -327,6 +328,13 @@ const SurvivorOSTerminal = () => {
     setTimeout(() => displayCurrentQuestion(questionIndex + 1), 500);
   };
 
+  const stopCurrentGame = () => {
+    if (activeGameRef.current && activeGameRef.current.stop) {
+      activeGameRef.current.stop();
+      activeGameRef.current = null;
+    }
+  };
+
   const processCommand = (cmd) => {
     const command = cmd.toLowerCase().trim();
     
@@ -353,6 +361,8 @@ const SurvivorOSTerminal = () => {
     }
     
     if (command === 'wyrm') {
+      stopCurrentGame();
+      
       addToTerminalHistory({ 
         type: 'output', 
         text: 'LAUNCHING WYRM v1.0\n\nUse arrow keys to control the wyrm.\nCollect food to grow.\nAvoid walls and yourself.\nPress ESC to quit.\n\nLoading game...'
@@ -371,7 +381,7 @@ const SurvivorOSTerminal = () => {
         const gameElement = Array.from(outputElements).find(el => el.textContent === '');
         
         if (gameElement && window.startWyrmGame) {
-          window.startWyrmGame(gameElement);
+          activeGameRef.current = window.startWyrmGame(gameElement);
           gameElement.scrollIntoView({ behavior: 'smooth' });
         }
       }, 500);
@@ -380,6 +390,8 @@ const SurvivorOSTerminal = () => {
     }
     
     if (command === 'rogue' || command === 'roguelike') {
+      stopCurrentGame();
+      
       addToTerminalHistory({ 
         type: 'output', 
         text: 'LAUNCHING ROGUE 2000 DUNGEON CRAWLER v0.1\n\nUse arrow keys to move/attack.\nS: Use SWEAT for power attack.\nT: Use TEARS to analyze enemy.\nFind the stairs (>) to descend.\nSurvive 10 levels to win.\n\nPress ESC to quit.\n\nLoading game...'
@@ -398,7 +410,7 @@ const SurvivorOSTerminal = () => {
         const gameElement = Array.from(outputElements).find(el => el.textContent === '');
         
         if (gameElement && window.startRoguelikeGame) {
-          window.startRoguelikeGame(gameElement);
+          activeGameRef.current = window.startRoguelikeGame(gameElement);
           gameElement.scrollIntoView({ behavior: 'smooth' });
         }
       }, 500);

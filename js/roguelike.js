@@ -1,16 +1,16 @@
 // Rogue 2000 ASCII Roguelike
-// A simplified implementation using rot.js and the P.O.W.E.R system
+// A simplified implementation using the terminal's styling
 
 // Game constants
-const DISPLAY_WIDTH = 80;
-const DISPLAY_HEIGHT = 25;
-const STATS_HEIGHT = 8;
-const MESSAGE_HEIGHT = 3;
+const DISPLAY_WIDTH = 60;
+const DISPLAY_HEIGHT = 18;
+const STATS_HEIGHT = 5;
+const MESSAGE_HEIGHT = 4;
 const MAP_HEIGHT = DISPLAY_HEIGHT - STATS_HEIGHT - MESSAGE_HEIGHT;
 const NUM_LEVELS = 10;
 const COLORS = {
   player: '#e0f8cf',
-  wall: '#306850',
+  wall: '#86c06c',
   floor: '#071821',
   enemy: '#86c06c',
   item: '#cebb49',
@@ -24,32 +24,32 @@ const COLORS = {
 
 // Game state
 let Game = {
-  display: null,
+  container: null,
   map: {},
   player: null,
   entities: [],
   items: [],
   level: 1,
-  scheduler: null,
-  engine: null,
   gameOver: false,
   messages: [],
-  fov: null,
   visibleTiles: {},
+  keyHandler: null,
+  gameLoop: null,
   
   // Initialize game
   init: function(container) {
-    // Create display
-    this.display = new ROT.Display({
-      width: DISPLAY_WIDTH,
-      height: DISPLAY_HEIGHT,
-      fontFamily: "RuneScape, monospace",
-      fontSize: 16,
-      spacing: 1.0,
-      forceSquareRatio: true
-    });
-    
-    container.appendChild(this.display.getContainer());
+    this.container = container;
+    container.style.fontFamily = "RuneScape, monospace";
+    container.style.fontSize = "16px";
+    container.style.lineHeight = "1";
+    container.style.color = COLORS.text;
+    container.style.backgroundColor = COLORS.floor;
+    container.style.padding = "0";
+    container.style.margin = "0";
+    container.style.overflow = "hidden";
+    container.style.userSelect = "none";
+    container.style.width = "100%";
+    container.style.height = "500px";
     
     // Add scanline effect to match terminal
     const scanlines = document.createElement('div');
@@ -63,10 +63,6 @@ let Game = {
     scanlines.style.zIndex = '2';
     container.appendChild(scanlines);
     
-    // Set up scheduler for turn-based gameplay
-    this.scheduler = new ROT.Scheduler.Simple();
-    this.engine = new ROT.Engine(this.scheduler);
-    
     // Initialize the player
     this.initPlayer();
     
@@ -78,10 +74,11 @@ let Game = {
     this.addMessage("The Gamemaster is always watching.");
     
     // Set up input handling
-    window.addEventListener("keydown", this.handleInput.bind(this));
+    this.keyHandler = this.handleInput.bind(this);
+    window.addEventListener("keydown", this.keyHandler);
     
-    // Start game
-    this.engine.start();
+    // Initial draw
+    this.drawAll();
     
     return this;
   },
@@ -101,9 +98,6 @@ let Game = {
     
     // Calculate derived stats
     this.player.updateDerivedStats();
-    
-    // Add player to scheduler
-    this.scheduler.add(this.player, true);
   },
   
   // Generate a new level
@@ -113,32 +107,16 @@ let Game = {
     this.items = [];
     this.visibleTiles = {};
     
-    // Generate map using cellular automata for an organic cave feel
-    const mapGenerator = new ROT.Map.Cellular(DISPLAY_WIDTH, MAP_HEIGHT);
-    mapGenerator.randomize(0.5);
-    
-    // Run automata iterations
-    for (let i = 0; i < 3; i++) {
-      mapGenerator.create();
-    }
-    
-    // Convert to our map format
-    mapGenerator.create((x, y, value) => {
-      const key = `${x},${y}`;
-      // 0 = floor, 1 = wall
-      this.map[key] = value ? "wall" : "floor";
-    });
+    // Generate cave-like map
+    this.generateCaveMap();
     
     // Find a valid position for the player
     let validPosition = this.findEmptyPosition();
     this.player.x = validPosition.x;
     this.player.y = validPosition.y;
     
-    // Create FOV
-    this.fov = new ROT.FOV.PreciseShadowcasting((x, y) => {
-      const key = `${x},${y}`;
-      return key in this.map && this.map[key] === "floor";
-    });
+    // Update FOV
+    this.updateFOV();
     
     // Place stairs
     if (this.level < NUM_LEVELS) {
@@ -150,20 +128,69 @@ let Game = {
     // Place entities and items
     this.placeEntities();
     this.placeItems();
+  },
+  
+  // Generate a cave-like map using cellular automata algorithm
+  generateCaveMap: function() {
+    // Start with random noise
+    let tempMap = {};
+    for (let x = 0; x < DISPLAY_WIDTH; x++) {
+      for (let y = 0; y < MAP_HEIGHT; y++) {
+        const key = `${x},${y}`;
+        tempMap[key] = Math.random() < 0.4 ? "floor" : "wall";
+      }
+    }
     
-    // Update FOV
-    this.updateFOV();
+    // Run cellular automata rules for a few iterations
+    for (let i = 0; i < 3; i++) {
+      let newMap = {};
+      for (let x = 0; x < DISPLAY_WIDTH; x++) {
+        for (let y = 0; y < MAP_HEIGHT; y++) {
+          const key = `${x},${y}`;
+          
+          // Count walls in 3x3 neighborhood
+          let walls = 0;
+          for (let nx = x-1; nx <= x+1; nx++) {
+            for (let ny = y-1; ny <= y+1; ny++) {
+              const nkey = `${nx},${ny}`;
+              if (nx < 0 || ny < 0 || nx >= DISPLAY_WIDTH || ny >= MAP_HEIGHT) {
+                walls++; // Count edges as walls
+              } else if (tempMap[nkey] === "wall") {
+                walls++;
+              }
+            }
+          }
+          
+          // Apply cellular automata rules
+          if (tempMap[key] === "wall") {
+            newMap[key] = (walls >= 4) ? "wall" : "floor";
+          } else {
+            newMap[key] = (walls >= 5) ? "wall" : "floor";
+          }
+        }
+      }
+      tempMap = newMap;
+    }
     
-    // Draw everything
-    this.drawAll();
+    // Add border walls
+    for (let x = 0; x < DISPLAY_WIDTH; x++) {
+      tempMap[`${x},0`] = "wall";
+      tempMap[`${x},${MAP_HEIGHT-1}`] = "wall";
+    }
+    for (let y = 0; y < MAP_HEIGHT; y++) {
+      tempMap[`0,${y}`] = "wall";
+      tempMap[`${DISPLAY_WIDTH-1},${y}`] = "wall";
+    }
+    
+    this.map = tempMap;
   },
   
   // Find an empty position on the map
   findEmptyPosition: function() {
     let x, y, key;
     do {
-      x = Math.floor(ROT.RNG.getUniform() * DISPLAY_WIDTH);
-      y = Math.floor(ROT.RNG.getUniform() * MAP_HEIGHT);
+      x = Math.floor(Math.random() * (DISPLAY_WIDTH - 2)) + 1;
+      y = Math.floor(Math.random() * (MAP_HEIGHT - 2)) + 1;
       key = `${x},${y}`;
     } while (!(key in this.map) || this.map[key] !== "floor" || this.getEntityAt(x, y));
     
@@ -179,7 +206,6 @@ let Game = {
       let pos = this.findEmptyPosition();
       let enemy = this.createEnemy(pos.x, pos.y);
       this.entities.push(enemy);
-      this.scheduler.add(enemy, true);
     }
   },
   
@@ -191,16 +217,16 @@ let Game = {
     const statBonus = Math.floor(this.level / 3);
     
     enemy.attributes = {
-      power: 1 + statBonus + Math.floor(ROT.RNG.getUniform() * 3),
-      oddity: 1 + Math.floor(ROT.RNG.getUniform() * 2),
-      wisdom: 1 + Math.floor(ROT.RNG.getUniform() * 2),
-      endurance: 1 + statBonus + Math.floor(ROT.RNG.getUniform() * 2),
-      reflex: 1 + Math.floor(ROT.RNG.getUniform() * 3)
+      power: 1 + statBonus + Math.floor(Math.random() * 3),
+      oddity: 1 + Math.floor(Math.random() * 2),
+      wisdom: 1 + Math.floor(Math.random() * 2),
+      endurance: 1 + statBonus + Math.floor(Math.random() * 2),
+      reflex: 1 + Math.floor(Math.random() * 3)
     };
     
     // Random enemy types
     const types = ['BITMAP SHADE', 'GLITCH STALKER', 'DATA WRAITH', 'CODE GOLEM', 'PIXEL FIEND'];
-    enemy.name = types[Math.floor(ROT.RNG.getUniform() * types.length)];
+    enemy.name = types[Math.floor(Math.random() * types.length)];
     
     // Calculate derived stats
     enemy.updateDerivedStats();
@@ -221,143 +247,206 @@ let Game = {
         type: "medkit",
         char: "+",
         color: COLORS.item,
-        healing: 5 + Math.floor(ROT.RNG.getUniform() * this.level)
+        healing: 5 + Math.floor(Math.random() * this.level)
       };
       this.items.push(item);
     }
   },
   
-  // Update field of view
+  // Update field of view using basic raycasting
   updateFOV: function() {
     this.visibleTiles = {};
     
-    // Calculate visible tiles
-    this.fov.compute(this.player.x, this.player.y, 8, (x, y, r, visibility) => {
+    // Helper function to check if a tile blocks sight
+    const blocksSight = (x, y) => {
       const key = `${x},${y}`;
-      this.visibleTiles[key] = true;
-    });
-  },
-  
-  // Draw everything
-  drawAll: function() {
-    // Clear display
-    this.display.clear();
+      return !(key in this.map) || this.map[key] === "wall";
+    };
     
-    // Draw map
-    for (let x = 0; x < DISPLAY_WIDTH; x++) {
-      for (let y = 0; y < MAP_HEIGHT; y++) {
+    // Simple 360-degree raycasting
+    const viewDistance = 6;
+    for (let angle = 0; angle < 360; angle += 3) {
+      const rad = angle * (Math.PI / 180);
+      const dx = Math.cos(rad);
+      const dy = Math.sin(rad);
+      
+      let cx = this.player.x;
+      let cy = this.player.y;
+      
+      for (let i = 0; i < viewDistance; i++) {
+        cx += dx;
+        cy += dy;
+        
+        const x = Math.round(cx);
+        const y = Math.round(cy);
         const key = `${x},${y}`;
         
-        // Only draw if tile is visible
-        if (this.visibleTiles[key]) {
-          if (key in this.map) {
-            let tile = this.map[key];
-            let char, fg, bg;
-            
-            switch (tile) {
-              case "floor":
-                char = ".";
-                fg = "#86c06c";
-                bg = COLORS.floor;
-                break;
-              case "wall":
-                char = "#";
-                fg = "#e0f8cf";
-                bg = COLORS.wall;
-                break;
-              case "stairs":
-                char = ">";
-                fg = COLORS.stairs;
-                bg = COLORS.floor;
-                break;
-            }
-            
-            this.display.draw(x, y, char, fg, bg);
-          }
+        this.visibleTiles[key] = true;
+        
+        if (blocksSight(x, y)) {
+          break;
         }
       }
     }
     
-    // Draw items
-    for (let item of this.items) {
-      const key = `${item.x},${item.y}`;
-      if (this.visibleTiles[key]) {
-        this.display.draw(item.x, item.y, item.char, item.color, COLORS.floor);
+    // Always add player position and adjacent tiles
+    this.visibleTiles[`${this.player.x},${this.player.y}`] = true;
+    for (let dx = -1; dx <= 1; dx++) {
+      for (let dy = -1; dy <= 1; dy++) {
+        const key = `${this.player.x + dx},${this.player.y + dy}`;
+        this.visibleTiles[key] = true;
       }
     }
+  },
+  
+  // Draw everything
+  drawAll: function() {
+    // Clear container
+    this.container.innerHTML = '';
     
-    // Draw entities
-    for (let entity of this.entities) {
-      const key = `${entity.x},${entity.y}`;
-      if (this.visibleTiles[key]) {
-        this.display.draw(entity.x, entity.y, entity.char, entity.color, COLORS.floor);
+    // Create the game display element
+    const display = document.createElement('pre');
+    display.style.margin = '0';
+    display.style.padding = '0';
+    display.style.backgroundColor = COLORS.floor;
+    display.style.color = COLORS.text;
+    display.style.fontFamily = 'RuneScape, monospace';
+    display.style.width = '100%';
+    display.style.height = '100%';
+    display.style.overflow = 'hidden';
+    
+    // Create the map display
+    let mapDisplay = '';
+    for (let y = 0; y < MAP_HEIGHT; y++) {
+      for (let x = 0; x < DISPLAY_WIDTH; x++) {
+        const key = `${x},${y}`;
+        
+        if (this.visibleTiles[key]) {
+          // Draw entities first
+          const entity = this.getEntityAt(x, y);
+          if (entity) {
+            mapDisplay += `<span style="color:${entity.color}">${entity.char}</span>`;
+            continue;
+          }
+          
+          // Draw items
+          const item = this.getItemAt(x, y);
+          if (item) {
+            mapDisplay += `<span style="color:${item.color}">${item.char}</span>`;
+            continue;
+          }
+          
+          // Draw map features
+          if (key in this.map) {
+            let tile = this.map[key];
+            let char, color;
+            
+            switch (tile) {
+              case "floor":
+                char = ".";
+                color = "#86c06c";
+                break;
+              case "wall":
+                char = "#";
+                color = "#e0f8cf";
+                break;
+              case "stairs":
+                char = ">";
+                color = COLORS.stairs;
+                break;
+              default:
+                char = " ";
+                color = COLORS.floor;
+            }
+            
+            mapDisplay += `<span style="color:${color}">${char}</span>`;
+          } else {
+            mapDisplay += ' ';
+          }
+        } else {
+          // Not visible
+          mapDisplay += ' ';
+        }
       }
+      mapDisplay += '\n';
     }
     
-    // Draw stats
-    this.drawStats();
-    
-    // Draw messages
-    this.drawMessages();
-  },
-  
-  // Draw player stats
-  drawStats: function() {
-    const statsY = MAP_HEIGHT;
-    
-    // Draw border
+    // Add border between map and stats
+    let borderLine = '';
     for (let x = 0; x < DISPLAY_WIDTH; x++) {
-      this.display.draw(x, statsY, '-', COLORS.text);
+      borderLine += '-';
     }
     
-    // Draw basic stats
-    this.display.drawText(1, statsY + 1, `LEVEL: ${this.level}/${NUM_LEVELS}`);
+    // Create stat display
+    const pText = `P:${this.player.attributes.power}`;
+    const oText = `O:${this.player.attributes.oddity}`;
+    const wText = `W:${this.player.attributes.wisdom}`;
+    const eText = `E:${this.player.attributes.endurance}`;
+    const rText = `R:${this.player.attributes.reflex}`;
     
-    // Draw P.O.W.E.R stats
-    const statsText = `P:${this.player.attributes.power} O:${this.player.attributes.oddity} W:${this.player.attributes.wisdom} E:${this.player.attributes.endurance} R:${this.player.attributes.reflex}`;
-    this.display.drawText(20, statsY + 1, statsText);
+    const statsDisplay = `
+${borderLine}
+LEVEL: ${this.level}/${NUM_LEVELS}          ${pText} ${oText} ${wText} ${eText} ${rText}
+
+BLOOD: ${this.player.blood.current}/${this.player.blood.max} ${'█'.repeat(this.player.blood.current)}${'░'.repeat(this.player.blood.max - this.player.blood.current)}  ARROWS: Move/Attack
+SWEAT: ${this.player.sweat.current}/${this.player.sweat.max} ${'█'.repeat(this.player.sweat.current)}${'░'.repeat(this.player.sweat.max - this.player.sweat.current)}  S: Use SWEAT to power attack
+TEARS: ${this.player.tears.current}/${this.player.tears.max} ${'█'.repeat(this.player.tears.current)}${'░'.repeat(this.player.tears.max - this.player.tears.current)}  T: Use TEARS to analyze enemy
+${borderLine}
+`;
     
-    // Draw health/resource bars
-    this.drawResourceBar(1, statsY + 3, "BLOOD", this.player.blood.current, this.player.blood.max, COLORS.blood);
-    this.drawResourceBar(1, statsY + 4, "SWEAT", this.player.sweat.current, this.player.sweat.max, COLORS.sweat);
-    this.drawResourceBar(1, statsY + 5, "TEARS", this.player.tears.current, this.player.tears.max, COLORS.tears);
-    
-    // Help text
-    this.display.drawText(40, statsY + 3, "ARROWS: Move/Attack");
-    this.display.drawText(40, statsY + 4, "S: Use SWEAT to power attack");
-    this.display.drawText(40, statsY + 5, "T: Use TEARS to analyze enemy");
-  },
-  
-  // Draw a resource bar
-  drawResourceBar: function(x, y, name, current, max, color) {
-    const barText = `${name}: ${current}/${max}`;
-    this.display.drawText(x, y, barText, color);
-    
-    const barWidth = 20;
-    const filledWidth = Math.round((current / max) * barWidth);
-    
-    for (let i = 0; i < barWidth; i++) {
-      const barX = x + barText.length + 1 + i;
-      const barChar = i < filledWidth ? "█" : "░";
-      this.display.draw(barX, y, barChar, color);
-    }
-  },
-  
-  // Draw messages
-  drawMessages: function() {
-    const messagesY = MAP_HEIGHT + STATS_HEIGHT;
-    
-    // Draw border
-    for (let x = 0; x < DISPLAY_WIDTH; x++) {
-      this.display.draw(x, messagesY, '-', COLORS.text);
-    }
-    
-    // Draw messages
+    // Create message display
+    let messagesDisplay = '';
     for (let i = 0; i < Math.min(this.messages.length, MESSAGE_HEIGHT); i++) {
       const message = this.messages[this.messages.length - 1 - i];
-      const color = message.important ? COLORS.critical : COLORS.text;
-      this.display.drawText(1, messagesY + MESSAGE_HEIGHT - i, message.text, color);
+      messagesDisplay = message.text + '\n' + messagesDisplay;
     }
+    
+    // If game over, display that message
+    if (this.gameOver) {
+      const gameOverMessage = this.level > NUM_LEVELS ? 
+        "CONGRATULATIONS! You've survived the Gamemaster's trials!\nPress SPACE to play again." :
+        "YOU DIED. The Gamemaster claims another victim.\nPress SPACE to try again.";
+      
+      mapDisplay = `<div style="text-align:center; margin-top:50px; font-size:20px; color:${COLORS.critical}">${gameOverMessage}</div>`;
+    }
+    
+    // Combine all displays
+    display.innerHTML = mapDisplay + statsDisplay + messagesDisplay;
+    
+    // Add the display to the container
+    this.container.appendChild(display);
+    
+    // Add scanlines back
+    const scanlines = document.createElement('div');
+    scanlines.style.position = 'absolute';
+    scanlines.style.top = '0';
+    scanlines.style.left = '0';
+    scanlines.style.width = '100%';
+    scanlines.style.height = '100%';
+    scanlines.style.background = 'repeating-linear-gradient(to bottom, rgba(7, 24, 33, 0), rgba(7, 24, 33, 0) 1px, rgba(7, 24, 33, 0.1) 1px, rgba(7, 24, 33, 0.1) 2px)';
+    scanlines.style.pointerEvents = 'none';
+    scanlines.style.zIndex = '2';
+    this.container.appendChild(scanlines);
+  },
+  
+  // Get entity at a specific position
+  getEntityAt: function(x, y) {
+    for (let entity of this.entities) {
+      if (entity.x === x && entity.y === y) {
+        return entity;
+      }
+    }
+    return null;
+  },
+  
+  // Get item at a specific position
+  getItemAt: function(x, y) {
+    for (let item of this.items) {
+      if (item.x === x && item.y === y) {
+        return item;
+      }
+    }
+    return null;
   },
   
   // Add a message to the log
@@ -377,9 +466,6 @@ let Game = {
       }
       return;
     }
-    
-    // Only handle input when it's the player's turn
-    if (this.engine.lock) return;
     
     let actionTaken = false;
     let dx = 0, dy = 0;
@@ -426,6 +512,10 @@ let Game = {
           this.addMessage("Not enough TEARS for analysis.");
         }
         break;
+      case 'Escape':
+        // Stop the game
+        this.stopGame();
+        return;
     }
     
     if (actionTaken) {
@@ -458,8 +548,8 @@ let Game = {
           this.player.powerAttack = false;
           this.player.analyze = false;
           
-          // End player turn
-          this.player.act();
+          // Run enemy turns
+          this.runEnemyTurns();
         } else if (tile === "stairs") {
           // Go to next level
           this.level++;
@@ -471,15 +561,10 @@ let Game = {
           if (this.level > NUM_LEVELS) {
             this.victory();
           } else {
-            // Remove all entities except player from scheduler
-            for (let entity of this.entities) {
-              if (entity !== this.player) {
-                this.scheduler.remove(entity);
-              }
-            }
-            
             this.generateLevel();
           }
+        } else if (tile === "wall") {
+          this.addMessage("You bump into a wall.");
         }
       }
       
@@ -489,16 +574,6 @@ let Game = {
       // Redraw everything
       this.drawAll();
     }
-  },
-  
-  // Get entity at a specific position
-  getEntityAt: function(x, y) {
-    for (let entity of this.entities) {
-      if (entity.x === x && entity.y === y) {
-        return entity;
-      }
-    }
-    return null;
   },
   
   // Check for items at player position
@@ -516,6 +591,68 @@ let Game = {
         // Remove item from the map
         this.items.splice(i, 1);
         break;
+      }
+    }
+  },
+  
+  // Run enemy turns
+  runEnemyTurns: function() {
+    for (let entity of this.entities) {
+      if (entity !== this.player) {
+        this.enemyTurn(entity);
+      }
+    }
+  },
+  
+  // Enemy turn logic
+  enemyTurn: function(enemy) {
+    // Simple AI - move towards player if visible, otherwise random
+    const key = `${enemy.x},${enemy.y}`;
+    if (key in this.visibleTiles) {
+      // Move towards player
+      const dx = Math.sign(this.player.x - enemy.x);
+      const dy = Math.sign(this.player.y - enemy.y);
+      
+      const newX = enemy.x + dx;
+      const newY = enemy.y + dy;
+      const newKey = `${newX},${newY}`;
+      
+      // Check if movement is valid
+      if (newKey in this.map && this.map[newKey] === "floor") {
+        // Check for entity
+        const entity = this.getEntityAt(newX, newY);
+        if (entity) {
+          // Attack entity
+          if (entity === this.player) {
+            this.combat(enemy, entity);
+          }
+        } else {
+          // Move
+          enemy.x = newX;
+          enemy.y = newY;
+        }
+      }
+    } else {
+      // Random movement if player not visible
+      for (let attempt = 0; attempt < 5; attempt++) {
+        const dirs = [
+          [0, -1], [1, -1], [1, 0], [1, 1],
+          [0, 1], [-1, 1], [-1, 0], [-1, -1]
+        ];
+        
+        const index = Math.floor(Math.random() * dirs.length);
+        const [dx, dy] = dirs[index];
+        
+        const newX = enemy.x + dx;
+        const newY = enemy.y + dy;
+        const newKey = `${newX},${newY}`;
+        
+        // Check if movement is valid
+        if (newKey in this.map && this.map[newKey] === "floor" && !this.getEntityAt(newX, newY)) {
+          enemy.x = newX;
+          enemy.y = newY;
+          break;
+        }
       }
     }
   },
@@ -576,7 +713,9 @@ let Game = {
       if (defender.blood.current <= 0) {
         if (defender === this.player) {
           this.gameOver = true;
-          this.addMessage("YOU DIED. Press SPACE to restart.", true);
+          this.addMessage("YOU DIED. The Gamemaster claims another victim.", true);
+          this.addMessage("Press SPACE to try again.", true);
+          this.drawAll();
         } else {
           // Remove enemy
           this.addMessage(`${defender.name} is defeated!`);
@@ -594,6 +733,9 @@ let Game = {
         this.addMessage(`${attacker.name}'s attack misses you.`);
       }
     }
+    
+    // Create a glitch effect for combat
+    this.createGlitchEffect(attackSucceeds);
   },
   
   // Roll dice for an entity based on P.O.W.E.R attributes
@@ -602,12 +744,12 @@ let Game = {
     
     // Add dice based on POWER
     for (let i = 0; i < entity.attributes.power; i++) {
-      dice.push(Math.floor(ROT.RNG.getUniform() * 6) + 1);
+      dice.push(Math.floor(Math.random() * 6) + 1);
     }
     
     // Add dice based on REFLEX
     for (let i = 0; i < entity.attributes.reflex; i++) {
-      dice.push(Math.floor(ROT.RNG.getUniform() * 6) + 1);
+      dice.push(Math.floor(Math.random() * 6) + 1);
     }
     
     return dice;
@@ -617,7 +759,7 @@ let Game = {
   rollExtraDice: function(count) {
     let dice = [];
     for (let i = 0; i < count; i++) {
-      dice.push(Math.floor(ROT.RNG.getUniform() * 6) + 1);
+      dice.push(Math.floor(Math.random() * 6) + 1);
     }
     return dice;
   },
@@ -717,17 +859,44 @@ let Game = {
     this.addMessage(`Analyzing ${enemy.name}...`);
     this.addMessage(`P:${enemy.attributes.power} O:${enemy.attributes.oddity} W:${enemy.attributes.wisdom} E:${enemy.attributes.endurance} R:${enemy.attributes.reflex}`);
     this.addMessage(`BLOOD: ${enemy.blood.current}/${enemy.blood.max}`);
+    this.createGlitchEffect(true);
   },
   
   // Remove an entity from the game
   removeEntity: function(entity) {
-    // Remove from scheduler
-    this.scheduler.remove(entity);
-    
     // Remove from entities array
     const index = this.entities.indexOf(entity);
     if (index !== -1) {
       this.entities.splice(index, 1);
+    }
+  },
+  
+  // Create a glitch effect
+  createGlitchEffect: function(intense = false) {
+    const numArtifacts = intense ? 5 : 2;
+    
+    for (let i = 0; i < numArtifacts; i++) {
+      setTimeout(() => {
+        const artifact = document.createElement('div');
+        artifact.className = Math.random() > 0.5 ? 'artifact h-line' : 'artifact v-line';
+        artifact.style.position = 'absolute';
+        artifact.style.height = Math.random() > 0.5 ? '1px' : `${Math.random() * 3 + 1}px`;
+        artifact.style.width = Math.random() > 0.5 ? '100%' : `${Math.random() * 50 + 20}px`;
+        artifact.style.left = `${Math.random() * 100}%`;
+        artifact.style.top = `${Math.random() * 100}%`;
+        artifact.style.backgroundColor = '#86c06c';
+        artifact.style.opacity = '0.7';
+        artifact.style.zIndex = '3';
+        
+        if (this.container) {
+          this.container.appendChild(artifact);
+          setTimeout(() => {
+            if (artifact.parentNode) {
+              artifact.parentNode.removeChild(artifact);
+            }
+          }, 200);
+        }
+      }, i * 50);
     }
   },
   
@@ -736,7 +905,7 @@ let Game = {
     this.gameOver = true;
     this.addMessage("CONGRATULATIONS! You've completed all 10 levels!", true);
     this.addMessage("You have survived the Gamemaster's trials.", true);
-    this.addMessage("Press SPACE to play again.");
+    this.addMessage("Press SPACE to play again.", true);
     this.drawAll();
   },
   
@@ -746,23 +915,35 @@ let Game = {
     this.gameOver = false;
     this.messages = [];
     
-    // Remove all entities from scheduler
-    for (let entity of this.entities) {
-      this.scheduler.remove(entity);
-    }
-    
     // Reset player
     this.initPlayer();
     
     // Generate new level
     this.generateLevel();
     
-    // Start engine
-    this.engine.start();
-    
     // Add message
     this.addMessage("Welcome to Rogue 2000. Survive 10 levels to win.");
     this.addMessage("The Gamemaster is always watching.");
+    
+    // Redraw
+    this.drawAll();
+  },
+  
+  // Stop the game and clean up
+  stopGame: function() {
+    if (this.keyHandler) {
+      window.removeEventListener("keydown", this.keyHandler);
+      this.keyHandler = null;
+    }
+    
+    if (this.gameLoop) {
+      clearInterval(this.gameLoop);
+      this.gameLoop = null;
+    }
+    
+    if (this.container && this.container.parentNode) {
+      this.container.parentNode.removeChild(this.container);
+    }
   }
 };
 
@@ -797,67 +978,6 @@ class Entity {
     this.tears.max = 1 + this.attributes.wisdom + this.attributes.oddity;
     this.tears.current = this.tears.max;
   }
-  
-  // Act - called by scheduler
-  act() {
-    if (this.isPlayer) {
-      // Lock engine and wait for player input
-      Game.engine.lock();
-    } else {
-      // Enemy AI
-      this.aiAct();
-    }
-  }
-  
-  // Enemy AI
-  aiAct() {
-    // Simple AI - move towards player if visible, otherwise random
-    const key = `${this.x},${this.y}`;
-    if (key in Game.visibleTiles) {
-      // Move towards player
-      const dx = Math.sign(Game.player.x - this.x);
-      const dy = Math.sign(Game.player.y - this.y);
-      
-      const newX = this.x + dx;
-      const newY = this.y + dy;
-      const newKey = `${newX},${newY}`;
-      
-      // Check if movement is valid
-      if (newKey in Game.map && Game.map[newKey] === "floor") {
-        // Check for entity
-        const entity = Game.getEntityAt(newX, newY);
-        if (entity) {
-          // Attack entity
-          if (entity === Game.player) {
-            Game.combat(this, entity);
-          }
-        } else {
-          // Move
-          this.x = newX;
-          this.y = newY;
-        }
-      }
-    } else {
-      // Random movement if player not visible
-      const dirs = [
-        [0, -1], [1, -1], [1, 0], [1, 1],
-        [0, 1], [-1, 1], [-1, 0], [-1, -1]
-      ];
-      
-      const index = Math.floor(ROT.RNG.getUniform() * dirs.length);
-      const [dx, dy] = dirs[index];
-      
-      const newX = this.x + dx;
-      const newY = this.y + dy;
-      const newKey = `${newX},${newY}`;
-      
-      // Check if movement is valid
-      if (newKey in Game.map && Game.map[newKey] === "floor" && !Game.getEntityAt(newX, newY)) {
-        this.x = newX;
-        this.y = newY;
-      }
-    }
-  }
 }
 
 // Initialize and start the game
@@ -882,14 +1002,8 @@ function startRoguelikeGame(terminal) {
   
   return {
     stop: () => {
-      // Clean up and remove the game
-      if (game.engine) {
-        game.engine.lock();
-      }
-      window.removeEventListener("keydown", game.handleInput);
-      if (gameContainer.parentNode) {
-        gameContainer.parentNode.removeChild(gameContainer);
-      }
+      // Clean up
+      game.stopGame();
     }
   };
 }
