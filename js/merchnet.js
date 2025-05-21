@@ -53,26 +53,14 @@ class Item {
   }
   
   getSummary() {
-    const summary = {
+    return {
       name: this.name,
       cost: `${this.cost} W`,
       rarity: this.rarity,
-      state: this.state
+      state: this.state,
+      weight: this.state === 'PHYSICAL' || this.state === 'HYBRID' ? `${this.weight} kg` : 'N/A',
+      memory: this.state === 'DIGITAL' || this.state === 'HYBRID' ? `${this.memory} MB` : 'N/A'
     };
-    
-    if (this.state === 'PHYSICAL' || this.state === 'HYBRID') {
-      summary.weight = `${this.weight} kg`;
-    } else {
-      summary.weight = 'N/A';
-    }
-    
-    if (this.state === 'DIGITAL' || this.state === 'HYBRID') {
-      summary.memory = `${this.memory} MB`;
-    } else {
-      summary.memory = 'N/A';
-    }
-    
-    return summary;
   }
   
   matches(term) {
@@ -110,15 +98,21 @@ class MerchNet {
     itemConfigArray.forEach(config => this.addItem(config));
   }
   
-  getItem(id) {
+  getItemById(id) {
     return this.items.find(item => item.id.toLowerCase() === id.toLowerCase());
   }
   
   getItemByName(name) {
     const searchName = name.toLowerCase();
+    const exactMatch = this.items.find(item => 
+      item.name.toLowerCase() === searchName
+    );
+    
+    if (exactMatch) return exactMatch;
+    
+    // Try to find by partial name match
     return this.items.find(item => 
-      item.name.toLowerCase() === searchName ||
-      item.id.toLowerCase() === searchName
+      item.name.toLowerCase().includes(searchName)
     );
   }
   
@@ -172,12 +166,12 @@ class MerchNet {
     
     if (command.startsWith('list ')) {
       const category = command.substring('list '.length).toUpperCase();
-      return { type: 'items', message: this.listItemsByCategory(category), category: category };
+      return { type: 'items', message: this.listItemsByCategory(category), items: this.getItemsByCategory(category) };
     }
     
     if (command === 'physical' || command === 'digital' || command === 'hybrid') {
       const state = command.toUpperCase();
-      return { type: 'items', message: this.listItemsByState(state), state: state };
+      return { type: 'items', message: this.listItemsByState(state), items: this.getItemsByState(state) };
     }
     
     if (command.startsWith('lookup "') && command.endsWith('"')) {
@@ -185,13 +179,17 @@ class MerchNet {
       return { type: 'item', message: this.lookupItem(searchTerm) };
     }
     
-    if (command.startsWith('addtocart "') && command.includes('" ')) {
-      const parts = command.substring(10).split('" ');
-      const itemName = parts[0];
-      const quantity = parseInt(parts[1], 10);
+    if (command.startsWith('addtocart "') && command.includes('"')) {
+      // Extract item name and quantity
+      let parts = command.substring(10).split('"');
+      const itemName = parts[0].trim();
       
-      if (isNaN(quantity) || quantity <= 0) {
-        return { type: 'error', message: 'Please enter a valid quantity.' };
+      let quantity = 1;
+      if (parts.length > 1 && parts[1].trim()) {
+        quantity = parseInt(parts[1].trim(), 10);
+        if (isNaN(quantity) || quantity <= 0) {
+          quantity = 1;
+        }
       }
       
       return this.addToCart(itemName, quantity);
@@ -207,7 +205,7 @@ class MerchNet {
     }
     
     if (command === 'order') {
-      return { type: 'order', message: this.prepareOrder() };
+      return { type: 'order', message: this.prepareOrder(), total: this.getCartTotal() };
     }
     
     if (command.startsWith('pay ')) {
@@ -240,7 +238,7 @@ physical                - List all physical items
 digital                 - List all digital items
 hybrid                  - List all hybrid items
 lookup "[item name]"    - View detailed information on an item
-addtocart "[item]" [#]  - Add item to cart with quantity
+addtocart "[item]" [#]  - Add item to cart with quantity (or addtocart "[item]" for qty 1)
 showcart                - Show current cart contents
 clearcart               - Clear your cart
 order                   - Review order and prepare for payment
@@ -294,22 +292,11 @@ Press ENTER on a selected item to view details.
     let output = `${title}\n`;
     output += "-".repeat(title.length) + "\n\n";
     
-    let header = "NAME COST RARITY STATE WEIGHT";
-    if (items.some(item => item.state === 'DIGITAL' || item.state === 'HYBRID')) {
-      header += " MEMORY";
-    }
-    
-    output += header + "\n\n";
+    output += "NAME COST RARITY STATE WEIGHT\n\n";
     
     items.forEach(item => {
       const summary = item.getSummary();
-      
-      let row = `${summary.name} ${summary.cost} ${summary.rarity} ${summary.state} ${summary.weight}`;
-      if (items.some(item => item.state === 'DIGITAL' || item.state === 'HYBRID')) {
-        row += ` ${summary.memory}`;
-      }
-      
-      output += row + "\n";
+      output += `${summary.name} ${summary.cost} ${summary.rarity} ${summary.state} ${summary.weight}\n`;
     });
     
     output += "\nType 'lookup \"[item name]\"' for detailed information.";
@@ -317,27 +304,35 @@ Press ENTER on a selected item to view details.
   }
   
   lookupItem(searchTerm) {
-    const exactIdMatch = this.getItem(searchTerm);
-    if (exactIdMatch) {
-      return this.formatItemDetails(exactIdMatch);
+    // First try exact match by ID
+    let item = this.getItemById(searchTerm);
+    
+    // Then try by name
+    if (!item) {
+      item = this.getItemByName(searchTerm);
     }
     
-    const matches = this.searchItems(searchTerm);
-    
-    if (matches.length === 0) {
-      return `No items found matching "${searchTerm}".`;
+    // Then try search
+    if (!item) {
+      const matches = this.searchItems(searchTerm);
+      
+      if (matches.length === 0) {
+        return `No items found matching "${searchTerm}".`;
+      }
+      
+      if (matches.length === 1) {
+        item = matches[0];
+      } else {
+        let output = `Multiple items found matching "${searchTerm}":\n\n`;
+        matches.forEach(match => {
+          output += `- ${match.name}\n`;
+        });
+        output += "\nPlease refine your search with 'lookup \"[exact name]\"'";
+        return output;
+      }
     }
     
-    if (matches.length === 1) {
-      return this.formatItemDetails(matches[0]);
-    }
-    
-    let output = `Multiple items found matching "${searchTerm}":\n\n`;
-    matches.forEach(item => {
-      output += `- ${item.name}\n`;
-    });
-    output += "\nPlease refine your search with 'lookup \"[exact name]\"'";
-    return output;
+    return this.formatItemDetails(item);
   }
   
   formatItemDetails(item) {
@@ -350,6 +345,7 @@ Press ENTER on a selected item to view details.
   }
   
   addToCart(itemName, quantity) {
+    // Find the item by name, more fuzzy matching
     const item = this.getItemByName(itemName);
     
     if (!item) {
@@ -408,6 +404,14 @@ Press ENTER on a selected item to view details.
     return output;
   }
   
+  getCartTotal() {
+    let total = 0;
+    this.cart.forEach(cartItem => {
+      total += cartItem.item.cost * cartItem.quantity;
+    });
+    return total;
+  }
+  
   prepareOrder() {
     if (this.cart.length === 0) {
       return "Your cart is empty. Nothing to order.";
@@ -439,10 +443,7 @@ Press ENTER on a selected item to view details.
       return { type: 'error', message: "Your cart is empty. Nothing to pay for." };
     }
     
-    let total = 0;
-    this.cart.forEach(cartItem => {
-      total += cartItem.item.cost * cartItem.quantity;
-    });
+    let total = this.getCartTotal();
     
     if (amount < total) {
       return { 
@@ -454,7 +455,7 @@ Press ENTER on a selected item to view details.
     if (this.userWatts < amount) {
       return { 
         type: 'error', 
-        message: "You don't have enough Watts to make the exchange." 
+        message: "You don't have enough watts to make the exchange." 
       };
     }
     

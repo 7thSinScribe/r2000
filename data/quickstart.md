@@ -76,7 +76,7 @@ At power 6, you would have 1d7/4d6, and at power 7, you would have access to 2d7
 Like many RPGs of the time, Rogue 2000 used derived stats, calculated & updated based on your **POWER** stats. 
 
 
-### **BLOOD**
+### BLOOD
 > The last analogue interface.
 
 Run out of this stuff and you don't need to question what happens, type outofblood into the terminal if you're curious. 
