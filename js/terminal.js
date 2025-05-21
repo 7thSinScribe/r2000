@@ -226,6 +226,8 @@ function renderOutput(item, isBooting) {
     );
   } else if (item.isWyrmGame) {
     return <pre className="terminal-output"></pre>;
+  } else if (item.isRoguelikeGame) {
+    return <pre className="terminal-output"></pre>;
   } else {
     if (item.text && item.text.includes("QUESTION")) {
       return <pre className="terminal-output">{item.text}</pre>;

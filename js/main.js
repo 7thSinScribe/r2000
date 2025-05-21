@@ -1,4 +1,3 @@
-// main.js
 const { useState, useEffect, useRef } = React;
 
 const SurvivorOSTerminal = () => {
@@ -115,7 +114,6 @@ const SurvivorOSTerminal = () => {
   const handleTerminalKeyPress = (e) => {
     if (e.key === 'Enter') {
       const inputValue = terminalInput;
-      // Clear input immediately after Enter is pressed
       setTerminalInput('');
       
       if (characterCreation.active) {
@@ -224,12 +222,10 @@ const SurvivorOSTerminal = () => {
           text: `Name registered: ${name}`
         });
         
-        // Verify total points is exactly 15 (5 base + 10 distributed)
         const totalPoints = Object.values(characterCreation.attributes).reduce((sum, val) => sum + val, 0);
         
         if (totalPoints !== 15) {
           console.error(`Point total ${totalPoints} !== 15. Character creation error.`);
-          // This shouldn't happen with the cascading system, but log it if it does
         }
         
         const characterSheet = generateCharacterSheet(
@@ -290,15 +286,12 @@ const SurvivorOSTerminal = () => {
     let updatedItems = [...characterCreation.items];
     let updatedBackground = characterCreation.background;
     
-    // Handle different attribute distribution scenarios
     if (selectedOption.primaryAttributes) {
-      // Multi-attribute option (like backgrounds)
       updatedAttributes = distributeMultipleAttributes(
         updatedAttributes,
         selectedOption.primaryAttributes
       );
     } else if (selectedOption.primaryAttribute) {
-      // Single attribute option with possible fallbacks
       const pointsToAdd = selectedOption.multiplePoints || 1;
       updatedAttributes = distributeAttributePoints(
         updatedAttributes,
@@ -308,12 +301,10 @@ const SurvivorOSTerminal = () => {
       );
     }
     
-    // Add item if present
     if (selectedOption.item && !updatedItems.includes(selectedOption.item)) {
       updatedItems.push(selectedOption.item);
     }
     
-    // Set background if present
     if (selectedOption.background) {
       updatedBackground = {
         title: selectedOption.background,
@@ -321,7 +312,6 @@ const SurvivorOSTerminal = () => {
       };
     }
     
-    // Calculate total points used
     const totalPoints = Object.values(updatedAttributes).reduce((sum, val) => sum + val, 0);
     
     setCharacterCreation({
@@ -345,10 +335,8 @@ const SurvivorOSTerminal = () => {
       return;
     }
     
-    // Add command to terminal history before processing
     addToTerminalHistory({ type: 'input', text: `> ${command}` });
     
-    // Process different commands
     if (command === 'quickstart') {
       showQuickstartContent();
       return;
@@ -384,6 +372,33 @@ const SurvivorOSTerminal = () => {
         
         if (gameElement && window.startWyrmGame) {
           window.startWyrmGame(gameElement);
+          gameElement.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 500);
+      
+      return;
+    }
+    
+    if (command === 'rogue' || command === 'roguelike') {
+      addToTerminalHistory({ 
+        type: 'output', 
+        text: 'LAUNCHING ROGUE 2000 DUNGEON CRAWLER v0.1\n\nUse arrow keys to move/attack.\nS: Use SWEAT for power attack.\nT: Use TEARS to analyze enemy.\nFind the stairs (>) to descend.\nSurvive 10 levels to win.\n\nPress ESC to quit.\n\nLoading game...'
+      });
+      
+      const gameOutputItem = { 
+        type: 'output', 
+        text: '', 
+        isRoguelikeGame: true 
+      };
+      
+      addToTerminalHistory(gameOutputItem);
+      
+      setTimeout(() => {
+        const outputElements = terminalRef.current.querySelectorAll('.terminal-output');
+        const gameElement = Array.from(outputElements).find(el => el.textContent === '');
+        
+        if (gameElement && window.startRoguelikeGame) {
+          window.startRoguelikeGame(gameElement);
           gameElement.scrollIntoView({ behavior: 'smooth' });
         }
       }, 500);
@@ -443,7 +458,6 @@ const SurvivorOSTerminal = () => {
       return;
     }
     
-    // CATALOGUE COMMAND HANDLING
     if (command === 'catalogue' || command === 'catalogue list') {
       addToTerminalHistory({ 
         type: 'output', 
@@ -468,7 +482,6 @@ const SurvivorOSTerminal = () => {
       });
       
       setTimeout(() => {
-        // Look for exact ID match (with leading zeros)
         const entity = catalogueEntities.find(e => e.id === entityId);
         if (entity) {
           addToTerminalHistory({ 
@@ -507,7 +520,6 @@ const SurvivorOSTerminal = () => {
       return;
     }
     
-    // Standard command responses
     let response = '';
     
     if (command === 'help') {
@@ -524,6 +536,8 @@ ascii:      Display SurvivorOS ASCII art logo
 catalogue:  Access entity database
 logs:       List available survivor logs
 log [#]:    Display specific log entry
+wyrm:       Play Wyrm snake game
+rogue:      Play Rogue 2000 dungeon crawler
 
 For survivors in the zones: Type what you learn out there.
 Stay safe. Share knowledge. Survive.`;
