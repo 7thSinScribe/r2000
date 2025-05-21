@@ -337,6 +337,32 @@ const SurvivorOSTerminal = () => {
     
     addToTerminalHistory({ type: 'input', text: `> ${command}` });
     
+    // MerchNet commands
+    if (command === 'merchnet' || command.startsWith('merchnet ') || command.startsWith('lookup "')) {
+      addToTerminalHistory({ 
+        type: 'output', 
+        text: 'CONNECTING TO MERCHNET...'
+      });
+      
+      setTimeout(() => {
+        if (window.processMerchnetCommand) {
+          const response = window.processMerchnetCommand(command);
+          
+          addToTerminalHistory({ 
+            type: 'output', 
+            text: response
+          });
+        } else {
+          addToTerminalHistory({ 
+            type: 'output', 
+            text: 'ERROR: MerchNet module not found. Please update SurvivorOS.'
+          });
+        }
+      }, 500);
+      
+      return;
+    }
+    
     if (command === 'quickstart') {
       showQuickstartContent();
       return;
@@ -510,6 +536,8 @@ catalogue:  Access entity database
 logs:       List available survivor logs
 log [#]:    Display specific log entry
 wyrm:       Play Wyrm snake game
+merchnet:   Access survivor marketplace
+lookup "x": Search for specific items
 
 For survivors in the zones: Type what you learn out there.
 Stay safe. Share knowledge. Survive.`;
