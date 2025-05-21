@@ -6,14 +6,16 @@ const SurvivorOSTerminal = () => {
   const [terminalHistory, setTerminalHistory] = useState([]);
   const [blinkCursor, setBlinkCursor] = useState(true);
   const terminalRef = useRef(null);
+  const inputRef = useRef(null);
   
   const [inMerchNet, setInMerchNet] = useState(false);
   const [merchNetItemsList, setMerchNetItemsList] = useState([]);
   const [selectedMerchNetIndex, setSelectedMerchNetIndex] = useState(0);
-  const [merchNetCart, setMerchNetCart] = useState([]);
   const [merchNetWatts, setMerchNetWatts] = useState(1000);
   const [awaitingPayment, setAwaitingPayment] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState(0);
+  const [lastSelectedItem, setLastSelectedItem] = useState("");
+  const [browsingHistory, setBrowsingHistory] = useState([]);
   
   const [characterCreation, setCharacterCreation] = useState({
     active: false,
@@ -110,7 +112,7 @@ const SurvivorOSTerminal = () => {
   }, []);
 
   useEffect(() => {
-    if (terminalRef.current) {
+    if (terminalRef.current && !inMerchNet) {
       terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
     }
   }, [terminalHistory]);
@@ -127,16 +129,49 @@ const SurvivorOSTerminal = () => {
         e.preventDefault();
       } else if (e.key === 'Enter' && merchNetItemsList.length > 0) {
         const selectedItem = merchNetItemsList[selectedMerchNetIndex];
-        const lookupCommand = `lookup "${selectedItem.name}"`;
-        setTerminalInput(lookupCommand);
-        processMerchNetCommand(lookupCommand);
+        
+        // If we're pressing Enter on the same item twice, execute the lookup
+        if (lastSelectedItem === selectedItem.name) {
+          const lookupCommand = `lookup "${selectedItem.name}"`;
+          setTerminalInput("");
+          processMerchNetCommand(lookupCommand);
+          setLastSelectedItem("");
+        } else {
+          // First Enter press - just put the lookup command in the input
+          setTerminalInput(`lookup "${selectedItem.name}"`);
+          setLastSelectedItem(selectedItem.name);
+        }
+        e.preventDefault();
+      } else if (e.key === 'Escape') {
+        // Cancel item selection mode
+        if (lastSelectedItem) {
+          setLastSelectedItem("");
+          setTerminalInput("");
+        } else if (browsingHistory.length > 0) {
+          // Go back to previous view
+          const prevState = browsingHistory[browsingHistory.length - 1];
+          setMerchNetItemsList(prevState.items || []);
+          setBrowsingHistory(prev => prev.slice(0, -1));
+        }
+        e.preventDefault();
+      } else if (e.key === 'Backspace' && browsingHistory.length > 0) {
+        // Go back to previous view
+        const prevState = browsingHistory[browsingHistory.length - 1];
+        setMerchNetItemsList(prevState.items || []);
+        setBrowsingHistory(prev => prev.slice(0, -1));
         e.preventDefault();
       }
     };
     
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [inMerchNet, selectedMerchNetIndex, merchNetItemsList]);
+  }, [inMerchNet, selectedMerchNetIndex, merchNetItemsList, lastSelectedItem, browsingHistory]);
+
+  useEffect(() => {
+    if (inMerchNet && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [inMerchNet, terminalInput]);
 
   const handleTerminalInput = (e) => {
     setTerminalInput(e.target.value);
@@ -146,6 +181,7 @@ const SurvivorOSTerminal = () => {
     if (e.key === 'Enter') {
       const inputValue = terminalInput;
       setTerminalInput('');
+      setLastSelectedItem("");
       
       if (characterCreation.active) {
         processCharacterCreationAnswer(inputValue);
@@ -171,44 +207,7 @@ const SurvivorOSTerminal = () => {
       });
       setInMerchNet(false);
       setMerchNetItemsList([]);
-      return;
-    }
-    
-    if (awaitingPayment && command.toLowerCase().startsWith('pay ')) {
-      const amount = parseInt(command.substring(4), 10);
-      
-      if (isNaN(amount)) {
-        addToTerminalHistory({ 
-          type: 'output', 
-          text: 'Please enter a valid amount.'
-        });
-        return;
-      }
-      
-      if (amount < paymentAmount) {
-        addToTerminalHistory({ 
-          type: 'output', 
-          text: `Payment of ${amount} W is insufficient. Order total is ${paymentAmount} W.`
-        });
-        return;
-      }
-      
-      if (merchNetWatts < amount) {
-        addToTerminalHistory({ 
-          type: 'output', 
-          text: "You don't have enough watts to make the exchange."
-        });
-        return;
-      }
-      
-      setMerchNetWatts(prev => prev - paymentAmount);
-      setMerchNetCart([]);
-      setAwaitingPayment(false);
-      
-      addToTerminalHistory({ 
-        type: 'output', 
-        text: `Thanks for using MerchNet. Your remaining balance is ${merchNetWatts - paymentAmount} W.\n\nYour items have been prepared for pickup at the nearest Haven trading post.`
-      });
+      setBrowsingHistory([]);
       return;
     }
     
@@ -217,6 +216,14 @@ const SurvivorOSTerminal = () => {
       
       if (result.type === 'items') {
         if (result.items && Array.isArray(result.items)) {
+          // Save current state to history before changing
+          if (merchNetItemsList.length > 0) {
+            setBrowsingHistory(prev => [...prev, { 
+              items: merchNetItemsList,
+              selectedIndex: selectedMerchNetIndex
+            }]);
+          }
+          
           setMerchNetItemsList(result.items);
           setSelectedMerchNetIndex(0);
         }
@@ -224,7 +231,6 @@ const SurvivorOSTerminal = () => {
         setAwaitingPayment(true);
         setPaymentAmount(result.total || 0);
       } else if (result.type === 'success' && result.orderItems) {
-        setMerchNetCart([]);
         setAwaitingPayment(false);
       }
       
@@ -232,6 +238,13 @@ const SurvivorOSTerminal = () => {
         type: 'output', 
         text: result.message || "Command processed."
       });
+
+      // Scroll to bottom after processing a command
+      if (terminalRef.current) {
+        setTimeout(() => {
+          terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
+        }, 50);
+      }
     } else {
       addToTerminalHistory({ 
         type: 'output', 
@@ -461,7 +474,8 @@ const SurvivorOSTerminal = () => {
       setTimeout(() => {
         if (window.processMerchnetCommand) {
           setInMerchNet(true);
-          const result = window.processMerchnetCommand('help');
+          setBrowsingHistory([]);
+          setMerchNetItemsList([]);
           
           addToTerminalHistory({ 
             type: 'output', 
@@ -737,7 +751,7 @@ Type 'help' for available commands.`;
             <div 
               className="terminal-content flex-1 overflow-auto p-4 font-mono text-sm"
               ref={terminalRef}
-              style={{ height: 'calc(100% - 32px)' }}
+              style={{ height: 'calc(100% - 64px)' }}
             >
               {terminalHistory.map((item, index) => (
                 <div key={index} className="mb-1" style={{color: '#e0f8cf'}}>
@@ -762,10 +776,16 @@ Type 'help' for available commands.`;
                       {item.name} - {item.cost} W - {item.rarity} - {item.state}
                     </div>
                   ))}
-                  <div className="mt-2 text-sm">Use arrow keys to navigate, ENTER to select</div>
+                  <div className="mt-2 text-sm text-green-200">
+                    {lastSelectedItem ? 
+                      'Press ENTER again to view details or ESC to cancel' :
+                      'Use arrow keys to navigate, ENTER to select, BACKSPACE to go back'}
+                  </div>
                 </div>
               )}
-              
+            </div>
+            
+            <div className="terminal-input-container p-2 border-t border-green-700 bg-gray-900 bg-opacity-50">
               {bootComplete && !characterCreation.active && !inMerchNet && (
                 <div className="flex command-input">
                   <span>{'>'}</span>
@@ -777,6 +797,7 @@ Type 'help' for available commands.`;
                     className="flex-1 bg-transparent outline-none border-none ml-1"
                     style={{color: '#e0f8cf'}}
                     autoFocus
+                    ref={inputRef}
                   />
                   <span className={blinkCursor ? 'opacity-100' : 'opacity-0'}>_</span>
                 </div>
@@ -793,6 +814,7 @@ Type 'help' for available commands.`;
                     className="flex-1 bg-transparent outline-none border-none ml-1"
                     style={{color: '#e0f8cf'}}
                     autoFocus
+                    ref={inputRef}
                   />
                   <span className={blinkCursor ? 'opacity-100' : 'opacity-0'}>_</span>
                 </div>
@@ -809,6 +831,7 @@ Type 'help' for available commands.`;
                     className="flex-1 bg-transparent outline-none border-none ml-1"
                     style={{color: '#e0f8cf'}}
                     autoFocus
+                    ref={inputRef}
                   />
                   <span className={blinkCursor ? 'opacity-100' : 'opacity-0'}>_</span>
                 </div>
@@ -818,7 +841,7 @@ Type 'help' for available commands.`;
           
           {renderRandomGlitch()}
         </div>
-        
+
         <div className="crt-scanlines"></div>
         <div className="crt-overlay"></div>
       </div>
